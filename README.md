@@ -20,3 +20,21 @@ Agent-native 视频生产引擎。
 参考方法来自 anything2explainer：它明确采用 Research → Narration & Timeline → Storyboard → Overlays & primitives → G1 Pilot → Parallel Build → Render → QC & fixes → Delivery，并以完整样片的源码、报告和成片帧作为质量标尺。
 
 核心边界仍然保持：Agent/Skill 负责理解、研究、导演、判断和修复；Typed Artifact Contract 是稳定接口；真实媒体时间来自真实音频/ASR，不允许按字数伪造。
+
+
+## 完整生产链
+
+Research -> Narration / Timeline -> Storyboard -> Overlay / Primitives -> G1 Pilot / 30s Preview -> Parallel Build -> Render 16:9 + 9:16 -> Quantitative QC -> Scoped Repair / Recheck -> Delivery
+
+常用入口：
+- npm run run-flow：从 Research 跑到 Pilot 前并停在审批点。
+- npm run preview：生成 Pilot 预览。
+- npm run pilot：创建 Pilot approval artifact。
+- npm run checkpoint -- pilot-preview approved：批准 Pilot。
+- npm run render：通过审批后渲染双比例成片。
+- npm run qc：汇总媒体、帧级和动作级 QC。
+- npm run repair：根据失败报告对 RenderIR 做局部修复。
+- npm run deliver：生成 checksum delivery manifest。
+- npm run still -- <frame>：渲染指定帧静帧用于目检。
+
+生产过程中的 artifact 统一归档到 artifacts/<project_id>/，包括 research、script、beats、scene、render-ir、audio、build-groups、runtime、qc、repair 和 delivery。
