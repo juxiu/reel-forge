@@ -12,42 +12,42 @@ for (let i = 0; i < ir.scenes.length; i += maxPerGroup) {
   const dir = path.join(root, id);
   fs.mkdirSync(dir, {recursive: true});
   const imports = [];
+  const exports = [];
   const entries = [];
 
   for (let j = 0; j < scenes.length; j++) {
     const scene = scenes[j];
     const shotId = "SC" + String(i + j + 1).padStart(2, "0");
-    const file = path.join(dir, shotId + ".jsx");
-    fs.writeFileSync(file,
+    fs.writeFileSync(path.join(dir, shotId + ".jsx"),
       'import React from "react";\nimport {ExplainerShot} from "../Shot.jsx";\nexport function ' +
       shotId + '({scene}) { return <ExplainerShot scene={scene} />; }\n');
     imports.push('import {' + shotId + '} from "./' + shotId + '.jsx";');
+    exports.push('export {' + shotId + '} from "./' + shotId + '.jsx";');
     entries.push('  "' + scene.id + '": ' + shotId + ',');
   }
 
   fs.writeFileSync(path.join(dir, "index.jsx"),
-    imports.join("\n") + "\n\nexport const SHOTS_" + id + " = {" + "\n" + entries.join("\n") + "\n};\n");
+    imports.join("\n") + "\n" + exports.join("\n") + "\n\nexport const SHOTS_" + id +
+    " = {\n" + entries.join("\n") + "\n};\n");
   fs.writeFileSync(path.join(dir, "BUILD_NOTES.md"),
     "# " + id + " 构建记录\n\n" +
     "镜头数：" + scenes.length + "\n\n" +
     scenes.map((scene, n) => "- " + ("SC" + String(i + n + 1).padStart(2, "0")) + " / " + scene.id + " / " +
       Math.round(scene.start * ir.fps) + "–" + Math.round((scene.start + scene.duration) * ir.fps) + "f").join("\n") +
-    "\n\n共用图元：ExplainerShot / Backdrop / Hud / Captions / ProgressBar。\n");
+    "\n\n每个镜头独立组件，共用 ExplainerShot 图元。\n");
   groups.push({id, scene_ids: scenes.map((scene) => scene.id), status: "generated"});
 }
 
-const registryEntries = [];
-for (const group of groups) {
-  const manifest = JSON.parse(fs.readFileSync("artifacts/" + ir.project_id + "/build-groups/" + group.id + ".json", "utf8"));
-  for (const sceneId of manifest.scene_ids) {
-    const number = Number(sceneId.split("-").at(-1));
-    const groupId = groups.find((g) => g.scene_ids.includes(sceneId)).id;
-    registryEntries.push('  "' + sceneId + '": ' + groupId + '.SC' + String(number).padStart(2, "0") + ',');
-  }
-}
 const registryImports = groups.map((group) =>
   'import * as ' + group.id + ' from "./' + group.id + '/index.jsx";'
 ).join("\n");
+const registryEntries = [];
+for (const group of groups) {
+  for (const sceneId of group.scene_ids) {
+    const number = Number(sceneId.split("-").at(-1));
+    registryEntries.push('  "' + sceneId + '": ' + group.id + '.SC' + String(number).padStart(2, "0") + ',');
+  }
+}
 fs.writeFileSync(path.join(root, "registry.jsx"),
   registryImports + "\n\nexport const SHOT_REGISTRY = {\n" + registryEntries.join("\n") + "\n};\n");
 
