@@ -53,10 +53,10 @@ for index, shot in enumerate(shots):
     prev_to = shot["to"]
 
 glitch_line = next((line for line in storyboard.splitlines() if "闪烁白名单" in line), "")
-glitch_whitelist = dict(re.findall(r"(SC\d+)\s+[^,；;]+", glitch_line))
+glitch_whitelist = set(re.findall(r"\b(SC\d+)\b", glitch_line))
 for shot in shots:
     used = len(re.findall(r"\bGlitchIn\b|\bglitch\b", shot["visual"] + " " + shot["motion"], re.I))
-    allowed = 0 if not glitch_line or shot["id"] not in glitch_line else 1
+    allowed = 1 if shot["id"] in glitch_whitelist else 0
     if used > allowed:
         fail("glitch over whitelist: " + shot["id"])
 
