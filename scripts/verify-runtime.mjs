@@ -28,7 +28,12 @@ lock.release();
 if (!blocked) throw new Error("project lock failed");
 
 const checkpointRoot = "artifacts/runtime-checkpoint-test";
+fs.mkdirSync(checkpointRoot + "/fixtures", {recursive:true});
+fs.mkdirSync(checkpointRoot + "/script", {recursive:true});
 fs.mkdirSync(checkpointRoot + "/artifacts/preview", {recursive:true});
+fs.writeFileSync(checkpointRoot + "/fixtures/project.json", "{}");
+fs.writeFileSync(checkpointRoot + "/fixtures/script.json", "{}");
+fs.writeFileSync(checkpointRoot + "/script/timeline.json", "{}");
 fs.writeFileSync(checkpointRoot + "/artifacts/preview/preview.mp4", "test-preview");
 initCheckpoints("checkpoint-test", checkpointRoot);
 for (const name of ["length-language","narration-signoff","voiceover","pilot-preview"]) {
