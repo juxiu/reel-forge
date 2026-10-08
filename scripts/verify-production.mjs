@@ -1,12 +1,13 @@
 import fs from "node:fs";
 import crypto from "node:crypto";
 
-const project = JSON.parse(fs.readFileSync("fixtures/project.json", "utf8"));
+const project = JSON.parse(fs.readFileSync(process.env.PROJECT_FILE || "fixtures/project.json", "utf8"));
 const root = "artifacts/" + project.project_id;
 const required = [
   "research.json","research.md","script.json","qc/report.json","qc/report.md",
   "qc/frame_metrics_16x9.json","qc/frame_metrics_9x16.json",
   "qc/motion_16x9.json","qc/motion_9x16.json",
+  "qc/visual_regression_16x9.json","qc/visual_regression_9x16.json",
   "audio/asr-second-pass.json","repair/status.json","repair/source-repair.json",
 ];
 for (const file of required) {
@@ -18,16 +19,16 @@ for (const ratio of ["16x9","9x16"]) {
   if (!fs.existsSync(render) || !fs.statSync(render).size) throw new Error("production render missing: " + render);
   const frame = JSON.parse(fs.readFileSync(root + "/qc/frame_metrics_" + ratio + ".json","utf8"));
   const motion = JSON.parse(fs.readFileSync(root + "/qc/motion_" + ratio + ".json","utf8"));
+  const visual = JSON.parse(fs.readFileSync(root + "/qc/visual_regression_" + ratio + ".json","utf8"));
   if (frame.summary?.status !== "PASS") throw new Error("frame metrics not PASS: " + ratio);
   if (motion.summary?.status !== "PASS") throw new Error("motion metrics not PASS: " + ratio);
+  if (visual.status !== "PASS") throw new Error("visual regression not PASS: " + ratio);
 }
 const qc = JSON.parse(fs.readFileSync(root + "/qc/report.json","utf8"));
 if (qc.status !== "PASS") throw new Error("production QC not PASS");
 
 const asr = JSON.parse(fs.readFileSync(root + "/audio/asr-second-pass.json","utf8"));
-if (asr.provider !== "tts-word-boundary" ||
-    asr.source !== "tts-word-boundary" ||
-    asr.alignment_mode !== "tts-word-boundary") {
+if (asr.provider !== "tts-word-boundary" || asr.source !== "tts-word-boundary" || asr.alignment_mode !== "tts-word-boundary") {
   throw new Error("production timeline alignment must use tts-word-boundary");
 }
 
@@ -52,5 +53,6 @@ console.log("production gate PASS", JSON.stringify({
   alignment_mode:asr.alignment_mode,
   timeline_source:"tts-word-boundary",
   qc:qc.status,
+  visual_regression:"PASS",
   delivery_files:manifest.files.length
 }));
