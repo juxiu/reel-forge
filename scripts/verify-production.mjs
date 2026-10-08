@@ -24,9 +24,15 @@ for (const ratio of ["16x9","9x16"]) {
 const qc = JSON.parse(fs.readFileSync(root + "/qc/report.json","utf8"));
 if (qc.status !== "PASS") throw new Error("production QC not PASS");
 const asr = JSON.parse(fs.readFileSync(root + "/audio/asr-second-pass.json","utf8"));
-if (process.env.PRODUCTION_MODE === "1") {
-  if (asr.required_real_asr !== true || asr.source !== "external-asr-provider") throw new Error("production mode requires a real external ASR provider");
-  if (process.env.ASR_PROVIDER === "tts-alignment-proxy") throw new Error("proxy ASR is forbidden in production mode");
+const strictProduction = process.env.PRODUCTION_MODE === "1";
+const proxyProviders = new Set(["tts-alignment-proxy", "tts-word-boundary"]);
+if (strictProduction) {
+  if (asr.required_real_asr !== true || asr.source !== "external-asr-provider") {
+    throw new Error("production mode requires a real external ASR provider");
+  }
+  if (proxyProviders.has(asr.provider) || asr.alignment_mode !== "external-asr") {
+    throw new Error("proxy or non-external ASR is forbidden in production mode");
+  }
 }
 const repair = JSON.parse(fs.readFileSync(root + "/repair/status.json","utf8"));
 const sourceRepair = JSON.parse(fs.readFileSync(root + "/repair/source-repair.json","utf8"));
@@ -43,4 +49,11 @@ for (const entry of manifest.files || []) {
   const sha = crypto.createHash("sha256").update(data).digest("hex");
   if (sha !== entry.sha256 || data.length !== entry.size) throw new Error("delivery integrity mismatch: " + entry.name);
 }
-console.log("production gate PASS", JSON.stringify({project_id:project.project_id,mode:process.env.PRODUCTION_MODE==="1"?"production":"candidate",real_asr:asr.required_real_asr===true,qc:qc.status,delivery_files:manifest.files.length}));
+console.log("production gate PASS", JSON.stringify({
+  project_id:project.project_id,
+  mode:strictProduction ? "production" : "candidate",
+  asr_mode:asr.alignment_mode || "unknown",
+  real_asr:asr.required_real_asr === true,
+  qc:qc.status,
+  delivery_files:manifest.files.length
+}));
