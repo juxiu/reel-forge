@@ -43,7 +43,7 @@ export function ProgressBar({chapters = [], totalFrames = 1}) {
   const progress = clamp01(frame / Math.max(1, totalFrames - 1));
   const count = Math.max(1, chapters.length);
   const widthPx = config.width - area.left - area.right;
-  return <div style={{position: "absolute", left: area.left, right: area.right, bottom: config.height - area.bottom - 6, height: 5, background: "#262631", display: "flex"}}>
+  return <div style={{position: "absolute", left: area.left, right: area.right, bottom: 16, height: 5, background: "#262631", display: "flex"}}>
     {Array.from({length: count}, function(_, i) {
       const from = chapters[i] ? chapters[i].from : Math.round((i / count) * totalFrames);
       const to = chapters[i + 1] ? chapters[i + 1].from : totalFrames;
@@ -63,7 +63,7 @@ export function Captions({captions = []}) {
   const text = String(current.text);
   const maxChars = config.width > config.height ? 18 : 12;
   const fontSize = text.length > maxChars ? 34 : 44;
-  return <div style={{position: "absolute", left: area.left, right: area.right, bottom: config.height - area.bottom + 4, padding: "10px 16px", fontFamily: "Arial,sans-serif", fontSize, fontWeight: 800, lineHeight: 1.18, textAlign: "center", color: PALETTE.white, WebkitTextStroke: "2px #000", paintOrder: "stroke fill", textShadow: "0 3px 12px rgba(0,0,0,.9)"}}>{text}</div>;
+  return <div style={{position: "absolute", left: area.left, right: area.right, bottom: 34, padding: "10px 16px", fontFamily: "Arial,sans-serif", fontSize, fontWeight: 800, lineHeight: 1.18, textAlign: "center", color: PALETTE.white, WebkitTextStroke: "2px #000", paintOrder: "stroke fill", textShadow: "0 3px 12px rgba(0,0,0,.9)"}}>{text}</div>;
 }
 
 export function ChapterCard({timeline}) {
