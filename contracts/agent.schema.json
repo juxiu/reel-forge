@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","required":["id","provider","input","output"],"properties":{"id":{"type":"string"},"provider":{"type":"string"},"input":{"type":"object"},"output":{"type":"object"},"status":{"enum":["running","paused","failed","completed"]}},"additionalProperties":false}

@@ -1,0 +1,2 @@
+export const MOTION_PRIMITIVES=["rise","fade","scale","travel","draw","counter","push","pan","parallax","glow","slide"];
+export function lintMotion(beats){return beats.flatMap(b=>{const issues=[];if(!b.state_change||b.state_change==="static")issues.push(b.id+":no-state-change");if(!b.camera?.type)issues.push(b.id+":no-camera-motion");if(b.duration<2.5)issues.push(b.id+":too-short");return issues;});}

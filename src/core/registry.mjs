@@ -1,0 +1,1 @@
+export class Registry{constructor(){this.map=new Map();}add(kind,id,provider){if(!provider||typeof provider.run!=="function")throw new Error("invalid provider");this.map.set(kind+":"+id,provider);}get(kind,id){const p=this.map.get(kind+":"+id);if(!p)throw new Error("provider missing: "+kind+":"+id);return p;}}

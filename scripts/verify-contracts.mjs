@@ -1,0 +1,1 @@
+import fs from "node:fs";for(const f of fs.readdirSync("contracts").filter(x=>x.endsWith(".json")))JSON.parse(fs.readFileSync("contracts/"+f,"utf8"));console.log("contracts PASS");

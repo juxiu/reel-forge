@@ -1,0 +1,1 @@
+import{fetchSource}from "../src/providers/research/web.mjs";const s=await fetchSource("https://www.rfc-editor.org/rfc/rfc9530.html");if(!s.content_hash||s.text.length<1000)throw new Error("source extraction failed");console.log("research PASS");

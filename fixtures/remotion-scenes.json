@@ -1,7 +1,0 @@
-{
-  "duration":6,
-  "scenes":[
-    {"scene_id":"scene-001","start":0,"duration":3,"narration":{"text":"关键词搜索主要依赖词项匹配。"},"visual":{"type":"exact-match"}},
-    {"scene_id":"scene-002","start":3,"duration":3,"narration":{"text":"语义搜索可以使用向量相似度表达查询与内容的关系。"},"visual":{"type":"semantic-match"}}
-  ]
-}

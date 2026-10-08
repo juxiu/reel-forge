@@ -1,28 +1,3 @@
-import React from "react";
-import {AbsoluteFill, Sequence, useCurrentFrame, useVideoConfig} from "remotion";
-
-function Scene({scene}) {
-  const frame=useCurrentFrame();
-  const {fps}=useVideoConfig();
-  const local=Math.max(0,(frame/fps)-scene.start);
-  const opacity=Math.min(1,local/0.25);
-  return (
-    <AbsoluteFill style={{display:"flex",alignItems:"center",justifyContent:"center",background:"#111",color:"#fff",padding:80,fontFamily:"Arial, sans-serif",opacity}}>
-      <div style={{width:"82%",textAlign:"center"}}>
-        <div style={{fontSize:28,letterSpacing:2,textTransform:"uppercase",opacity:0.65,marginBottom:24}}>{scene.visual.type}</div>
-        <div style={{fontSize:54,fontWeight:700,lineHeight:1.15}}>{scene.narration.text}</div>
-        <div style={{marginTop:32,fontSize:24,opacity:0.7}}>Reel Forge · Scene DSL → Remotion</div>
-      </div>
-    </AbsoluteFill>
-  );
-}
-
-export const DemoComposition=({scenes})=>(
-  <AbsoluteFill style={{background:"#111"}}>
-    {scenes.map(scene=>(
-      <Sequence key={scene.scene_id} from={Math.round(scene.start*30)} durationInFrames={Math.max(1,Math.round(scene.duration*30))}>
-        <Scene scene={scene}/>
-      </Sequence>
-    ))}
-  </AbsoluteFill>
-);
+import React from "react";import{AbsoluteFill,Sequence,useCurrentFrame,useVideoConfig,interpolate}from "remotion";
+function Scene({scene}){const frame=useCurrentFrame(),config=useVideoConfig(),fps=config.fps,local=Math.max(0,frame/fps-scene.start),p=Math.min(1,local/.45),x=Math.sin(local*1.4)*10,y=(1-p)*50+x,scale=interpolate(p,[0,1],[.94,1]);return <AbsoluteFill style={{background:"#080811",color:"#fff",fontFamily:"Arial"}}><div style={{position:"absolute",inset:0,background:"radial-gradient(circle at 50% 45%,#24204c 0%,#080811 62%)"}}/><div style={{position:"absolute",top:"9%",left:"8%",fontSize:20,letterSpacing:4,opacity:.5}}>REEL FORGE</div><div style={{position:"absolute",bottom:"12%",left:"8%",right:"8%",height:6,background:"#202035"}}><div style={{height:"100%",width:(Math.min(100,local/scene.duration*100))+"%",background:"#7d68ff"}}/></div><Sequence from={0} durationInFrames={Math.max(1,Math.round(scene.duration*fps))}><div style={{position:"absolute",top:"23%",left:"10%",right:"10%",transform:"translateY("+y+"px) scale("+scale+")",opacity:p}}><div style={{fontSize:20,letterSpacing:3,color:"#a993ff",marginBottom:20}}>CONCEPT</div><div style={{fontSize:58,fontWeight:700,lineHeight:1.12,textShadow:"0 0 24px rgba(125,104,255,.35)"}}>{scene.elements.find(e=>e.id==="hero")?.text}</div><div style={{marginTop:28,fontSize:26,opacity:.68}}>enter → transform → settle</div></div></Sequence></AbsoluteFill>;}
+export function ReelForgeComposition({renderIR}){return <AbsoluteFill>{renderIR.scenes.map(s=><Sequence key={s.id} from={Math.round(s.start*renderIR.fps)} durationInFrames={Math.max(1,Math.round(s.duration*renderIR.fps))}><Scene scene={s}/></Sequence>)}</AbsoluteFill>}

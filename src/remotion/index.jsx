@@ -1,10 +1,1 @@
-import React from "react";
-import {Composition, registerRoot} from "remotion";
-import {DemoComposition} from "./Root.jsx";
-import sceneDoc from "../../fixtures/remotion-scenes.json";
-
-export const RemotionRoot=()=>(
-  <Composition id="Demo" component={DemoComposition} durationInFrames={Math.max(1,Math.round(sceneDoc.duration*30))} fps={30} width={1280} height={720} defaultProps={{scenes:sceneDoc.scenes}} />
-);
-
-registerRoot(RemotionRoot);
+import React from "react";import{Composition,registerRoot}from "remotion";import fixture from "../../fixtures/render-ir.json";import{ReelForgeComposition}from "./Root.jsx";export const RemotionRoot=()=> <Composition id="ReelForge" component={ReelForgeComposition} durationInFrames={Math.ceil(fixture.duration*fixture.fps)} fps={fixture.fps} width={fixture.width} height={fixture.height} defaultProps={{renderIR:fixture}}/>;registerRoot(RemotionRoot);

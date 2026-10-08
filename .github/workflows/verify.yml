@@ -1,41 +1,50 @@
 name: verify
-
 on:
   push:
     branches: ["main"]
   pull_request:
-
 jobs:
-  core:
+  contracts:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with:
-          node-version: 22
+        with: {node-version: 22}
       - run: npm install
-      - run: npm run verify:p0
-      - run: npm run verify:p1
-      - run: npm run verify:p2
-      - run: npm run verify:p3
-
-  remotion:
+      - run: npm run verify:plan
+      - run: npm run verify:contracts
+      - run: npm run verify:runtime
+  research-visual:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with:
-          node-version: 22
+        with: {node-version: 22}
+      - run: npm install
+      - run: npm run verify:research
+      - run: npm run verify:visual
+      - run: npm run verify:e2e
+  render:
+    runs-on: ubuntu-latest
+    needs: research-visual
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
       - run: npm install
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg
-      - run: npm run verify:p4
-
-  hyperframes:
+      - run: npm run verify:visual
+      - run: npm run verify:e2e
+      - run: npm run render
+      - run: ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 artifacts/render/reel-forge.mp4
+  tts:
+    if: ${{ vars.REEL_FORGE_LIVE_TTS == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install -r requirements.txt
       - run: npm install
-      - run: npm run verify:p5
+      - run: node -e "import('./src/providers/tts/edge.mjs').then(async m=>{await m.edgeTts({text:'This is a real timing test.',voice:'en-US-GuyNeural',outDir:'artifacts/tts'});})"
+      - run: test -s artifacts/tts/audio.mp3

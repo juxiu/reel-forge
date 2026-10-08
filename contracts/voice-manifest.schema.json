@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","required":["provider","voice","audio_sha256","duration_s"],"properties":{"provider":{"type":"string"},"voice":{"type":"string"},"audio_sha256":{"type":"string"},"duration_s":{"type":"number","minimum":0}},"additionalProperties":false}

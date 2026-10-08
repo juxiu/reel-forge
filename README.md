@@ -1,19 +1,10 @@
 # reel-forge
 
-AI 自动化视频生产系统。
+Agent-native 视频生产引擎。
 
-目标流水线：
+目标：给定主题或脚本，完成研究、真实配音、词级时间轴、视觉导演、并行镜头生产、真实渲染、像素/运动/编辑质检、局部修复，并交付 16:9 与 9:16 成片。
 
-Research → Script → Content QA → Director → Storyboard → Visual → TTS → Animation → Render → Multi-layer QC
+边界：Agent/Skill 负责理解、研究、导演、判断和修复；Typed Artifact Contract 是唯一稳定接口；确定性媒体核心负责时间轴、布局、渲染、编码、缓存和验证；Provider 可替换且不能污染上层契约；真实媒体时间来自真实音频/ASR，不允许按字数伪造。
 
-设计原则：
-
-- LLM 负责理解、决策与规划，不直接生成最终视频。
-- Scene DSL 是 AI 与渲染器之间的稳定契约。
-- Renderer 与上层业务解耦，首个实现为 Remotion，并评估 HyperFrames。
-- 每个阶段都有可验证的 Artifact 输出和质量门。
-- 任何中间产物都可版本化、缓存、局部重跑。
-
-## 当前状态
-
-项目从空仓库开始，按 `docs/IMPLEMENTATION_PLAN.md` 的阶段门推进。
+计划：docs/IMPLEMENTATION_PLAN.md
+参考：docs/REFERENCES.md

@@ -1,0 +1,1 @@
+import{spawnSync}from "node:child_process";const r=spawnSync("npx",["remotion","render","src/remotion/index.jsx","ReelForge","artifacts/render/reel-forge.mp4","--codec=h264"],{stdio:"inherit"});process.exit(r.status||0);
