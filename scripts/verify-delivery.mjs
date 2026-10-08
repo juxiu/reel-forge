@@ -32,6 +32,11 @@ const required = [
 ];
 
 const entries = new Map((manifest.files || []).map((file) => [file.name, file]));
+if (entries.has("status.json") && !entries.has("source-repair.json")) throw new Error("repair status requires source-repair audit");
+if (entries.has("source-repair.json")) {
+  const sourceRepair = JSON.parse(fs.readFileSync(manifestDir + "/source-repair.json", "utf8"));
+  if (sourceRepair.version !== "0.2" || !Array.isArray(sourceRepair.entries)) throw new Error("source repair audit incomplete");
+}
 const missing = required.filter((name) => !entries.has(name));
 if (missing.length) throw new Error("delivery missing: " + missing.join(","));
 if (manifest.metadata?.qc_status !== "PASS") throw new Error("delivery metadata QC is not PASS");
