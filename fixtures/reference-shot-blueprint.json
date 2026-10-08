@@ -1,0 +1,715 @@
+{
+  "schema_version": "reference-parity-v1",
+  "shot_count": 44,
+  "group_count": 8,
+  "qc": {
+    "rounds": 2,
+    "recheck": true
+  },
+  "shots": [
+    {
+      "shot_id": "SC01",
+      "group": "G1",
+      "variant": "network",
+      "hero_size": 210,
+      "settle_frames": 30,
+      "camera": "pan",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC02",
+      "group": "G1",
+      "variant": "split",
+      "hero_size": 190,
+      "settle_frames": 30,
+      "camera": "parallax",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC03",
+      "group": "G1",
+      "variant": "preference",
+      "hero_size": 185,
+      "settle_frames": 30,
+      "camera": "push",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC04",
+      "group": "G1",
+      "variant": "structured",
+      "hero_size": 200,
+      "settle_frames": 30,
+      "camera": "pan",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC05",
+      "group": "G1",
+      "variant": "comparison",
+      "hero_size": 200,
+      "settle_frames": 30,
+      "camera": "parallax",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC06",
+      "group": "G1",
+      "variant": "transformation",
+      "hero_size": 200,
+      "settle_frames": 30,
+      "camera": "push",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC07",
+      "group": "G2",
+      "variant": "sequence",
+      "hero_size": 190,
+      "settle_frames": 30,
+      "camera": "pan",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC08",
+      "group": "G2",
+      "variant": "causal",
+      "hero_size": 190,
+      "settle_frames": 30,
+      "camera": "parallax",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC09",
+      "group": "G2",
+      "variant": "evidence",
+      "hero_size": 195,
+      "settle_frames": 30,
+      "camera": "push",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC10",
+      "group": "G2",
+      "variant": "code",
+      "hero_size": 200,
+      "settle_frames": 30,
+      "camera": "pan",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC11",
+      "group": "G2",
+      "variant": "network",
+      "hero_size": 210,
+      "settle_frames": 30,
+      "camera": "parallax",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC12",
+      "group": "G2",
+      "variant": "split",
+      "hero_size": 190,
+      "settle_frames": 30,
+      "camera": "push",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC13",
+      "group": "G3",
+      "variant": "preference",
+      "hero_size": 185,
+      "settle_frames": 30,
+      "camera": "pan",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC14",
+      "group": "G3",
+      "variant": "structured",
+      "hero_size": 200,
+      "settle_frames": 30,
+      "camera": "parallax",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC15",
+      "group": "G3",
+      "variant": "comparison",
+      "hero_size": 200,
+      "settle_frames": 30,
+      "camera": "push",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC16",
+      "group": "G3",
+      "variant": "transformation",
+      "hero_size": 200,
+      "settle_frames": 30,
+      "camera": "pan",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC17",
+      "group": "G3",
+      "variant": "sequence",
+      "hero_size": 190,
+      "settle_frames": 30,
+      "camera": "parallax",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC18",
+      "group": "G3",
+      "variant": "causal",
+      "hero_size": 190,
+      "settle_frames": 30,
+      "camera": "push",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC19",
+      "group": "G4",
+      "variant": "evidence",
+      "hero_size": 195,
+      "settle_frames": 30,
+      "camera": "pan",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC20",
+      "group": "G4",
+      "variant": "code",
+      "hero_size": 200,
+      "settle_frames": 30,
+      "camera": "parallax",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC21",
+      "group": "G4",
+      "variant": "network",
+      "hero_size": 210,
+      "settle_frames": 30,
+      "camera": "push",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC22",
+      "group": "G4",
+      "variant": "split",
+      "hero_size": 190,
+      "settle_frames": 30,
+      "camera": "pan",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC23",
+      "group": "G4",
+      "variant": "preference",
+      "hero_size": 185,
+      "settle_frames": 30,
+      "camera": "parallax",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC24",
+      "group": "G4",
+      "variant": "structured",
+      "hero_size": 200,
+      "settle_frames": 30,
+      "camera": "push",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC25",
+      "group": "G5",
+      "variant": "comparison",
+      "hero_size": 200,
+      "settle_frames": 30,
+      "camera": "pan",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC26",
+      "group": "G5",
+      "variant": "transformation",
+      "hero_size": 200,
+      "settle_frames": 30,
+      "camera": "parallax",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC27",
+      "group": "G5",
+      "variant": "sequence",
+      "hero_size": 190,
+      "settle_frames": 30,
+      "camera": "push",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC28",
+      "group": "G5",
+      "variant": "causal",
+      "hero_size": 190,
+      "settle_frames": 30,
+      "camera": "pan",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC29",
+      "group": "G5",
+      "variant": "evidence",
+      "hero_size": 195,
+      "settle_frames": 30,
+      "camera": "parallax",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC30",
+      "group": "G5",
+      "variant": "code",
+      "hero_size": 200,
+      "settle_frames": 30,
+      "camera": "push",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC31",
+      "group": "G6",
+      "variant": "network",
+      "hero_size": 210,
+      "settle_frames": 30,
+      "camera": "pan",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC32",
+      "group": "G6",
+      "variant": "split",
+      "hero_size": 190,
+      "settle_frames": 30,
+      "camera": "parallax",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC33",
+      "group": "G6",
+      "variant": "preference",
+      "hero_size": 185,
+      "settle_frames": 30,
+      "camera": "push",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC34",
+      "group": "G6",
+      "variant": "structured",
+      "hero_size": 200,
+      "settle_frames": 30,
+      "camera": "pan",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC35",
+      "group": "G6",
+      "variant": "comparison",
+      "hero_size": 200,
+      "settle_frames": 30,
+      "camera": "parallax",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC36",
+      "group": "G6",
+      "variant": "transformation",
+      "hero_size": 200,
+      "settle_frames": 30,
+      "camera": "push",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC37",
+      "group": "G7",
+      "variant": "sequence",
+      "hero_size": 190,
+      "settle_frames": 30,
+      "camera": "pan",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC38",
+      "group": "G7",
+      "variant": "causal",
+      "hero_size": 190,
+      "settle_frames": 30,
+      "camera": "parallax",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC39",
+      "group": "G7",
+      "variant": "evidence",
+      "hero_size": 195,
+      "settle_frames": 30,
+      "camera": "push",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC40",
+      "group": "G7",
+      "variant": "code",
+      "hero_size": 200,
+      "settle_frames": 30,
+      "camera": "pan",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC41",
+      "group": "G7",
+      "variant": "network",
+      "hero_size": 210,
+      "settle_frames": 30,
+      "camera": "parallax",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC42",
+      "group": "G7",
+      "variant": "split",
+      "hero_size": 190,
+      "settle_frames": 30,
+      "camera": "push",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC43",
+      "group": "G8",
+      "variant": "preference",
+      "hero_size": 185,
+      "settle_frames": 30,
+      "camera": "pan",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    },
+    {
+      "shot_id": "SC44",
+      "group": "G8",
+      "variant": "structured",
+      "hero_size": 200,
+      "settle_frames": 30,
+      "camera": "parallax",
+      "still_kinds": [
+        "enter+1",
+        "enter-mid",
+        "entered",
+        "key",
+        "exit-mid",
+        "tail"
+      ]
+    }
+  ]
+}\n

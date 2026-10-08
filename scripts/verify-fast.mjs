@@ -12,6 +12,9 @@ const checks = [
   "verify:visual-grammar",
   "verify:visual-benchmark",
   "verify:semantic-director",
+  "verify:footage",
+  "verify:reference-sample",
+  "verify:tts-parity",
   "verify:repair",
   "verify:hyperframes",
 ];
