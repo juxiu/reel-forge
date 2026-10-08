@@ -135,6 +135,7 @@ CI 已真实走完：materialize IR → build groups → shots → e2e → previ
 - 已完成：双比例 Scene Contract 样例补齐，并接入 CI 质量门禁。
 - 已完成：CI 现在在生产链中执行 visual-grammar、semantic-director、scene-contract、shot-score、narrative、ASR 多层验收。
 - 已完成：ASR 二次对齐契约、第一版逐镜头评分、source_ref 修复追踪。
-- 未完成：真实 ASR provider、真实参考样片/反例资产、更多语义视觉变体、HyperFrames/分布式渲染、对象存储与缓存。
+- 已完成：真实 ASR provider 接口（通过 `ASR_REQUIRED=1` + `ASR_COMMAND` 接入真实 provider；未配置时生产默认仍使用显式标记的 proxy）。
+- 未完成：真实参考样片/反例资产、更多语义视觉变体、HyperFrames/分布式渲染、对象存储与缓存。
 - 已完成：QC → repair → re-render → QC 限次自动闭环入口，CI 默认最多执行 2 次修复循环。
-- 下一步：接入真实 ASR provider、真实参考样片/反例资产评分，并把 repair patch 与具体源节点建立可回写映射。
+- 下一步：接入真实参考样片/反例资产评分，并把 repair patch 与具体源节点建立可回写映射；交付包已强制纳入 ASR 二次校验结果与双比例 RenderIR。
