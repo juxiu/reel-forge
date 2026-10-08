@@ -27,6 +27,7 @@ jobs:
       - run: npm run verify:store
       - run: npm run verify:research
       - run: npm run verify:visual
+      - run: npm run verify:visual-grammar
       - run: npm run verify:repair
       - run: npm run verify:hyperframes
       - run: npm run run-production
@@ -40,7 +41,9 @@ jobs:
       - run: npm run build-groups
       - run: npm run materialize-shots
       - run: npm run verify:shots
+      - run: npm run verify:scene-contract
       - run: npm run verify:e2e
+      - run: npm run verify:narrative
       - run: npm run preview
       - run: npm run pilot
       - run: node scripts/checkpoint.mjs pilot-preview approved
