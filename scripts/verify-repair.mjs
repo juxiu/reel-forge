@@ -1,0 +1,1 @@
+import{buildRepairPlan}from "../src/qc/repair-loop.mjs";const p=buildRepairPlan({status:"FAIL",issues:[{node:"scene-1",type:"motion_too_low"},{node:"scene-1",type:"hero_too_small"},{node:"scene-2",type:"freeze"}]},{maxRetries:2});if(p.nodes.length!==2||p.nodes[0].issues.length!==2||p.maxRetries!==2)throw new Error("repair plan failed");console.log("repair plan PASS");

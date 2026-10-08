@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","required":["project_id","files"],"properties":{"project_id":{"type":"string"},"files":{"type":"array","items":{"type":"object","required":["name","sha256","size"]}}},"additionalProperties":false}

@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","required":["version","canvas","scenes"],"properties":{"version":{"type":"string"},"canvas":{"type":"object","required":["width","height","fps"]},"scenes":{"type":"array"}},"additionalProperties":false}

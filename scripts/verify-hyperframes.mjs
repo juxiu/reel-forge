@@ -1,0 +1,1 @@
+import fs from "node:fs";import{buildHyperFramesProject}from "../src/backends/hyperframes-project.mjs";const ir=JSON.parse(fs.readFileSync("fixtures/render-ir-16x9.json","utf8"));const p=buildHyperFramesProject(ir);if(p.canvas.width!==1280||!p.scenes.length)throw new Error("hyperframes project contract failed");console.log("hyperframes contract PASS");

@@ -16,6 +16,8 @@ jobs:
       - run: npm run verify:runtime
       - run: npm run verify:scheduler
       - run: npm run verify:store
+      - run: npm run verify:repair
+      - run: npm run verify:hyperframes
   research-visual:
     runs-on: ubuntu-latest
     steps:
@@ -25,6 +27,7 @@ jobs:
       - run: npm install
       - run: npm run verify:research
       - run: npm run verify:visual
+      - run: npm run run-production
       - run: npm run verify:e2e
   render-qc-delivery:
     runs-on: ubuntu-latest
@@ -35,9 +38,9 @@ jobs:
         with: {node-version: 22}
       - uses: actions/setup-python@v5
         with: {python-version: "3.11"}
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - run: pip install -r requirements.txt
       - run: npm install
-      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - run: npm run verify:visual
       - run: npm run prepare-media
       - run: npm run verify:e2e
@@ -45,16 +48,4 @@ jobs:
       - run: npm run verify:qc artifacts/render/reel-forge-16x9.mp4
       - run: npm run verify:qc artifacts/render/reel-forge-9x16.mp4
       - run: npm run verify:delivery
-  tts:
-    if: ${{ vars.REEL_FORGE_LIVE_TTS == 'true' }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: "3.11"}
-      - uses: actions/setup-node@v4
-        with: {node-version: 22}
-      - run: pip install -r requirements.txt
-      - run: npm install
-      - run: node -e "import('./src/providers/tts/edge.mjs').then(async m=>{await m.edgeTts({text:'This is a real timing test.',voice:'en-US-GuyNeural',outDir:'artifacts/tts'});})"
-      - run: test -s artifacts/tts/audio.mp3
+      - run: test -s artifacts/delivery/demo-production/delivery-manifest.json
