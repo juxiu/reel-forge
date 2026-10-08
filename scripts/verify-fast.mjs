@@ -10,6 +10,7 @@ const checks = [
   "verify:store",
   "verify:visual",
   "verify:visual-grammar",
+  "verify:visual-benchmark",
   "verify:semantic-director",
   "verify:repair",
   "verify:hyperframes",
