@@ -39,7 +39,8 @@
     "still": "node scripts/still.mjs",
     "verify:visual-grammar": "node scripts/verify-visual-grammar.mjs",
     "verify:scene-contract": "node scripts/verify-scene-contract.mjs",
-    "verify:narrative": "node scripts/verify-narrative.mjs"
+    "verify:narrative": "node scripts/verify-narrative.mjs",
+    "repair-cycle": "node scripts/repair-cycle.mjs"
   },
   "dependencies": {
     "@remotion/cli": "4.0.534",
