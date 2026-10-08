@@ -20,9 +20,12 @@ for (let i = 0; i < ir.scenes.length; i += maxPerGroup) {
     const shotId = "SC" + String(i + j + 1).padStart(2, "0");
     const shotFile = path.join(dir, shotId + ".jsx");
     if (!fs.existsSync(shotFile)) {
-      fs.writeFileSync(shotFile,
-        'import React from "react";\\nimport {ExplainerShot} from "../Shot.jsx";\\nexport function ' +
-        shotId + '({scene}) { return <ExplainerShot scene={scene} />; }\\n');
+      fs.writeFileSync(shotFile, [
+        'import React from "react";',
+        'import {ExplainerShot} from "../Shot.jsx";',
+        'export function ' + shotId + '({scene}) { return <ExplainerShot scene={scene} />; }',
+        '',
+      ].join("\\n"));
     }
     imports.push('import {' + shotId + '} from "./' + shotId + '.jsx";');
     exports.push('export {' + shotId + '} from "./' + shotId + '.jsx";');
