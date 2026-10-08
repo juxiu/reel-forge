@@ -28,10 +28,13 @@ jobs:
       - run: npm run verify:research
       - run: npm run verify:visual
       - run: npm run verify:visual-grammar
+      - run: npm run verify:semantic-director
       - run: npm run verify:repair
       - run: npm run verify:hyperframes
       - run: npm run run-production
       - run: npm run tts
+      - run: npm run asr-second-pass
+      - run: npm run verify:asr
       - run: node scripts/checkpoint.mjs length-language approved
       - run: node scripts/checkpoint.mjs narration-signoff approved
       - run: node scripts/checkpoint.mjs voiceover approved
@@ -42,6 +45,7 @@ jobs:
       - run: npm run materialize-shots
       - run: npm run verify:shots
       - run: npm run verify:scene-contract
+      - run: npm run verify:shot-score
       - run: npm run verify:e2e
       - run: npm run verify:narrative
       - run: npm run preview
