@@ -14,7 +14,7 @@ const required = ["# reel-forge Skill","## 目标","## 何时使用","## 输入�
 for (const section of required) {
   if (!body.includes(section)) throw new Error("SKILL.md missing section: " + section);
 }
-for (const token of ["tts-alignment-proxy","external-asr-provider","npm run verify:fast"]) {
+for (const token of ["tts-word-boundary","npm run verify:fast"]) {
   if (!body.includes(token)) throw new Error("SKILL.md missing contract token: " + token);
 }
 const match = /^name:\s*(.+)$/m.exec(frontmatter);
