@@ -28,6 +28,7 @@ jobs:
       - run: npm run verify:research
       - run: npm run verify:visual
       - run: npm run verify:visual-grammar
+      - run: npm run verify:visual-benchmark
       - run: npm run verify:semantic-director
       - run: npm run verify:repair
       - run: npm run verify:hyperframes
@@ -57,6 +58,10 @@ jobs:
       - run: npm run frame-metrics -- --frames artifacts/frames/9x16 --render-ir fixtures/render-ir-9x16.json --out artifacts/digest-explainer/qc/frame_metrics_9x16.json
       - run: npm run motion-check -- artifacts/frames/16x9 --render-ir fixtures/render-ir-16x9.json --report artifacts/digest-explainer/qc/motion_16x9.json
       - run: npm run motion-check -- artifacts/frames/9x16 --render-ir fixtures/render-ir-9x16.json --report artifacts/digest-explainer/qc/motion_9x16.json
+      - run: npm run visual-regression -- --frames artifacts/frames/16x9 --render-ir fixtures/render-ir-16x9.json --out artifacts/digest-explainer/qc/visual_regression_16x9.json
+      - run: npm run visual-regression -- --frames artifacts/frames/9x16 --render-ir fixtures/render-ir-9x16.json --out artifacts/digest-explainer/qc/visual_regression_9x16.json
+      - run: npm run verify-shot-score
+      - run: npm run verify:visual-regression
       - run: AUTO_APPROVE=1 npm run repair-cycle
       - run: npm run verify:qc
       - run: npm run deliver
@@ -80,4 +85,6 @@ jobs:
             artifacts/digest-explainer/qc/frame_metrics_9x16.json
             artifacts/digest-explainer/qc/motion_16x9.json
             artifacts/digest-explainer/qc/motion_9x16.json
+            artifacts/digest-explainer/qc/visual_regression_16x9.json
+            artifacts/digest-explainer/qc/visual_regression_9x16.json
             artifacts/delivery/digest-explainer/**
