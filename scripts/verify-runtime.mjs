@@ -9,7 +9,7 @@ e.pause("review");
 if (e.state.status !== "paused") throw new Error("pause");
 e.resume();
 e.complete();
-const state = JSON.parse(fs.readFileSync(e.dir + "/state.json", "utf8"));
+const state = JSON.parse(fs.readFileSync(e.dir + "/state.json", "utf8"));\nconst restored = Execution.load({project_id:"runtime-test",request:"test"});\nif (restored.state.status !== "completed" || restored.state.events.length !== state.events.length) throw new Error("state restore");
 if (state.status !== "completed" || state.events.length < 3) throw new Error("state");
 
 const lock = FileLock.forProject("runtime-lock-test");
