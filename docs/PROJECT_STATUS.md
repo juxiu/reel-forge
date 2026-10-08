@@ -4,13 +4,13 @@
 
 ## 总体状态
 
-**状态：基础生产链已通过完整 GitHub Actions 验收，可实际产出双比例 MP4；确认点产物哈希门禁与第一版视觉语法 lint 已落地，进入语义镜头与闭环修复增强阶段。**
+**状态：基础生产链与双比例质量门禁已落地；当前继续补齐 ASR 二次对齐、镜头评分与源级修复追踪。**
 
 当前主干已经覆盖：
 
 Research → Narration / Timeline → Storyboard → Overlay / Primitives → G1 Pilot → Parallel Build → Render → Quantitative QC → Repair / Recheck → Delivery。
 
-本轮 CI 已真实跑通 Research → TTS → Storyboard → Selfcheck → Render → Frame/Motion QC → QC → Delivery，全链路通过。
+当前提交尚无可确认的 GitHub Actions run；代码层面已接入完整生产链与新增质量门禁。
 
 ## 已完成
 
@@ -67,7 +67,7 @@ Research → Narration / Timeline → Storyboard → Overlay / Primitives → G1
 
 **当前没有 P0 阻塞。**
 
-本轮 GitHub Actions 已取得绿色结果：Workflow `verify`，Run `37752344623`（Run #172），目标 PR #9；Render、双比例量化 QC、Delivery Verification 全部通过。
+此前曾存在绿色验证记录，但不能将其视为当前提交的验证结果；当前最新提交需要新的 Actions run 确认。
 
 此前失败记录：
 
@@ -88,10 +88,10 @@ CI 已真实走完：materialize IR → build groups → shots → e2e → previ
 
 - 视觉表现继续向 anything2explainer 样片靠拢：更多语义图元、镜头级专属动画、更加严格的反 PPT 构图。
 - CI 已默认自动批准四个 checkpoint；交互生产模式仍可保持暂停/恢复。
-- 独立 ASR 二次校验。
+- [x] ASR 二次对齐契约与 CI 门禁；当前默认使用 TTS word-boundary 代理，`ASR_REQUIRED=1` 时强制要求真实 ASR provider。
 - 更多本地 TTS provider。
-- 更强 Repair Agent：从 QC issue 自动修改源码并闭环重渲染。
-- [ ] 建立完整参考样片/反例资产与逐镜头质量标尺。
+- [x] Repair 输出 scene → source_ref 修复映射；[ ] 继续实现真正的源代码节点回写。
+- [x] 建立第一版逐镜头质量评分标尺；[ ] 继续接入真实参考样片/反例资产。
 - 对象存储、分布式 worker / lock。
 - HyperFrames 真正 runtime render backend。
 - 四个确认点现在记录对应产物 SHA-256，并在后续阶段校验产物未被静默替换。
@@ -119,7 +119,7 @@ CI 已真实走完：materialize IR → build groups → shots → e2e → previ
 
 - [~] Motion Grammar 已进一步覆盖稳定期、特效白名单、空闲窗口与反 PPT motion，继续补齐 Composition/Light、Narration 与章界规则。
 - [x] 增加第一版 semantic shot variants，并在 RenderIR → Remotion 链路启用。\n- [ ] 扩充更多 semantic shot variants，继续减少 generic fallback。
-- Repair 从 RenderIR patch 升级为源码级 scoped repair。
+- Repair 已具备 source_ref 追踪与修复审计映射，下一步把修复实际回写 BeatGraph/脚本源节点。
 - 增加 ASR、更多 TTS 和对象存储 provider。
 
 
@@ -129,5 +129,5 @@ CI 已真实走完：materialize IR → build groups → shots → e2e → previ
 - 已完成：叙事时间线自动验收，校验 Script → Sentence → 字幕词级时间 → 双比例 RenderIR 的覆盖与时长一致性。
 - 已完成：双比例 Scene Contract 样例补齐，并接入 CI 质量门禁。
 - 已完成：CI 现在在生产链中执行 visual-grammar、scene-contract、narrative 三层验收。
-- 未完成：真实 ASR 二次校验、TTS provider 抽象、逐镜头参考样片评分、更多语义视觉变体、HyperFrames/分布式渲染、对象存储与缓存。
+- 已完成：ASR 二次对齐契约、第一版逐镜头评分、source_ref 修复追踪。\n- 未完成：真实 ASR provider、真实参考样片/反例资产、更多语义视觉变体、HyperFrames/分布式渲染、对象存储与缓存。
 - 已完成：QC → repair → re-render → QC 限次自动闭环入口，CI 默认最多执行 2 次修复循环。\n- 下一步：补 ASR 二次校验与镜头级参考样片评分，并把 repair patch 与具体源节点建立更细粒度映射。
