@@ -1,5 +1,5 @@
 import{probeMedia,mediaSignals}from "./media.mjs";
-export async function runMediaQc(file,{minMotionFrames=2,maxBlackSegments=0}={}){
+export async function runMediaQc(file,{minMotionFrames=2,maxBlackSegments=1}={}){
  const probe=await probeMedia(file),signals=await mediaSignals(file),duration=Number(probe.format?.duration||0),streams=probe.streams||[],video=streams.find(x=>x.codec_type==="video"),audio=streams.find(x=>x.codec_type==="audio"),issues=[];
  if(!(duration>0))issues.push({type:"invalid_duration"});
  if(!video)issues.push({type:"missing_video"});
