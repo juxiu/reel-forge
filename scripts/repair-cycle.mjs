@@ -32,7 +32,6 @@ for(let attempt=1;attempt<=max;attempt++){
   }
   if(attempt===max) break;
   if(run("npm",["run","repair"])!==0) break;
-  if(run("npm",["run","materialize-ir"])!==0) break;
   if(run("npm",["run","render"])!==0) break;
   if(!refreshQualityReports()) break;
 }
