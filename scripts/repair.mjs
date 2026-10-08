@@ -9,6 +9,11 @@ if (!fs.existsSync(qcFile)) throw new Error("QC report missing; run npm run qc f
 
 const report = JSON.parse(fs.readFileSync(qcFile, "utf8"));
 if (report.status === "PASS") {
+  const plansDir = path.join("artifacts", project.project_id, "repair");
+  fs.mkdirSync(plansDir, {recursive: true});
+  fs.writeFileSync(path.join(plansDir, "repair-plan.json"), JSON.stringify({maxRetries: Number(process.env.REPAIR_RETRIES || 2), status: "not-needed", issues: [], nodes: []}, null, 2));
+  fs.writeFileSync(path.join(plansDir, "source-repair.json"), JSON.stringify({version: "0.2", source: "artifacts/" + project.project_id + "/beats.json", entries: [], writeback_count: 0}, null, 2));
+  fs.writeFileSync(path.join(plansDir, "status.json"), JSON.stringify({status: "not-needed", repaired_at: new Date().toISOString(), changed_nodes: [], source_writeback_count: 0, by_ratio: []}, null, 2));
   console.log("repair SKIP: QC already PASS");
   process.exit(0);
 }
