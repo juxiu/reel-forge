@@ -1,0 +1,32 @@
+{
+  "version": "0.1",
+  "name": "reference-shot-rubric",
+  "source": "anything2explainer-aligned-reference",
+  "positive": [
+    "single dominant concept",
+    "mechanism shown visually",
+    "motion lands before settle",
+    "purple accent used sparingly",
+    "source/evidence traceable"
+  ],
+  "negative": [
+    "static card",
+    "generic fallback when semantic variant is available",
+    "decorative motion without narrative role",
+    "multiple competing heroes",
+    "unsafe subtitle area"
+  ],
+  "weights": {
+    "semantic_variant": 0.22,
+    "hero": 0.18,
+    "motion": 0.2,
+    "composition": 0.18,
+    "light": 0.08,
+    "safety": 0.14
+  },
+  "thresholds": {
+    "pass": 0.72,
+    "reference": 0.82,
+    "excellent": 0.9
+  }
+}
