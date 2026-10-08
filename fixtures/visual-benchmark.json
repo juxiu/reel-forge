@@ -1,0 +1,84 @@
+{
+  "version": "1.0",
+  "name": "reel-forge-visual-benchmark",
+  "embedding": "visual-pixel-v1",
+  "thresholds": {
+    "pass": 0.62,
+    "reference": 0.78,
+    "excellent": 0.88,
+    "anti_fail": 0.9
+  },
+  "sampling": {
+    "positions": [
+      0.2,
+      0.5,
+      0.8
+    ],
+    "top_k_positive": 3
+  },
+  "positives": [
+    {
+      "id": "network-flow",
+      "variant": [
+        "network"
+      ],
+      "image": "fixtures/visual-references/positive/network-flow.ppm",
+      "tags": [
+        "single-hero",
+        "mechanism",
+        "flow"
+      ]
+    },
+    {
+      "id": "structured-mechanism",
+      "variant": [
+        "structured",
+        "code"
+      ],
+      "image": "fixtures/visual-references/positive/structured-mechanism.ppm",
+      "tags": [
+        "single-hero",
+        "structured",
+        "mechanism"
+      ]
+    },
+    {
+      "id": "transformation",
+      "variant": [
+        "transformation"
+      ],
+      "image": "fixtures/visual-references/positive/transformation.ppm",
+      "tags": [
+        "before-after",
+        "mechanism",
+        "settle"
+      ]
+    }
+  ],
+  "anti": [
+    {
+      "id": "static-card",
+      "image": "fixtures/visual-references/anti/static-card.ppm",
+      "tags": [
+        "static-card",
+        "ppt-like"
+      ]
+    },
+    {
+      "id": "clutter",
+      "image": "fixtures/visual-references/anti/clutter.ppm",
+      "tags": [
+        "multiple-heroes",
+        "visual-clutter"
+      ]
+    },
+    {
+      "id": "decorative-motion",
+      "image": "fixtures/visual-references/anti/decorative-motion.ppm",
+      "tags": [
+        "decorative-motion",
+        "no-narrative-role"
+      ]
+    }
+  ]
+}
