@@ -2,6 +2,8 @@ export const CAMERA_TYPES = new Set(["push", "pan", "slide", "parallax", "orbit"
 export const HERO_SIZES = new Set(["large", "xlarge"]);
 export const MOTION_STATES = ["enter", "transform", "settle"];
 export const APPROVED_EFFECTS = new Set(["glitch", "lightSweep"]);
+export const FOCUS_MODES = new Set(["single-hero", "hero-plus-flow"]);
+export const LIGHT_MODES = new Set(["hero-key", "soft-key"]);
 
 function motionTypes(beat) {
   return (beat.motion || []).map((item) => item.preset || item.type).filter(Boolean);
@@ -51,6 +53,16 @@ export function lintVisualGrammar(beats, {minDuration = 4, maxIdleFrames = 90, f
     if (Number(beat.idle_frames || 0) > maxIdleFrames) {
       issues.push(beat.id + ":idle-window-too-long");
     }
+
+    if (!FOCUS_MODES.has(beat.composition?.focus)) issues.push(beat.id + ":invalid-focus-mode");
+    if (!Number.isFinite(Number(beat.composition?.hero_weight)) || Number(beat.composition.hero_weight) < 0.45) {
+      issues.push(beat.id + ":hero-weight-too-low");
+    }
+    if (!LIGHT_MODES.has(beat.light?.mode)) issues.push(beat.id + ":invalid-light-mode");
+    if (!(Number(beat.light?.key_intensity) > 0 && Number(beat.light?.key_intensity) <= 1)) {
+      issues.push(beat.id + ":invalid-key-light");
+    }
+    if (beat.light?.accent !== "purple") issues.push(beat.id + ":missing-purple-accent");
   }
 
   return issues;
