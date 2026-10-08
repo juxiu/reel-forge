@@ -2,3 +2,15 @@ node_modules/
 artifacts/
 .env
 *.log
+
+# 运行产物：由 npm run tts / render_storyboard 生成，不入库。
+# 原因：src/remotion/index.jsx 会 import script/timeline.json，<Audio> 依赖 public/audio.mp3，
+# 全新的 clone 必须先跑一次 TTS 才能渲染或执行 verify:e2e。
+public/audio.mp3
+script/timeline.json
+script/timeline-source.json
+script/timeline.md
+分镜表.md
+
+# 系统文件
+.DS_Store

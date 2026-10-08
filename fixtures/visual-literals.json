@@ -1,0 +1,142 @@
+{
+  "version": "1.0",
+  "note": "Rendered on-screen literals must be registered here. Structural labels are allowed; factual claims must trace to script/research instead.",
+  "literals": [
+    {
+      "literal": "AFTER",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "BEFORE",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "CLAIM",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "EVIDENCE B",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "SELECTED",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "SOURCE A",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "VERIFIED",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "VS",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "cause",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "const",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "cost",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "dominant flow",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "first",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "header",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "input = request;",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "mechanism",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "metadata",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "next",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "one dominant idea · one visual action",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "option A",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "option B",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "payload",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "policy",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "preferred",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "quality",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "result = transform(input);",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "result",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "return",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "schema → inspectable state",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "signal",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "speed",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "state change",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "structure",
+      "file": "src/shots/SemanticShots.jsx"
+    },
+    {
+      "literal": "verify(result);",
+      "file": "src/shots/SemanticShots.jsx"
+    }
+  ]
+}

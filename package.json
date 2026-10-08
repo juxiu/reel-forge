@@ -45,6 +45,7 @@
     "verify:visual-grammar": "node scripts/verify-visual-grammar.mjs",
     "verify:visual-benchmark": "node scripts/verify-visual-benchmark.mjs",
     "verify:visual-regression": "node scripts/verify-visual-regression.mjs",
+    "verify:text-provenance": "node scripts/verify-text-provenance.mjs",
     "verify:scene-contract": "node scripts/verify-scene-contract.mjs",
     "verify:narrative": "node scripts/verify-narrative.mjs",
     "repair-cycle": "node scripts/repair-cycle.mjs",
@@ -65,5 +66,8 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "remotion": "4.0.534"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true
   }
 }

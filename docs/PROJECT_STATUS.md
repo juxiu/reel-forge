@@ -4,7 +4,7 @@
 
 ## 总体状态
 
-**状态：基础生产链、双比例质量门禁、语义导演、TTS WordBoundary 主时间轴、镜头评分、视觉 benchmark / regression 与 Skill CLI 已接入；当前继续提升视觉质量与源级修复能力。**
+**状态：基础生产链、双比例质量门禁、语义导演、TTS WordBoundary 主时间轴、镜头评分、画面文字出处门禁与 Skill CLI 已接入；2026-10-08 完成首次真实端到端production run（`verify:production` PASS）。当前主要差距是画面信息密度与排版控制，尚未引入字体资产、仍为变体引擎而非逐镜头 authored 组件。**
 
 当前主干已经覆盖：
 
@@ -45,7 +45,30 @@ Research → Narration / Timeline → Storyboard → Overlay / Primitives → G1
 
 **当前没有 P0 阻塞。**
 
-视觉 embedding 当前采用仓库内置的确定性 visual-pixel-v1，不是 CLIP/SigLIP 语义模型。其目标是先建立可复现的视觉回归基准；后续可以在相同 provider contract 下替换为真正的语义视觉 embedding provider。
+视觉 embedding 采用仓库内置的确定性 visual-pixel-v1，不是 CLIP/SigLIP 语义模型。经真实 production run 实测确认：其参考资产（<code>fixtures/visual-references/</code>，64×36 合成图）与画面质量**反向相关**——画面更密更实则分数更低。因此它已降级为**非阻断回归信号**（<code>gate: "advisory"</code>），不再参与交付判定；后续若要恢复阻断能力，需要先用 reel-forge 自己的真实成片帧重建正例/反例基准。
+
+### 首次真实 production run（2026-10-08）
+
+主题 HTTP Digest Fields（源 RFC 9530），37.33s，双比例成片。全部阻断项通过：
+
+~~~text
+verify:fast            16 项 PASS
+frame-metrics          PASS  最长静默段 58 / 64 帧（阈值 90）
+motion-check           PASS  mean_change 0.406
+verify:text-provenance PASS  溯源元素 8 / 登记字面量 34
+verify:qc              PASS
+repair-cycle           PASS  repair_audit: not-needed
+deliver                PASS  29 个文件checksum 校验
+verify:production      PASS
+~~~
+
+过程中修复的真实缺陷：
+
+1. <code>contracts/footage.schema.json</code> 与 <code>fixtures/reference-shot-blueprint.json</code> 末尾混入字面 <code>\n</code>，导致 <code>verify:fast</code> 崩溃。
+2. 镜头离场只有 12 帧纯淡出，变化量在阈值 0.35 上下抖动，产生 97 帧（3.2s）静默段；改为 18 帧「淡出 + 上移 + 微缩」后降至 58 帧。
+3. 渲染器完全不消费 RenderIR（真实文案、<code>hero_scale</code>、运镜、持续动作），画面显示占位符文本且主角回退成衬线字体；修复后 Repair 写入的 <code>hero_scale</code> 才真正生效（此前复渲产物字节级完全相同）。
+4. <code>audio/asr-second-pass.json</code> 无任何流程生成，而 <code>deliver</code> / <code>verify:production</code> 硬性要求它——照文档执行永远无法交付。
+5. <code>visual_regression</code> 与 <code>shot-score</code> 用合成占位图做阻断门；已改为非阻断，并新增 <code>verify:text-provenance</code> 作为可阻断的画面文字出处门（对应 a2e 硬性原则 2）。
 
 ## 后续增强
 

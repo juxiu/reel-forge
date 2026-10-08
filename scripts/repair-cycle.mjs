@@ -17,6 +17,7 @@ function refreshQualityReports(){
     if(run("npm",["run","motion-check","--","artifacts/frames/"+ratio,"--render-ir","fixtures/render-ir-"+ratio+".json","--report",motionOut])!==0) return false;
     if(run("npm",["run","visual-regression","--","--frames","artifacts/frames/"+ratio,"--render-ir","fixtures/render-ir-"+ratio+".json","--out",visualOut])!==0) return false;
   }
+  if(run("npm",["run","verify:text-provenance"],{...process.env,PROJECT_FILE:process.env.PROJECT_FILE||"fixtures/project.json"})!==0) return false;
   return true;
 }
 

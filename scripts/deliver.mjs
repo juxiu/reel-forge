@@ -21,6 +21,7 @@ const required = [
   base + "qc/motion_9x16.json",
   base + "qc/visual_regression_16x9.json",
   base + "qc/visual_regression_9x16.json",
+  base + "qc/text_provenance.json",
   base + "audio/asr-second-pass.json",
   "fixtures/render-ir-16x9.json",
   "fixtures/render-ir-9x16.json",
@@ -47,12 +48,18 @@ if (asr.required_real_asr === true && asr.source !== "external-asr-provider") {
 }
 const qc = JSON.parse(fs.readFileSync(base + "qc/report.json", "utf8"));
 if (qc.status !== "PASS") throw new Error("delivery requires PASS QC");
+const provenance = JSON.parse(fs.readFileSync(base + "qc/text_provenance.json", "utf8"));
+if (provenance.status !== "PASS") throw new Error("delivery requires traceable on-screen text");
+// visual-pixel-v1 仅为回归记录，不参与交付判定。
 for (const ratio of ["16x9", "9x16"]) {
   const frame = JSON.parse(fs.readFileSync(base + "qc/frame_metrics_" + ratio + ".json", "utf8"));
   const motion = JSON.parse(fs.readFileSync(base + "qc/motion_" + ratio + ".json", "utf8"));
   const visual = JSON.parse(fs.readFileSync(base + "qc/visual_regression_" + ratio + ".json", "utf8"));
-  if (frame.summary?.status !== "PASS" || motion.summary?.status !== "PASS" || visual.status !== "PASS") {
-    throw new Error("delivery requires PASS frame/motion/visual metrics: " + ratio);
+  if (frame.summary?.status !== "PASS" || motion.summary?.status !== "PASS") {
+    throw new Error("delivery requires PASS frame/motion metrics: " + ratio);
+  }
+  if (visual.gate !== "advisory" || visual.blocking !== false) {
+    throw new Error("visual regression must stay advisory: " + ratio);
   }
 }
 
@@ -63,7 +70,8 @@ const result = packageDelivery({
     contract_version: "0.3",
     ratios: ["16x9", "9x16"],
     qc_status: qc.status,
-    visual_regression: "PASS",
+    visual_regression: "advisory",
+    text_provenance: provenance.status,
     asr_provider: asr.provider,
     real_asr: asr.required_real_asr === true,
     required_files: required.map((file) => file.split("/").pop()),

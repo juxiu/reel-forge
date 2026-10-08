@@ -66,6 +66,15 @@ npm run verify:fast
 npm run verify:authored-shots
 ~~~
 
+这两项不需要任何运行产物。
+
+**要渲染或跑 <code>verify:e2e</code>，必须先生成 TTS 产物**：<code>public/audio.mp3</code>、<code>script/timeline.json</code>、<code>fixtures/captions.json</code>。它们由 <code>npm run tts</code> 生成、不入库（<code>src/remotion/index.jsx</code> 会 import时间轴，<code>&lt;Audio&gt;</code> 依赖配音文件），所以全新 clone 的第一步是：
+
+~~~bash
+npm run tts
+npm run run-production
+~~~
+
 ### 3. 作为 Skill 一键执行
 
 ~~~bash

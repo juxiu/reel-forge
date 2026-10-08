@@ -88,6 +88,21 @@ npm run verify:fast
 npm run verify:authored-shots
 ~~~
 
+这两项不需要运行产物。
+
+**渲染、<code>verify:e2e</code> 与后续所有质量门需要 TTS 产物**（<code>public/audio.mp3</code>、<code>script/timeline.json</code>、<code>script/timeline.md</code>、<code>script/timeline-source.json</code>、<code>分镜表.md</code>）。这些由 <code>npm run tts</code> 与 <code>scripts/render_storyboard.py</code> 生成，已在 <code>.gitignore</code> 中排除——因为 <code>src/remotion/index.jsx</code> 会 import 时间轴、<code>&lt;Audio&gt;</code> 依赖配音文件，入库会造成"仓库里的样片产物与真实运行产物不同步"。
+
+全新 clone 的正确顺序：
+
+~~~bash
+npm install
+pip install -r requirements.txt
+npm run verify:fast          # 无需 TTS
+npm run tts# 生成配音与词边界时间轴
+npm run run-production       # 生成调研 / claims / beats
+npm run verify:e2e           # 端到端契约校验（需要以上产物）
+~~~
+
 ## 5. 作为 Skill 使用
 
 最重要的入口：
@@ -531,6 +546,8 @@ decorative-motion
 
 它主要用于确定性的视觉回归，不应描述成真正的语义视觉模型。
 
+> **口径说明（重要）**：<code>fixtures/visual-references/</code> 里的正例/反例是 <strong>64×36 的 P3 PPM 合成图</strong>（3–30 种纯色），不是真实样片帧。实测显示：把画面做得更密、更实、更有真实文案后，<code>reference_similarity</code> 会<strong>下降</strong>（0.597 → 0.50），即该指标与画面质量反向相关。因此自 v2.0 起它标记为 <code>gate: "advisory"</code> / <code>blocking: false</code>，<strong>不再阻断交付</strong>，只作为 run-to-run 回归记录（报告含 <code>reference_similarity_delta</code>）。它的 PASS 不代表质量达标，只代表没有异常漂移。
+
 典型调用：
 
 ~~~bash
@@ -586,6 +603,10 @@ excellent  = 0.90
 
 reference similarity 不替代结构化视觉规则。
 
+<code>reference_similarity</code> 只作为加权分的一个维度参与，**不作为硬门**——原因见第21 节的基准口径说明。硬门是 <code>shot-score-too-low</code>（总分低于 0.72）。
+
+当没有视觉回归报告时，该维度使用默认值 <code>0.72</code>；此时的总分**偏乐观**，不能当作已测量的质量分。
+
 ## 23. QC
 
 完整质量链：
@@ -597,7 +618,7 @@ Frame Metrics
   ↓
 Motion
   ↓
-Visual Regression
+画面文字出处（阻断）
   ↓
 Agent QC
   ↓
@@ -754,7 +775,7 @@ Frame Metrics
 +
 Motion
 +
-Visual Regression
+画面文字出处
 +
 Shot Score
 +
@@ -790,6 +811,7 @@ npm run run-production
 
 npm run tts
 npm run verify:word-boundary
+npm run asr-second-pass
 
 npm run storyboard
 npm run selfcheck
@@ -811,6 +833,7 @@ npm run render
 npm run frame-metrics
 npm run motion-check
 npm run visual-regression
+npm run verify:text-provenance
 
 npm run qc
 npm run repair-cycle
@@ -830,8 +853,10 @@ npm run verify:production
 | Production 前半段 | <code>npm run run-production</code> |
 | TTS | <code>npm run tts</code> |
 | WordBoundary 校验 | <code>npm run verify:word-boundary</code> |
+| 配音收口 / 二次校验 | <code>npm run asr-second-pass</code> |
 | Storyboard | <code>npm run storyboard</code> |
 | Storyboard 自检 | <code>npm run selfcheck</code> |
+| 画面文字出处 | <code>npm run verify:text-provenance</code> |
 | RenderIR | <code>npm run materialize-ir</code> |
 | Build Groups | <code>npm run build-groups</code> |
 | Shot 物化 | <code>npm run materialize-shots</code> |

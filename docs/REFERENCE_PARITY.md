@@ -13,8 +13,9 @@
 | Parallel Build | build-groups + materialize-shots + scheduler/pool | 完成 |
 | Render | Remotion 16:9 / 9:16 + audio | 完成 |
 | Quantitative QC | media probe + frame metrics + motion check | 完成 |
-| Visual Regression | scene/ratio frame sampling + visual-pixel-v1 cosine + anti-reference | 完成 |
-| Shot Score | semantic/hero/motion/composition/light/safety + five visual dimensions | 完成 |
+| Visual Regression | scene/ratio frame sampling + visual-pixel-v1 cosine + anti-reference | 完成，但降级为非阻断回归信号（参考资产为 64×36 合成图，与画面质量反向相关） |
+| Text Provenance | elements[].text 溯源到解说词/调研 + 硬编码字面量白名单 + 双比例一致 | 完成（阻断门，对应 a2e 硬性原则 2） |
+| Shot Score | semantic/hero/motion/composition/light/safety + five visual dimensions | 完成（reference_similarity 仅为维度，不作硬门） |
 | Repair / Recheck | repair engine + repair plan + rerender hook | 完成 |
 | Delivery | checksum delivery manifest | 完成 |
 | Paper trail | artifacts/<project>/{research,script,beats,scene,render-ir,qc,repair,runtime} | 完成 |
@@ -39,4 +40,6 @@ reel-forge 保留了更偏工程化的 Typed Artifact Contract、项目锁、外
 
 ## 当前验收说明
 
-当前代码主干已具备视觉 benchmark、anti-reference 和 scene-level visual regression 的完整入口；完整 render/QC/delivery 的最新 GitHub Actions run 仍应以实际 Actions 记录为准。
+2026-10-08 已在本地完成一次真实端到端production run（HTTP Digest Fields /源 RFC 9530，37.33s，双比例），全部阻断项通过：<code>frame-metrics</code>、<code>motion-check</code>、<code>verify:text-provenance</code>、<code>verify:qc</code>、<code>repair-cycle</code>、<code>deliver</code>、<code>verify:production</code>。明细见 <code>docs/PROJECT_STATUS.md</code>。
+
+需要注意：<code>verify:production</code> PASS 证明的是**链路完整、指标达标、画面文字有出处、可复现**，不证明画面已达到 a2e 样片的审美水准——后者仍依赖真实帧基准与人工／QC agent 复核。

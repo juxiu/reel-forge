@@ -7,7 +7,7 @@ const required = [
   "research.json","research.md","script.json","qc/report.json","qc/report.md",
   "qc/frame_metrics_16x9.json","qc/frame_metrics_9x16.json",
   "qc/motion_16x9.json","qc/motion_9x16.json",
-  "qc/visual_regression_16x9.json","qc/visual_regression_9x16.json",
+  "qc/visual_regression_16x9.json","qc/visual_regression_9x16.json","qc/text_provenance.json",
   "audio/asr-second-pass.json","repair/status.json","repair/source-repair.json",
 ];
 for (const file of required) {
@@ -22,8 +22,11 @@ for (const ratio of ["16x9","9x16"]) {
   const visual = JSON.parse(fs.readFileSync(root + "/qc/visual_regression_" + ratio + ".json","utf8"));
   if (frame.summary?.status !== "PASS") throw new Error("frame metrics not PASS: " + ratio);
   if (motion.summary?.status !== "PASS") throw new Error("motion metrics not PASS: " + ratio);
-  if (visual.status !== "PASS") throw new Error("visual regression not PASS: " + ratio);
+  if (visual.gate !== "advisory" || visual.blocking !== false) throw new Error("visual regression must stay advisory: " + ratio);
 }
+// 阻断项：画面文字必须可溯源到解说词 / 调研（a2e 硬性原则 2「事实有出处」）。
+const provenance = JSON.parse(fs.readFileSync(root + "/qc/text_provenance.json", "utf8"));
+if (provenance.status !== "PASS") throw new Error("text provenance not PASS");
 const qc = JSON.parse(fs.readFileSync(root + "/qc/report.json","utf8"));
 if (qc.status !== "PASS") throw new Error("production QC not PASS");
 
@@ -53,6 +56,7 @@ console.log("production gate PASS", JSON.stringify({
   alignment_mode:asr.alignment_mode,
   timeline_source:"tts-word-boundary",
   qc:qc.status,
-  visual_regression:"PASS",
+  visual_regression:"advisory",
+  text_provenance:provenance.status,
   delivery_files:manifest.files.length
 }));
