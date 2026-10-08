@@ -1,11 +1,3 @@
-import{spawnSync}from "node:child_process";
-import fs from "node:fs";
-const py=cmd=>{const r=spawnSync(cmd[0],cmd.slice(1),{stdio:"inherit"});if(r.status!==0)process.exit(r.status??1)};
-const js=cmd=>py(["node",...cmd]);
-js(["scripts/run-production.mjs"]);
-js(["scripts/tts_build.mjs"]);
-py(["python3","scripts/render_storyboard.py"]);
-py(["python3","scripts/selfcheck.py"]);
-js(["scripts/materialize-ir.mjs"]);
-js(["scripts/build-groups.mjs"]);
-console.log("FLOW STOP: pilot preview is ready; run npm run preview then npm run pilot, approve before full render.");
+import{spawnSync}from"node:child_process";
+const run=cmd=>{const r=spawnSync(cmd[0],cmd.slice(1),{stdio:"inherit"});if(r.status!==0)process.exit(r.status??1)};
+run(["node","scripts/run-production.mjs"]);run(["node","scripts/tts_build.mjs"]);run(["python3","scripts/render_storyboard.py"]);run(["python3","scripts/selfcheck.py"]);run(["node","scripts/materialize-ir.mjs"]);run(["node","scripts/build-groups.mjs"]);run(["node","scripts/materialize-shots.mjs"]);console.log("FLOW STOP: pilot preview is ready; run npm run preview, npm run pilot, then approve pilot-preview before full render.");
