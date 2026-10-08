@@ -118,6 +118,6 @@ CI 已真实走完：materialize IR → build groups → shots → e2e → previ
 ### P2：质量提升
 
 - [~] 第一版 Motion Grammar 已转成 machine-checkable lint，继续补齐 Composition/Light、Narration 与章界规则。
-- [ ] 增加更多 semantic shot variants，减少 generic fallback。
+- [x] 增加第一版 semantic shot variants，并在 RenderIR → Remotion 链路启用。\n- [ ] 扩充更多 semantic shot variants，继续减少 generic fallback。
 - Repair 从 RenderIR patch 升级为源码级 scoped repair。
 - 增加 ASR、更多 TTS 和对象存储 provider。
