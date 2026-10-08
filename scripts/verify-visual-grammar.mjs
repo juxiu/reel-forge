@@ -8,6 +8,10 @@ const timeline = fs.existsSync("script/timeline.json")
   : null;
 const graph = buildBeatGraph(script, timeline);
 const issues = lintVisualGrammar(graph.beats);
+const genericCount = graph.beats.filter((beat) => beat.visual_variant === "generic").length;
+if (graph.beats.length >= 4 && genericCount / graph.beats.length > 0.75) {
+  issues.push("semantic-variant-coverage-too-low");
+}
 
 if (issues.length) {
   console.error("visual grammar FAIL");
