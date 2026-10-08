@@ -2,17 +2,20 @@ export function repairScene(scene, issues) {
   const next = structuredClone(scene);
   for (const issue of issues) {
     if (issue.type === "hero_too_small") {
-      next.hero_scale = Math.min(1.7, Number(next.hero_scale || 1) + 0.18);\n      next.repair_trace = [...(next.repair_trace || []), {type: issue.type, source_ref: next.source_ref || null}];
+      next.hero_scale = Math.min(1.7, Number(next.hero_scale || 1) + 0.18);
+      next.repair_trace = [...(next.repair_trace || []), {type: issue.type, source_ref: next.source_ref || null}];
     }
     if (issue.type === "motion_too_low" || issue.type === "freeze") {
-      next.repair_trace = [...(next.repair_trace || []), {type: issue.type, source_ref: next.source_ref || null}];\n      next.motion = (next.motion || []).map((item) =>
+      next.repair_trace = [...(next.repair_trace || []), {type: issue.type, source_ref: next.source_ref || null}];
+      next.motion = (next.motion || []).map((item) =>
         item.target === "stage"
           ? {...item, amount: Math.min(0.12, Number(item.amount || 0.04) + 0.035)}
           : item
       );
     }
     if (issue.type === "caption_overlap") {
-      next.caption_safe = true;\n      next.repair_trace = [...(next.repair_trace || []), {type: issue.type, source_ref: next.source_ref || null}];
+      next.caption_safe = true;
+      next.repair_trace = [...(next.repair_trace || []), {type: issue.type, source_ref: next.source_ref || null}];
     }
   }
   return next;
@@ -45,9 +48,7 @@ export function repairRenderIR(renderIR, issues) {
     ...renderIR,
     scenes: renderIR.scenes.map((scene) => {
       const scoped = byNode.get(scene.id) || [];
-      const fallback = layoutTypes.size ? [
-        ...layoutIssues,
-      ] : [];
+      const fallback = layoutTypes.size ? [...layoutIssues] : [];
       return scoped.length || fallback.length
         ? repairScene(scene, [...scoped, ...fallback])
         : scene;
