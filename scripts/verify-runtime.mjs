@@ -31,7 +31,10 @@ const checkpointRoot = "artifacts/runtime-checkpoint-test";
 fs.mkdirSync(checkpointRoot + "/artifacts/preview", {recursive:true});
 fs.writeFileSync(checkpointRoot + "/artifacts/preview/preview.mp4", "test-preview");
 initCheckpoints("checkpoint-test", checkpointRoot);
-resolveCheckpoint("checkpoint-test","pilot-preview","approved", checkpointRoot);
+for (const name of ["length-language","narration-signoff","voiceover","pilot-preview"]) {
+  if (name === "pilot-preview") fs.writeFileSync(checkpointRoot + "/artifacts/preview/preview.mp4", "test-preview-final");
+  resolveCheckpoint("checkpoint-test", name, "approved", checkpointRoot);
+}
 requireCheckpoint("checkpoint-test","pilot-preview", checkpointRoot);
 
 console.log("runtime PASS");
