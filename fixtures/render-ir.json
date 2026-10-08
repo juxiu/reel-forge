@@ -1,1 +1,236 @@
-{"version":"0.2","project_id":"demo-production","width":1280,"height":720,"fps":30,"duration":10,"scenes":[{"id":"scene-001","start":0,"duration":5,"elements":[{"id":"hero","type":"card","text":"Semantic search compares meaning instead of exact words."}],"motion":[{"type":"enter","preset":"rise"},{"type":"transform","preset":"travel"}]},{"id":"scene-002","start":5,"duration":5,"elements":[{"id":"hero","type":"card","text":"The relationship changes visibly on screen."}],"motion":[{"type":"enter","preset":"rise"},{"type":"camera","preset":"pan"}]}]}
+{
+  "version": "0.3",
+  "project_id": "digest-explainer",
+  "width": 1280,
+  "height": 720,
+  "fps": 30,
+  "duration": 35.333333333333336,
+  "scenes": [
+    {
+      "id": "scene-001",
+      "start": 1.6,
+      "duration": 7.333333333333334,
+      "source_ref": {
+        "segment_index": 0,
+        "script_id": "seg-001"
+      },
+      "variant": "network",
+      "narrative_job": "hook",
+      "semantic_confidence": 1,
+      "matched_rules": [
+        "\\bconnect\\b",
+        "\\bconnection\\b",
+        "\\btransport\\b",
+        "连接|关系|传递|网络|链路"
+      ],
+      "composition": {
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
+        "safe_margin": 0.08
+      },
+      "light": {
+        "mode": "hero-key",
+        "key_intensity": 0.82,
+        "accent": "purple"
+      },
+      "elements": [
+        {
+          "id": "hero",
+          "type": "card",
+          "text": "When an HTTP message crosses more than one connection, transport-layer integrity checks only protect individual connections."
+        },
+        {
+          "id": "flow",
+          "type": "signal"
+        }
+      ],
+      "motion": [
+        {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
+          "type": "camera",
+          "target": "stage",
+          "preset": "push",
+          "amount": 0.04
+        }
+      ]
+    },
+    {
+      "id": "scene-002",
+      "start": 10.033333333333333,
+      "duration": 9.533333333333333,
+      "source_ref": {
+        "segment_index": 1,
+        "script_id": "seg-002"
+      },
+      "variant": "split",
+      "narrative_job": "explain",
+      "semantic_confidence": 1,
+      "matched_rules": [
+        "content-digest",
+        "repr-digest",
+        "拆分|分成|两类|两部分|分别"
+      ],
+      "composition": {
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
+        "safe_margin": 0.08
+      },
+      "light": {
+        "mode": "hero-key",
+        "key_intensity": 0.82,
+        "accent": "purple"
+      },
+      "elements": [
+        {
+          "id": "hero",
+          "type": "card",
+          "text": "RFC 9530 defines Digest Fields for HTTP integrity, including Content-Digest for message content and Repr-Digest for representation data."
+        },
+        {
+          "id": "flow",
+          "type": "signal"
+        }
+      ],
+      "motion": [
+        {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
+          "type": "camera",
+          "target": "stage",
+          "preset": "pan",
+          "amount": 0.04
+        }
+      ]
+    },
+    {
+      "id": "scene-003",
+      "start": 20.666666666666668,
+      "duration": 6.633333333333333,
+      "source_ref": {
+        "segment_index": 2,
+        "script_id": "seg-003"
+      },
+      "variant": "preference",
+      "narrative_job": "hook",
+      "semantic_confidence": 0.9,
+      "matched_rules": [
+        "want-content-digest",
+        "want-repr-digest",
+        "\\bpreference\\b",
+        "\\bwanted\\b",
+        "偏好|选择|想要|需要|目标"
+      ],
+      "composition": {
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
+        "safe_margin": 0.08
+      },
+      "light": {
+        "mode": "hero-key",
+        "key_intensity": 0.82,
+        "accent": "purple"
+      },
+      "elements": [
+        {
+          "id": "hero",
+          "type": "card",
+          "text": "Senders can also use Want-Content-Digest and Want-Repr-Digest to express preferences about receiving those integrity fields."
+        },
+        {
+          "id": "flow",
+          "type": "signal"
+        }
+      ],
+      "motion": [
+        {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
+          "type": "camera",
+          "target": "stage",
+          "preset": "push",
+          "amount": 0.04
+        }
+      ]
+    },
+    {
+      "id": "scene-004",
+      "start": 28.4,
+      "duration": 6.933333333333337,
+      "source_ref": {
+        "segment_index": 3,
+        "script_id": "seg-004"
+      },
+      "variant": "structured",
+      "narrative_job": "explain",
+      "semantic_confidence": 0.45,
+      "matched_rules": [
+        "structured",
+        "结构化|字段|层级|组织|格式"
+      ],
+      "composition": {
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
+        "safe_margin": 0.08
+      },
+      "light": {
+        "mode": "hero-key",
+        "key_intensity": 0.82,
+        "accent": "purple"
+      },
+      "elements": [
+        {
+          "id": "hero",
+          "type": "card",
+          "text": "The standard uses Structured Fields for one consistent encoding format and replaces the older Digest and Want-Digest fields."
+        },
+        {
+          "id": "flow",
+          "type": "signal"
+        }
+      ],
+      "motion": [
+        {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
+          "type": "camera",
+          "target": "stage",
+          "preset": "pan",
+          "amount": 0.04
+        }
+      ]
+    }
+  ]
+}

@@ -71,6 +71,11 @@ try{
   if(!fs.existsSync("script/timeline.json")||!fs.existsSync("public/audio.mp3")) run("node",["scripts/tts_build.mjs"],env);
   if(!ensureCheckpoint("voiceover",{message:"voiceover 与 native-TTS 时间轴已生成"})) return;
 
+  // 配音收口：以 tts-word-boundary 为唯一时间轴口径，产出二次校验件。
+  // deliver / verify:production 都硬性要求它，缺了这一步交付门必然失败。
+  if(!fs.existsSync(root+"/audio/asr-second-pass.json")) run("node",["scripts/asr_second_pass.mjs"],env);
+  run("node",["scripts/verify-asr.mjs"],env);
+
   run("python3",["scripts/render_storyboard.py"],env);
   run("python3",["scripts/selfcheck.py"],env);
   run("node",["scripts/materialize-ir.mjs"],env);
@@ -95,10 +100,12 @@ try{
     run("python3",["scripts/visual_regression.py","--frames","artifacts/frames/"+ratio,"--render-ir","fixtures/render-ir-"+ratio+".json","--out","artifacts/"+projectId+"/qc/visual_regression_"+ratio+".json"],env);
   }
   run("node",["scripts/verify-shot-score.mjs"],env);
+  run("npm",["run","verify:text-provenance"],env);
   run("node",["scripts/verify-footage.mjs"],env);
   run("node",["scripts/verify-reference-sample.mjs"],env);
   run("node",["scripts/verify-tts-parity.mjs"],env);
   run("node",["scripts/verify-still-benchmark.mjs"],env);
+  run("node",["scripts/verify-visual-regression.mjs"],env);
   run("npm",["run","qc"],env);
   run("npm",["run","repair-cycle"],env);
   run("npm",["run","verify:qc"],env);

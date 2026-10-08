@@ -1,1 +1,17 @@
-{"project_id":"digest-explainer","groups":[{"id":"G1","scene_ids":["scene-001","scene-002","scene-003","scene-004"]}]}
+{
+  "project_id": "digest-explainer",
+  "concurrency": 4,
+  "agent_mode": "deterministic",
+  "groups": [
+    {
+      "id": "G1",
+      "scene_ids": [
+        "scene-001",
+        "scene-002",
+        "scene-003",
+        "scene-004"
+      ],
+      "agent_status": "skipped"
+    }
+  ]
+}

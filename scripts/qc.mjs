@@ -33,11 +33,15 @@ for(const ratio of ["16x9","9x16"]){
       else issues.push({node:"layout-"+ratio,type:"motion_too_low",ratio});
     }
   }
-  if(fs.existsSync(visualFile)){
-    const r=JSON.parse(fs.readFileSync(visualFile,"utf8"));
-    for(const scene of r.scenes||[]) if(scene.status==="FAIL") issues.push({node:scene.scene,type:"visual_regression_fail",ratio});
-    if(r.status==="FAIL"&&!(r.scenes||[]).length) issues.push({node:"visual-"+ratio,type:"visual_regression_fail",ratio});
-  }
+  // visual regression 降级为非阻断回归信号（参考资产为 64x36 合成图，embedding 非语义模型）。
+  if(!fs.existsSync(visualFile)) issues.push({node:"visual-record-"+ratio,type:"visual_record_missing",ratio});
+}
+// 画面文字出处门（阻断）：a2e 硬性原则 2「事实有出处」。
+const provenanceFile=path.join(qcDir,"text_provenance.json");
+if(!fs.existsSync(provenanceFile)) issues.push({node:"text-provenance",type:"text_provenance_missing"});
+else{
+  const provenance=JSON.parse(fs.readFileSync(provenanceFile,"utf8"));
+  if(provenance.status!=="PASS") for(const detail of (provenance.issues||[]).slice(0,20)) issues.push({node:"text-provenance",type:"text_not_traceable",detail});
 }
 for(const report of reports) for(const issue of report.issues||[]) issues.push({
   node:issue.node||(report.file.includes("9x16")?"layout-tall":"layout-wide"),type:issue.type,file:report.file
@@ -57,10 +61,16 @@ const result={
     const file=path.join(qcDir,"visual_regression_"+ratio+".json");
     if(!fs.existsSync(file)) return {ratio,status:"MISSING"};
     const report=JSON.parse(fs.readFileSync(file,"utf8"));
-    return {ratio,status:report.status,scenes:(report.scenes||[]).map(scene=>({
-      scene:scene.scene,reference_similarity:scene.reference_similarity,anti_similarity:scene.anti_similarity,quality_band:scene.quality_band
+    return {ratio,gate:report.gate||"advisory",status:report.status,scenes:(report.scenes||[]).map(scene=>({
+      scene:scene.scene,reference_similarity:scene.reference_similarity,delta_vs_previous:scene.reference_similarity_delta??null,anti_similarity:scene.anti_similarity,quality_band:scene.quality_band
     }))};
   }),
+  text_provenance:(()=>{
+    const file=path.join(qcDir,"text_provenance.json");
+    if(!fs.existsSync(file)) return {status:"MISSING"};
+    const report=JSON.parse(fs.readFileSync(file,"utf8"));
+    return {status:report.status,traced_elements:report.traced_elements,registered_literals:report.registered_literals,issues:(report.issues||[]).length};
+  })(),
   generated_at:new Date().toISOString()
 };
 fs.mkdirSync(qcDir,{recursive:true});
@@ -69,7 +79,8 @@ fs.writeFileSync(path.join(qcDir,"report.md"),
   "# QC 报告\n\n状态："+result.status+"\n\n"+
   result.media.map(item=>"- "+item.file+"：duration="+item.duration+"s / motion="+item.motion_frames+" / black="+item.black_segments).join("\n")+
   "\n\n## Agent QC\n"+reviews.map(item=>"- "+item.role+"："+item.status).join("\n")+
-  "\n\n## Visual Regression\n"+result.visual_regression.map(item=>"- "+item.ratio+"："+item.status+(item.scenes?" / scenes="+item.scenes.length:"")).join("\n")+
+  "\n\n## 画面文字出处（阻断）\n- 状态："+result.text_provenance.status+" / 溯源元素="+result.text_provenance.traced_elements+" / 登记字面量="+result.text_provenance.registered_literals+
+  "\n\n## Visual Regression（非阻断回归信号）\n"+result.visual_regression.map(item=>"- "+item.ratio+"："+item.status+" / gate="+item.gate+(item.scenes?" / scenes="+item.scenes.length:"")).join("\n")+
   "\n\n## 问题\n"+(issues.length?issues.map(issue=>"- "+issue.node+" / "+issue.type+" / "+(issue.ratio||"media")).join("\n"):"- 无")+"\n"
 );
 console.log("QC",result.status,"agents="+reviews.filter(x=>x.status==="completed").length);

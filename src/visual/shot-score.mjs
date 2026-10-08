@@ -68,9 +68,8 @@ export function lintShotScores(renderIR, {minScore = 0.72, visualByScene = {}} =
   for (const scene of renderIR.scenes || []) {
     const result = scoreShot(scene, visualByScene[scene.id] || {});
     if (result.score < minScore) issues.push(scene.id + ":shot-score-too-low:" + result.score);
-    if (visualByScene[scene.id] && result.dimensions.reference_similarity < 0.62) {
-      issues.push(scene.id + ":reference-similarity-too-low:" + result.dimensions.reference_similarity);
-    }
+    // reference_similarity 来自 64x36 合成参考图 + 确定性像素 embedding，实测与画面质量反向相关，
+    // 因此不再作为阻断项；它只作为维度参与加权分，回归趋势由 visual_regression 报告记录。
   }
   return issues;
 }

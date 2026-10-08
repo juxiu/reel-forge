@@ -1,1 +1,86 @@
-{"captions":[]}
+[
+  {
+    "id": "cap-001",
+    "text": "When an HTTP message crosses more than",
+    "start": 1.6,
+    "end": 4.025
+  },
+  {
+    "id": "cap-002",
+    "text": "one connection transport-layer integrity",
+    "start": 4.025,
+    "end": 6.4
+  },
+  {
+    "id": "cap-003",
+    "text": "checks only protect individual",
+    "start": 6.4,
+    "end": 8.1
+  },
+  {
+    "id": "cap-004",
+    "text": "connections RFC",
+    "start": 8.1,
+    "end": 10.5625
+  },
+  {
+    "id": "cap-005",
+    "text": "9530 defines Digest Fields for",
+    "start": 10.5625,
+    "end": 13.0625
+  },
+  {
+    "id": "cap-006",
+    "text": "HTTP integrity including",
+    "start": 13.0625,
+    "end": 15.200000000000001
+  },
+  {
+    "id": "cap-007",
+    "text": "Content-Digest for message content and",
+    "start": 15.200000000000001,
+    "end": 17.375
+  },
+  {
+    "id": "cap-008",
+    "text": "Repr-Digest for representation data",
+    "start": 17.375,
+    "end": 20.650000000000002
+  },
+  {
+    "id": "cap-009",
+    "text": "Senders can also use Want-Content-Digest",
+    "start": 20.650000000000002,
+    "end": 23.075
+  },
+  {
+    "id": "cap-010",
+    "text": "and Want-Repr-Digest to express preferences",
+    "start": 23.075,
+    "end": 25.3125
+  },
+  {
+    "id": "cap-011",
+    "text": "about receiving those integrity fields",
+    "start": 25.3125,
+    "end": 28.4125
+  },
+  {
+    "id": "cap-012",
+    "text": "The standard uses Structured Fields for one",
+    "start": 28.4125,
+    "end": 30.6375
+  },
+  {
+    "id": "cap-013",
+    "text": "consistent encoding format and replaces the",
+    "start": 30.6375,
+    "end": 32.9875
+  },
+  {
+    "id": "cap-014",
+    "text": "older Digest and Want-Digest fields",
+    "start": 32.9875,
+    "end": 35.325
+  }
+]

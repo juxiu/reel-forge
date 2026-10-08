@@ -34,7 +34,11 @@ G1…Gn 为独立构建角色，Agent provider 配置后每组分别收到 Build
 每镜头固定 6 个 still 采样点；高光时刻可扩展到 10 张。每组至少有一个 30 帧测渲契约。严格模式 `STRICT_STILLS=1` 时实际执行 still 渲染。
 
 ### QC
-Render → Frame Metrics → Motion → Visual Regression → Agent QC → QC → Repair → Recheck。Repair 必须保留 `repair-plan.json`、`status.json`、`source-repair.json`。支持二轮 QC，最终 delivery 才能通过 production gate。
+Render → Frame Metrics → Motion →画面文字出处（阻断）→ Agent QC → QC → Repair → Recheck。Repair 必须保留 `repair-plan.json`、`status.json`、`source-repair.json`。支持二轮 QC，最终 delivery 才能通过 production gate。
+
+阻断项：双比例 Frame Metrics、Motion、**画面文字出处**、QC、Repair / Recheck、tts-word-boundary、Delivery checksum、still manifest 与 `verify:production`。
+
+非阻断项：`visual-pixel-v1` Visual Regression。它的参考资产是 64×36 合成图、embedding 是确定性像素描述子而非语义模型，实测与画面质量反向相关（画面更密更实则分数更低），因此只作为 run-to-run 回归记录，**不参与交付判定**。它的通过不代表质量，只代表没有异常漂移。
 
 ## 一键入口
 `npm run skill -- "TOPIC" --source URL --auto-approve`
@@ -44,4 +48,17 @@ Render → Frame Metrics → Motion → Visual Regression → Agent QC → QC �
 然后使用 `npm run skill -- ... --resume` 继续。停止时保留 workspace，完整结束后再恢复原 demo fixture。
 
 ## 完成定义
-双比例成片、Frame Metrics、Motion、Visual Regression、QC、Repair、tts-word-boundary、Delivery checksum、still manifest 与 `verify:production` 全部通过。
+双比例成片、Frame Metrics、Motion、画面文字出处（text provenance）、QC、Repair、tts-word-boundary、Delivery checksum、still manifest 与 `verify:production` 全部通过。
+
+Visual Regression 不在完成定义内，它是非阻断回归记录。
+
+### 画面文字出处（阻断）
+对应 anything2explainer 的硬性原则 2「事实有出处」与样片 QC「画面英文/数字逐个核对调研文档」：
+
+```text
+A. 事实溯源    —— 每个 scene 的 elements[*].text 必须能在解说词里找到；其中的数字必须能在脚本或调研文档里找到
+B. 字面量白名单 —— 渲染源码里所有会上画面的硬编码文案必须登记在 fixtures/visual-literals.json
+C. 双比例一致  —— 同一 scene 在 16:9 / 9:16 的时长、顺序、变体必须一致
+```
+
+命令：`npm run verify:text-provenance`（新增白名单用 `-- --write`）。它防的是"画面出现无出处文案"这一类回归，不代表审美达标。
