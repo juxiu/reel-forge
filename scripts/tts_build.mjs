@@ -279,6 +279,7 @@ fs.writeFileSync(
   ].join("\n"),
 );
 fs.writeFileSync(path.join(root, "timeline-source.json"), JSON.stringify(allWords, null, 2));
+fs.writeFileSync("script/timeline-source.json", JSON.stringify(allWords, null, 2));
 fs.writeFileSync(path.join(root, "voice-manifest.json"), JSON.stringify({
   provider: "edge-tts",
   voice,
