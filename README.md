@@ -4,6 +4,8 @@ Agent-native 视频生产引擎。
 
 当前先按 anything2explainer 的生产过程完成可用功能，再做优化。
 
+本仓库同时提供根目录 `SKILL.md`，可作为 Agent Skill 执行规范：Agent 负责需求理解、Research、Narration、导演与质量判断，脚本负责确定性流水线、渲染、QC、Repair 与 Delivery。结构参考 anything2explainer 的 Skill 形态，但实现与画面保持本项目原创。
+
 生产过程：
 1. Research：来源、事实、证据。
 2. Narration：定稿文案、段落和字幕块。
