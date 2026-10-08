@@ -1,15 +1,19 @@
 export function repairScene(scene, issues) {
   const next = structuredClone(scene);
   for (const issue of issues) {
-    if (issue.type === "hero_too_small") {
-      next.hero_scale = Math.min(1.7, Number(next.hero_scale || 1) + 0.18);
+    if (issue.type === "hero_too_small" || issue.type === "visual_regression_fail") {
+      next.hero_scale = Math.min(1.7, Number(next.hero_scale || 1) + (issue.type === "visual_regression_fail" ? 0.12 : 0.18));
+      next.composition = {
+        ...(next.composition || {}),
+        hero_weight: Math.min(0.86, Number(next.composition?.hero_weight || 0.68) + (issue.type === "visual_regression_fail" ? 0.08 : 0)),
+      };
       next.repair_trace = [...(next.repair_trace || []), {type: issue.type, source_ref: next.source_ref || null}];
     }
-    if (issue.type === "motion_too_low" || issue.type === "freeze") {
+    if (issue.type === "motion_too_low" || issue.type === "freeze" || issue.type === "visual_regression_fail") {
       next.repair_trace = [...(next.repair_trace || []), {type: issue.type, source_ref: next.source_ref || null}];
       next.motion = (next.motion || []).map((item) =>
         item.target === "stage"
-          ? {...item, amount: Math.min(0.12, Number(item.amount || 0.04) + 0.035)}
+          ? {...item, amount: Math.min(0.12, Number(item.amount || 0.04) + (issue.type === "visual_regression_fail" ? 0.02 : 0.035))}
           : item
       );
     }
