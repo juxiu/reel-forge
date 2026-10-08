@@ -22,7 +22,7 @@ const name = match ? match[1].trim() : "";
 if (name !== "reel-forge") throw new Error("invalid skill name: " + name);
 
 const script = fs.readFileSync("scripts/skill.mjs","utf8");
-for (const token of ["--source","--auto-approve","scripts/run-production.mjs","scripts/visual_regression.py","scripts/verify:production"]) {
+for (const token of ["--source","--auto-approve","scripts/run-production.mjs","scripts/visual_regression.py","verify:production"]) {
   if (!script.includes(token)) throw new Error("skill runner missing token: " + token);
 }
 console.log("skill contract PASS", JSON.stringify({name, sections: required.length, cli:"npm run skill"}));
