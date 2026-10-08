@@ -1,0 +1,2 @@
+import fs from "node:fs";import{requestApproval,resolveApproval}from "../src/runtime/approval.mjs";
+requestApproval("approval-test",{preview:"x"});const p="artifacts/approval-test/runtime/approval.json";if(JSON.parse(fs.readFileSync(p,"utf8")).status!=="pending")throw new Error("approval request failed");resolveApproval("approval-test","approved");if(JSON.parse(fs.readFileSync(p,"utf8")).status!=="approved")throw new Error("approval resolve failed");console.log("approval PASS");

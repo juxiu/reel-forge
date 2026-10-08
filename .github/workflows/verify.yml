@@ -14,6 +14,8 @@ jobs:
       - run: npm run verify:plan
       - run: npm run verify:contracts
       - run: npm run verify:runtime
+      - run: npm run verify:approval
+      - run: npm run verify:build
       - run: npm run verify:scheduler
       - run: npm run verify:store
       - run: npm run verify:repair
@@ -47,5 +49,18 @@ jobs:
       - run: npm run render
       - run: npm run verify:qc artifacts/render/reel-forge-16x9.mp4
       - run: npm run verify:qc artifacts/render/reel-forge-9x16.mp4
+      - run: npm run preview
       - run: npm run verify:delivery
-      - run: test -s artifacts/delivery/demo-production/delivery-manifest.json
+  tts:
+    if: ${{ vars.REEL_FORGE_LIVE_TTS == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install -r requirements.txt
+      - run: npm install
+      - run: node -e "import('./src/providers/tts/edge.mjs').then(async m=>{await m.edgeTts({text:'This is a real timing test.',voice:'en-US-GuyNeural',outDir:'artifacts/tts'});})"
+      - run: test -s artifacts/tts/audio.mp3

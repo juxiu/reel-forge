@@ -1,0 +1,1 @@
+import{buildScenes}from "../src/build/parallel-scenes.mjs";const r=await buildScenes([1,2,3],async x=>x*10,{concurrency:2});if(r.join(",")!=="10,20,30")throw new Error("parallel build failed");console.log("build PASS");

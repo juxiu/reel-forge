@@ -1,0 +1,4 @@
+import fs from "node:fs";import path from "node:path";
+export function approvalPath(projectId,root="artifacts"){return path.join(root,projectId,"runtime","approval.json");}
+export function requestApproval(projectId,payload,root="artifacts"){const file=approvalPath(projectId,root);fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,JSON.stringify({status:"pending",requested_at:new Date().toISOString(),...payload},null,2));return file;}
+export function resolveApproval(projectId,status,root="artifacts"){if(!["approved","rejected"].includes(status))throw new Error("invalid approval");const file=approvalPath(projectId,root);const value=fs.existsSync(file)?JSON.parse(fs.readFileSync(file,"utf8")):{};value.status=status;value.resolved_at=new Date().toISOString();fs.writeFileSync(file,JSON.stringify(value,null,2));return value;}
