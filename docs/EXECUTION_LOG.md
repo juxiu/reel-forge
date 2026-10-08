@@ -27,3 +27,8 @@
 - 尚属增强项：独立 ASR 交叉校验、更多本地 TTS provider、对象存储、分布式 worker 和更复杂的 Motion Grammar。
 
 当前原则：先保证功能链真实可运行，再提升画面表现和生产效率。
+
+
+## 当前验收状态
+
+详细状态见 `docs/PROJECT_STATUS.md`。最近一次主干 CI run `37747763804` 在 `npm run selfcheck` 失败；此前 Research、Runtime、Build、Visual、Repair、TTS、Storyboard 等步骤已通过。当前优先修复 selfcheck，然后继续跑完 Render → QC → Repair/Recheck → Delivery。
