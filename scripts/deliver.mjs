@@ -2,6 +2,7 @@ import fs from "node:fs";
 import {packageDelivery} from "../src/delivery/package.mjs";
 
 const project = JSON.parse(fs.readFileSync("fixtures/project.json", "utf8"));
+const base = "artifacts/" + project.project_id + "/";
 const required = [
   "artifacts/render/reel-forge-16x9.mp4",
   "artifacts/render/reel-forge-9x16.mp4",
@@ -9,28 +10,61 @@ const required = [
   "script/timeline.md",
   "script/timeline-source.json",
   "分镜表.md",
-  "artifacts/" + project.project_id + "/research.json",
-  "artifacts/" + project.project_id + "/research.md",
-  "artifacts/" + project.project_id + "/script.json",
-  "artifacts/" + project.project_id + "/qc/report.json",
-  "artifacts/" + project.project_id + "/audio/asr-second-pass.json",
+  base + "research.json",
+  base + "research.md",
+  base + "script.json",
+  base + "qc/report.json",
+  base + "qc/report.md",
+  base + "qc/frame_metrics_16x9.json",
+  base + "qc/frame_metrics_9x16.json",
+  base + "qc/motion_16x9.json",
+  base + "qc/motion_9x16.json",
+  base + "audio/asr-second-pass.json",
   "fixtures/render-ir-16x9.json",
   "fixtures/render-ir-9x16.json",
 ];
 const optional = [
-  "artifacts/" + project.project_id + "/audio/voice-manifest.json",
-  "artifacts/" + project.project_id + "/build-groups/manifest.json",
-  "artifacts/" + project.project_id + "/runtime/state.json",
-  "artifacts/" + project.project_id + "/runtime/checkpoints.json",
+  base + "audio/voice-manifest.json",
+  base + "audio/asr-provider-output.json",
+  base + "build-groups/manifest.json",
+  base + "runtime/state.json",
+  base + "runtime/checkpoints.json",
   "artifacts/preview/manifest.json",
-  "artifacts/" + project.project_id + "/repair/repair-plan.json",
-  "artifacts/" + project.project_id + "/repair/status.json",
+  base + "repair/repair-plan.json",
+  base + "repair/status.json",
 ];
 const files = [...required, ...optional.filter((file) => fs.existsSync(file))];
 for (const file of required) {
   if (!fs.existsSync(file) || !fs.statSync(file).size) throw new Error("delivery input missing or empty: " + file);
 }
-const result = packageDelivery({projectId: project.project_id, files});
+
+const asr = JSON.parse(fs.readFileSync(base + "audio/asr-second-pass.json", "utf8"));
+if (asr.required_real_asr === true && asr.source !== "external-asr-provider") {
+  throw new Error("real ASR was required but delivery artifact is not provider-backed");
+}
+const qc = JSON.parse(fs.readFileSync(base + "qc/report.json", "utf8"));
+if (qc.status !== "PASS") throw new Error("delivery requires PASS QC");
+for (const ratio of ["16x9", "9x16"]) {
+  const frame = JSON.parse(fs.readFileSync(base + "qc/frame_metrics_" + ratio + ".json", "utf8"));
+  const motion = JSON.parse(fs.readFileSync(base + "qc/motion_" + ratio + ".json", "utf8"));
+  if (frame.summary?.status !== "PASS" || motion.summary?.status !== "PASS") {
+    throw new Error("delivery requires PASS frame/motion metrics: " + ratio);
+  }
+}
+
+const result = packageDelivery({
+  projectId: project.project_id,
+  files,
+  metadata: {
+    contract_version: "0.2",
+    ratios: ["16x9", "9x16"],
+    qc_status: qc.status,
+    asr_provider: asr.provider,
+    real_asr: asr.required_real_asr === true,
+    required_files: required.map((file) => file.split("/").pop()),
+    optional_files: optional.filter((file) => fs.existsSync(file)).map((file) => file.split("/").pop()),
+  },
+});
 if (result.files.length < required.length || result.files.some((file) => !file.sha256 || !file.size)) {
   throw new Error("delivery manifest incomplete");
 }
