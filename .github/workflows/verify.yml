@@ -60,6 +60,7 @@ jobs:
       - run: npm run verify:qc
       - run: npm run deliver
       - run: npm run verify:delivery
+      - run: npm run verify:production
       - name: 归档生产成片与验收产物
         if: ${{ success() }}
         uses: actions/upload-artifact@v4
