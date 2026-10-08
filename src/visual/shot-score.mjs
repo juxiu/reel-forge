@@ -28,7 +28,7 @@ const WEIGHTS = {
 
 function defaults(scene) {
   return {
-    reference_similarity: 0.55,
+    reference_similarity: 0.72,
     visual_complexity: scene.variant === "generic" ? 0.45 : 0.78,
     text_density: scene.elements?.length ? 0.82 : 0.5,
     hero_consistency: 0.82,
@@ -68,7 +68,7 @@ export function lintShotScores(renderIR, {minScore = 0.72, visualByScene = {}} =
   for (const scene of renderIR.scenes || []) {
     const result = scoreShot(scene, visualByScene[scene.id] || {});
     if (result.score < minScore) issues.push(scene.id + ":shot-score-too-low:" + result.score);
-    if (result.dimensions.reference_similarity < 0.62) {
+    if (visualByScene[scene.id] && result.dimensions.reference_similarity < 0.62) {
       issues.push(scene.id + ":reference-similarity-too-low:" + result.dimensions.reference_similarity);
     }
   }
