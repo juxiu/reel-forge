@@ -4,7 +4,7 @@
 
 ## 总体状态
 
-**状态：基础生产链与双比例质量门禁已落地；当前继续补齐 ASR 二次对齐、镜头评分与源级修复追踪。**
+**状态：基础生产链、双比例质量门禁、语义导演、ASR 契约与镜头评分已接入；当前继续补齐真实 ASR、真实参考资产与源级可回写修复。**
 
 当前主干已经覆盖：
 
@@ -95,7 +95,9 @@ CI 已真实走完：materialize IR → build groups → shots → e2e → previ
 - 对象存储、分布式 worker / lock。
 - HyperFrames 真正 runtime render backend。
 - 四个确认点现在记录对应产物 SHA-256，并在后续阶段校验产物未被静默替换。
-- 第一版视觉语法 lint：主角、视觉意图、状态变化、运镜、最小镜头时长、稳定期、特效白名单与 PPT-like motion。\n- 双比例 RenderIR 场景契约验收：canvas、duration、scene overlap、variant、hero、camera motion。\n- checkpoint 已形成 length-language → narration-signoff → voiceover → pilot-preview 的强依赖链。
+- 第一版视觉语法 lint：主角、视觉意图、状态变化、运镜、最小镜头时长、稳定期、特效白名单与 PPT-like motion。
+- 双比例 RenderIR 场景契约验收：canvas、duration、scene overlap、variant、hero、camera motion。
+- checkpoint 已形成 length-language → narration-signoff → voiceover → pilot-preview 的强依赖链。
 - 性能与缓存优化。
 
 ## 计划
@@ -118,7 +120,10 @@ CI 已真实走完：materialize IR → build groups → shots → e2e → previ
 ### P2：质量提升
 
 - [~] Motion Grammar 已进一步覆盖稳定期、特效白名单、空闲窗口与反 PPT motion，继续补齐 Composition/Light、Narration 与章界规则。
-- [x] 增加第一版 semantic shot variants，并在 RenderIR → Remotion 链路启用。\n- [ ] 扩充更多 semantic shot variants，继续减少 generic fallback。
+- [x] 增加第一版 semantic shot variants，并在 RenderIR → Remotion 链路启用。
+- [x] 增加语义导演决策层，按叙事语义选择镜头变体，并避免连续重复同一变体。
+- [x] 扩充 comparison / transformation / sequence / causal / evidence / code 等 semantic shot variants，并加入语义导演验收。
+- [ ] 继续减少 generic fallback，并引入更强的多句上下文导演。
 - Repair 已具备 source_ref 追踪与修复审计映射，下一步把修复实际回写 BeatGraph/脚本源节点。
 - 增加 ASR、更多 TTS 和对象存储 provider。
 
@@ -128,6 +133,8 @@ CI 已真实走完：materialize IR → build groups → shots → e2e → previ
 - 已完成：视觉构图契约进入 BeatGraph / Scene / RenderIR，强制单焦点、Hero 权重、安全边距、Hero Key 光、紫色强调色。
 - 已完成：叙事时间线自动验收，校验 Script → Sentence → 字幕词级时间 → 双比例 RenderIR 的覆盖与时长一致性。
 - 已完成：双比例 Scene Contract 样例补齐，并接入 CI 质量门禁。
-- 已完成：CI 现在在生产链中执行 visual-grammar、scene-contract、narrative 三层验收。
-- 已完成：ASR 二次对齐契约、第一版逐镜头评分、source_ref 修复追踪。\n- 未完成：真实 ASR provider、真实参考样片/反例资产、更多语义视觉变体、HyperFrames/分布式渲染、对象存储与缓存。
-- 已完成：QC → repair → re-render → QC 限次自动闭环入口，CI 默认最多执行 2 次修复循环。\n- 下一步：补 ASR 二次校验与镜头级参考样片评分，并把 repair patch 与具体源节点建立更细粒度映射。
+- 已完成：CI 现在在生产链中执行 visual-grammar、semantic-director、scene-contract、shot-score、narrative、ASR 多层验收。
+- 已完成：ASR 二次对齐契约、第一版逐镜头评分、source_ref 修复追踪。
+- 未完成：真实 ASR provider、真实参考样片/反例资产、更多语义视觉变体、HyperFrames/分布式渲染、对象存储与缓存。
+- 已完成：QC → repair → re-render → QC 限次自动闭环入口，CI 默认最多执行 2 次修复循环。
+- 下一步：接入真实 ASR provider、真实参考样片/反例资产评分，并把 repair patch 与具体源节点建立可回写映射。
