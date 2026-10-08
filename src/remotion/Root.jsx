@@ -9,7 +9,7 @@ function activeChapter(timeline, frame) {
   return chapters.slice().reverse().find((chapter) => frame >= chapter.from - 1);
 }
 
-export function ReelForgeComposition({renderIR, captions = [], timeline = null}) {
+export function ReelForgeComposition({renderIR, captions = [], timeline = null, includeScenes = true, includeAudio = true, showEndingCredit = true}) {
   const frame = useCurrentFrame();
   const lastSceneFrame = renderIR.scenes.length
     ? Math.max(...renderIR.scenes.map((scene) => Math.round((scene.start + scene.duration) * renderIR.fps)))
@@ -18,10 +18,10 @@ export function ReelForgeComposition({renderIR, captions = [], timeline = null})
   const chapter = activeChapter(timeline, frame);
 
   return <AbsoluteFill style={{background: "#000"}}>
-    <Audio src={staticFile("audio.mp3")} volume={1} />
+    {includeAudio ? <Audio src={staticFile("audio.mp3")} volume={1} /> : null}
     <Backdrop />
     <Hud chapter={chapter?.title || ""} />
-    {renderIR.scenes.map((scene) => {
+    {includeScenes ? renderIR.scenes.map((scene) => {
       const Shot = SHOT_REGISTRY[scene.id] || function FallbackShot(props) { return <ExplainerShot {...props} />; };
       return <Sequence key={scene.id} from={Math.round(scene.start * renderIR.fps)} durationInFrames={Math.max(1, Math.round(scene.duration * renderIR.fps))}>
         <Shot scene={scene} />
@@ -30,6 +30,6 @@ export function ReelForgeComposition({renderIR, captions = [], timeline = null})
     <ProgressBar chapters={timeline?.chapters || []} totalFrames={Math.ceil(renderIR.duration * renderIR.fps)} />
     <ChapterCard timeline={timeline} />
     <Captions captions={captions} />
-    <EndingCredit show={endShow} startFrame={lastSceneFrame + 12} />
+    <EndingCredit show={showEndingCredit && endShow} startFrame={lastSceneFrame + 12} />
   </AbsoluteFill>;
 }
