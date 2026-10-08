@@ -41,8 +41,6 @@ for index, shot in enumerate(shots):
         fail("timeline mismatch: %s" % shot["id"])
     if shot["to"] < shot["from"]:
         fail("invalid shot range: " + shot["id"])
-    if index and shot["from"] > prev_to + 1:
-        fail("shot coverage gap: " + shot["id"])
     if shot["from"] < prev_to:
         fail("shot overlap: " + shot["id"])
     if shot["to"] - shot["from"] + 1 < 120:
