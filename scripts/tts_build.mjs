@@ -78,7 +78,7 @@ function alignedChunks(text, chunks, words, duration) {
 
   for (const word of words) {
     const raw = String(word.text ?? "");
-    const clean = raw.replace(/[\\s，。、！？：；“”（）,.!?:;()\\-—…]/g, "");
+    const clean = raw.replace(/[\s，。、！？：；“”（）,.!?:;()\\-—…]/g, "");
     if (!clean) continue;
 
     let pos = text.indexOf(clean, cursor);
