@@ -20,6 +20,24 @@ const plansDir = path.join("artifacts", project.project_id, "repair");
 fs.mkdirSync(plansDir, {recursive: true});
 fs.writeFileSync(path.join(plansDir, "repair-plan.json"), JSON.stringify(plan, null, 2));
 
+const beatsFile = path.join("artifacts", project.project_id, "beats.json");
+const sourceRepairMap = [];
+if (fs.existsSync(beatsFile)) {
+  const graph = JSON.parse(fs.readFileSync(beatsFile, "utf8"));
+  for (const issue of report.issues || []) {
+    const match = String(issue.node || "").match(/^scene-(\\d+)$/);
+    if (!match) continue;
+    const index = Number(match[1]) - 1;
+    const beat = graph.beats?.[index];
+    if (!beat) continue;
+    if (issue.type === "motion_too_low" || issue.type === "freeze") {
+      beat.camera = {...beat.camera, amount: Math.min(0.12, Number(beat.camera?.amount || 0.04) + 0.035)};
+    }
+    if (issue.type === "hero_too_small") beat.hero = {...beat.hero, size: "xlarge"};
+    sourceRepairMap.push({node: issue.node, type: issue.type, source_ref: beat.source_ref || {segment_index: index}});
+  }
+  if (sourceRepairMap.length) fs.writeFileSync(beatsFile, JSON.stringify(graph, null, 2));
+}
 const repairs = [];
 for (const ratio of ["16x9", "9x16"]) {
   const file = "fixtures/render-ir-" + ratio + ".json";
