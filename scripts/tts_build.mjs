@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import {spawnSync} from "node:child_process";
+import crypto from "node:crypto";
 import {edgeTts} from "../src/providers/tts/edge.mjs";
 import {captionsFromWords} from "../src/captions/pipeline.mjs";
 
@@ -284,7 +285,7 @@ fs.writeFileSync(path.join(root, "voice-manifest.json"), JSON.stringify({
   rate: process.env.TTS_RATE || "+0%",
   sentence_count: audioParts.length,
   final_audio: audioFile,
-  audio_sha256: require("node:crypto").createHash("sha256").update(fs.readFileSync(audioFile)).digest("hex"),
+  audio_sha256: crypto.createHash("sha256").update(fs.readFileSync(audioFile)).digest("hex"),
   duration_s: totalSeconds,
 }, null, 2));
 fs.writeFileSync("fixtures/captions.json", JSON.stringify(captionSource.captions, null, 2));
