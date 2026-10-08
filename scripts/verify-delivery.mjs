@@ -7,7 +7,7 @@ if (!fs.existsSync(manifestPath)) throw new Error("delivery manifest missing");
 
 const manifestDir = "artifacts/delivery/" + project.project_id;
 const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
-if (manifest.version !== "0.2") throw new Error("unsupported delivery manifest version");
+if (manifest.version !== "0.3") throw new Error("unsupported delivery manifest version");
 if (manifest.project_id !== project.project_id) throw new Error("delivery project mismatch");
 
 const required = [
