@@ -2,6 +2,11 @@ export function sceneToRenderIR(scene, options={}) {
   const width=options.width??1280;
   const height=options.height??720;
   const fps=options.fps??30;
+  const objects=Array.isArray(scene?.visual?.objects) ? scene.visual.objects : [{
+    id:"concept",
+    type:scene?.visual?.type??"unknown",
+    label:""
+  }];
   return {
     version:"0.1",
     width,
@@ -11,7 +16,7 @@ export function sceneToRenderIR(scene, options={}) {
       id:scene.scene_id,
       start:scene.start,
       duration:scene.duration,
-      elements:scene.visual.objects.map((o)=>({
+      elements:objects.map((o)=>({
         id:o.id,
         kind:o.type,
         text:o.text??o.label??"",
