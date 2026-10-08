@@ -1,11 +1,22 @@
 # Execution Log
 
-| Stage | Verification | Result | Outputs |
-|---|---|---|---|
-| P0 | GitHub Actions run 37738234477 | PASS | contracts, CI, plan |
-| P1 | verify:p1 + negative regression | PASS | research.json, script.json, content-qa.json |
-| P2 | verify:p2 + overlap regression | PASS | director.json, storyboard.json, scene.json |
+| Stage | Result | Evidence |
+|---|---|---|
+| P0 | PASS | Actions run 37738234477 |
+| P1 | PASS | verify:p1 + claim coverage negative regression |
+| P2 | PASS | verify:p2 + timeline overlap negative regression |
+| P3 | PASS | verify:p3 on core CI run 37738661398 |
+| P4 | FIXED → VERIFYING | registerRoot issue found from run 37738661398; fixed in 098c2f0515f... |
+| P5 | FIXED → VERIFYING | missing visual.objects + RenderIR nesting issues found from CI; fixed in 395fdca518... |
+| P6 | FIXED → VERIFYING | clean CI missing upstream scene artifact; fixed in 2a4bb16ef1... |
+| P7 | VERIFYING | batch/cache gate wired into verify-advanced |
 
-## CI
+## Distributed verification
 
-GitHub Actions workflow "verify" for commit 0970888c2e53417dbb3feee541d2fc3a14d15b2d completed with conclusion success; steps verify:p0, verify:p1, and verify:p2 all passed.
+- `.github/workflows/verify.yml`: core / Remotion / HyperFrames parallel jobs.
+- `.github/workflows/verify-advanced.yml`: QC / Batch parallel jobs.
+
+## Current runs
+
+- verify run 37738856934: latest main pipeline after P6 fix.
+- verify-advanced run 37738856901: latest advanced pipeline after P6 fix.
