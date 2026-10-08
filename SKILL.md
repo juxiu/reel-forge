@@ -29,14 +29,19 @@ Agent 负责需求理解、研究、事实核验、叙事、导演、质量判�
 ### 3. 视觉导演
 每个镜头必须有明确 narrative job、单一 dominant hero、构图与光的理由、持续动作和落位停留。能使用 semantic shot variant 时不得退回 generic fallback。
 
-### 4. 章节与节奏
+### 4. 视觉基准
+真实参考帧与 anti-reference 都进入机器可读 benchmark。Render 后按 scene/ratio 采样帧，计算 visual embedding cosine similarity，并把 reference_similarity、visual_complexity、text_density、hero_consistency、layout_stability 直接并入现有 shot-score。
+
+benchmark 结构评分与图像 similarity 同时存在：embedding 不能替代 narrative、hero、motion、composition、light、safety 等结构门禁。
+
+### 5. 章节与节奏
 按画面单元组织叙事。短句并入相邻镜头，不为每句话机械切镜。多章片的章界必须承上启下，章首画面优先承接上一章主角或象征物。
 
-### 5. 质量闭环
-Render → Frame Metrics → Motion → QC → Repair → Recheck 是一个闭环。Repair 必须有 repair-plan.json、status.json、source-repair.json；无需修复时也要产生 not-needed 审计。
+### 6. 质量闭环
+Render → Frame Metrics → Motion → Visual Regression → QC → Repair → Recheck 是一个闭环。Repair 必须有 repair-plan.json、status.json、source-repair.json；无需修复时也要产生 not-needed 审计。
 
-### 6. 交付完整性
-Delivery 必须包含双比例成片、Research、Script、Timeline、QC、Motion、ASR 二次校验、RenderIR 和 Repair 审计，并通过 checksum manifest 校验。
+### 7. 交付完整性
+Delivery 必须包含双比例成片、Research、Script、Timeline、QC、Visual Regression、Motion、ASR 二次校验、RenderIR 和 Repair 审计，并通过 checksum manifest 校验。
 
 ## 执行阶段
 
@@ -59,13 +64,23 @@ Delivery 必须包含双比例成片、Research、Script、Timeline、QC、Motio
 Pilot 通过后运行并行镜头构建与 npm run render，必须得到 16:9 和 9:16 成片。
 
 ### 阶段 6：QC / Repair
-运行双比例 frame-metrics、motion-check、npm run qc、AUTO_APPROVE=1 npm run repair-cycle、npm run verify:qc。QC FAIL 时按 scene / node / ratio 局部修复并重新验收。
+运行双比例 frame-metrics、motion-check、visual-regression、npm run qc、AUTO_APPROVE=1 npm run repair-cycle、npm run verify:qc。QC FAIL 时按 scene / node / ratio 局部修复并重新验收。
 
 ### 阶段 7：Delivery
-运行 npm run deliver、npm run verify:delivery、npm run verify:production。这里的 Production Gate 只是完整交付验收，不代表另一个生产等级；只要成片、QC、Repair、ASR 二次校验和 Delivery checksum 全部通过，即完成生产。
+运行 npm run deliver、npm run verify:delivery、npm run verify:production。这里只表示完整交付验收；只要成片、QC、Visual Regression、Repair、ASR 二次校验和 Delivery checksum 全部通过，即完成生产。
+
+## 一键 Skill 执行器
+
+标准 CLI：
+
+npm run skill -- "TOPIC" --source URL --auto-approve
+
+可选参数：--duration、--language、--ratio；不加 --auto-approve 时在 Pilot 处停止，保持人工确认点。
+
+CLI 负责建立项目契约、调用 Agent、串联 Research → Narration → TTS/WordBoundary → Storyboard → Director → Pilot → Render → Visual Regression → QC → Repair → Delivery。执行期间会备份并恢复 workspace 中的 demo fixture，生产产物写入 artifacts/<project_id>/。
 
 ## 两级验证策略
-开发提交默认运行 npm run verify:fast。它只检查本地契约、导演、视觉语法、Repair 等轻量内容。
+开发提交默认运行 npm run verify:fast。它只检查本地契约、导演、视觉语法、Visual Benchmark、Repair 等轻量内容。
 
 完整生产链通过 .github/workflows/verify.yml 手动或定时执行。快速验证 PASS 不等于已经生成成片。
 
@@ -75,16 +90,20 @@ Pilot 通过后运行并行镜头构建与 npm run render，必须得到 16:9 �
 2. QC PASS；
 3. Frame Metrics PASS；
 4. Motion PASS；
-5. Repair audit 完整；
-6. ASR 二次校验为 tts-word-boundary 且通过；
-7. Delivery checksum PASS；
-8. verify:production PASS。
+5. Visual Regression PASS；
+6. 每个 scene 都有 reference_similarity、anti_similarity、visual_complexity、text_density、hero_consistency、layout_stability；
+7. Repair audit 完整；
+8. ASR 二次校验为 tts-word-boundary 且通过；
+9. Delivery checksum PASS；
+10. verify:production PASS。
 
 ## 常用入口
+npm run skill -- "TOPIC" --source URL --auto-approve
 npm run run-flow
 npm run preview
 npm run pilot
 npm run render
+npm run visual-regression -- --frames artifacts/frames/16x9 --render-ir fixtures/render-ir-16x9.json --out artifacts/<project>/qc/visual_regression_16x9.json
 npm run qc
 npm run repair-cycle
 npm run deliver
