@@ -1,0 +1,13 @@
+{
+  "name":"reel-forge",
+  "version":"0.1.0",
+  "private":true,
+  "type":"module",
+  "scripts":{
+    "verify:p0":"node scripts/verify-p0.mjs",
+    "verify:p1":"node scripts/verify-p1.mjs",
+    "verify:p2":"node scripts/verify-p2.mjs",
+    "demo:p1":"node scripts/run-p1.mjs",
+    "demo:p2":"node scripts/run-p2.mjs"
+  }
+}
