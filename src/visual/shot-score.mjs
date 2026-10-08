@@ -14,11 +14,11 @@ export function scoreShot(scene) {
   const composition = scene.composition?.focus === "hero-plus-flow" ? 1 : 0.5;
   const light = scene.light?.mode === "hero-key" && scene.light?.accent === "purple" ? 1 : 0.5;
   const safety = Number(scene.composition?.safe_margin || 0) >= 0.06 ? 1 : 0.5;
-  const weighted = 0.25 * hero + 0.2 * motion + 0.2 * composition + 0.15 * light + 0.2 * safety;
+  const semantic = scene.variant && scene.variant !== "generic" ? 1 : 0.45;\n  const weighted = 0.22 * semantic + 0.18 * hero + 0.2 * motion + 0.18 * composition + 0.08 * light + 0.14 * safety;
   return {
     score: Number(weighted.toFixed(3)),
     target: Number(((rule.hero + rule.motion) / 2).toFixed(3)),
-    dimensions: {hero, motion, composition, light, safety},
+    dimensions: {semantic, hero, motion, composition, light, safety},
   };
 }
 
