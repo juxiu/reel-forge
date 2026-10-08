@@ -33,7 +33,7 @@ reel-forge 保留了更偏工程化的 Typed Artifact Contract、项目锁、外
 
 ## 当前验收说明
 
-上述“完成”表示阶段能力已经具备对应实现入口，不等于最终生产验收已经通过。最终完成以 docs/PROJECT_STATUS.md 的 P0 结果与 GitHub Actions 全绿为准。
+本轮已经完成最终基线验收。GitHub Actions `verify` Run #172（ID `37752344623`）全绿，真实执行了双比例 Render、Frame Metrics、Motion Check、QC、Delivery 与 checksum verification。基础生产链已经获得实际媒体验收；后续差异主要属于参考样片的视觉语义、镜头专属动画和高级生产能力增强。
 
 本轮针对真实后段风险新增：
 - selfcheck 强化；
