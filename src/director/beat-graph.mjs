@@ -1,67 +1,12 @@
-const VARIANTS = [
-  ["want-", "preference"],
-  ["structured", "structured"],
-  ["content-digest", "split"],
-  ["repr-digest", "split"],
-  ["connection", "network"],
-  ["transport", "network"],
-];
-
-function visualVariant(text = "") {
-  const normalized = text.toLowerCase();
-  const hit = VARIANTS.find(([needle]) => normalized.includes(needle));
-  return hit?.[1] || "generic";
-}
-
+const VARIANTS = [["want-", "preference"],["structured", "structured"],["content-digest", "split"],["repr-digest", "split"],["connection", "network"],["transport", "network"]];
+function visualVariant(text = "") { const hit = VARIANTS.find(([needle]) => text.toLowerCase().includes(needle)); return hit?.[1] || "generic"; }
 export function buildBeatGraph(script, timeline = null) {
   let cursor = 0;
   const beats = script.segments.map((segment, i) => {
-    const timed = timeline?.sentences?.[i];
-    const start = timed ? Math.max(0, (timed.from - 1) / 30) : cursor;
-    const end = timed ? timed.to / 30 : start + Math.max(4, Math.min(7, segment.text.length / 8));
-    const duration = Math.max(0.5, end - start);
-    cursor = end;
-    return {
-      id: "beat-" + String(i + 1).padStart(3, "0"),
-      start,
-      duration,
-      narrative_job: i === 0 ? "hook" : "explain",
-      hero: {type: "concept", size: "large"},
-      state_change: "enter -> transform -> settle",
-      camera: {type: i % 2 ? "pan" : "push", amount: 0.04, duration_frames: Math.round(duration * 30)},
-      settle_frames: 30,
-      idle_frames: 0,
-      text_role: "narration",
-      asset_need: "diagram-or-code",
-      visual_variant: visualVariant(segment.text),
-      composition: {focus: "hero-plus-flow", hero_weight: 0.68, safe_margin: 0.08},
-      light: {mode: "hero-key", key_intensity: 0.82, accent: "purple"},
-      ppt_risk: "static-card",
-    };
+    const timed = timeline?.sentences?.[i]; const start = timed ? Math.max(0, (timed.from - 1) / 30) : cursor;
+    const end = timed ? timed.to / 30 : start + Math.max(4, Math.min(7, segment.text.length / 8)); const duration = Math.max(0.5, end - start); cursor = end;
+    return {id:"beat-"+String(i+1).padStart(3,"0"),start,duration,narrative_job:i===0?"hook":"explain",hero:{type:"concept",size:"large"},state_change:"enter -> transform -> settle",camera:{type:i%2?"pan":"push",amount:0.04,duration_frames:Math.round(duration*30)},settle_frames:30,idle_frames:0,text_role:"narration",asset_need:"diagram-or-code",visual_variant:visualVariant(segment.text),composition:{focus:"hero-plus-flow",hero_weight:0.68,safe_margin:0.08},light:{mode:"hero-key",key_intensity:0.82,accent:"purple"},ppt_risk:"static-card"};
   });
-  return {duration: cursor, beats};
+  return {duration:cursor,beats};
 }
-
-export function beatToScene(beat, segment) {
-  return {
-    scene_id: "scene-" + beat.id.slice(5),
-    start: beat.start,
-    duration: beat.duration,
-    narration: {text: segment.text},
-    variant: beat.visual_variant,
-    composition: beat.composition,
-    light: beat.light,
-    visual: {
-      type: "explainer",
-      objects: [
-        {id: "hero", type: "card", text: segment.text},
-        {id: "flow", type: "signal"},
-      ],
-    },
-    motion: [
-      {type: "enter", target: "hero", preset: "rise"},
-      {type: "transform", target: "flow", preset: "travel"},
-      {type: "camera", target: "stage", preset: beat.camera.type, amount: beat.camera.amount},
-    ],
-  };
-}
+export function beatToScene(beat, segment) { return {scene_id:"scene-"+beat.id.slice(5),start:beat.start,duration:beat.duration,narration:{text:segment.text},variant:beat.visual_variant,composition:beat.composition,light:beat.light,visual:{type:"explainer",objects:[{id:"hero",type:"card",text:segment.text},{id:"flow",type:"signal"}]},motion:[{type:"enter",target:"hero",preset:"rise"},{type:"transform",target:"flow",preset:"travel"},{type:"camera",target:"stage",preset:beat.camera.type,amount:beat.camera.amount}]};}
