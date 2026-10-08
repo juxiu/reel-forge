@@ -25,7 +25,7 @@ const sourceRepairMap = [];
 if (fs.existsSync(beatsFile)) {
   const graph = JSON.parse(fs.readFileSync(beatsFile, "utf8"));
   for (const issue of report.issues || []) {
-    const match = String(issue.node || "").match(/^scene-(\\d+)$/);
+    const match = String(issue.node || "").match(/^scene-(\d+)$/);
     if (!match) continue;
     const index = Number(match[1]) - 1;
     const beat = graph.beats?.[index];
