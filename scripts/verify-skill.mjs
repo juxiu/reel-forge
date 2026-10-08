@@ -17,7 +17,7 @@ for (const section of required) {
 for (const token of ["tts-alignment-proxy","external-asr-provider","npm run verify:fast"]) {
   if (!body.includes(token)) throw new Error("SKILL.md missing contract token: " + token);
 }
-const match = /^name:\\s*(.+)$/m.exec(frontmatter);
+const match = /^name:\s*(.+)$/m.exec(frontmatter);
 const name = match ? match[1].trim() : "";
 if (name !== "reel-forge") throw new Error("invalid skill name: " + name);
 console.log("skill contract PASS", JSON.stringify({name, sections: required.length}));
