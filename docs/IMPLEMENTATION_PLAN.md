@@ -82,3 +82,8 @@ Research -> Narration/Timeline -> Storyboard -> Overlay/Primitives -> G1 Pilot -
 功能完整度以 anything2explainer 的公开生产链为基线：完整 artifact 链、30 秒 Pilot gate、逐镜头源码、双比例渲染、量化 QC、修复重检和 checksum delivery 均必须可以独立运行。
 
 后续优化仅包括：更丰富的外部 LLM/TTS provider、独立 ASR、对象存储、分布式调度、更多视觉原语和性能优化；这些不再阻塞基础生产链。
+
+
+## 当前状态记录
+
+当前实时状态统一记录于 `docs/PROJECT_STATUS.md`。基础生产链功能已基本实现，但最终绿色 CI 验收尚未完成；在 selfcheck 修复和完整 render/QC/delivery 验收通过前，不将项目标记为最终完成。
