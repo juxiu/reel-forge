@@ -106,7 +106,13 @@ function VariantDiagram({variant, frame, width, height, tall}) {
   if (variant === "network") return <NetworkDiagram frame={frame} width={width} height={height} tall={tall}/>;
   if (variant === "split") return <SplitDigestDiagram frame={frame} width={width} height={height}/>;
   if (variant === "preference") return <PreferenceDiagram frame={frame} width={width} height={height}/>;
-  if (variant === "structured") return <StructuredDiagram frame={frame} width={width} height={height}/>;\n  if (variant === "comparison") return <ComparisonDiagram frame={frame} width={width} height={height}/>;\n  if (variant === "transformation") return <TransformationDiagram frame={frame} width={width} height={height}/>;\n  if (variant === "sequence") return <SequenceDiagram frame={frame} width={width} height={height}/>;\n  if (variant === "causal") return <CausalDiagram frame={frame} width={width} height={height}/>;\n  if (variant === "evidence") return <EvidenceDiagram frame={frame} width={width} height={height}/>;\n  if (variant === "code") return <CodeDiagram frame={frame} width={width} height={height}/>;
+  if (variant === "structured") return <StructuredDiagram frame={frame} width={width} height={height}/>;
+  if (variant === "comparison") return <ComparisonDiagram frame={frame} width={width} height={height}/>;
+  if (variant === "transformation") return <TransformationDiagram frame={frame} width={width} height={height}/>;
+  if (variant === "sequence") return <SequenceDiagram frame={frame} width={width} height={height}/>;
+  if (variant === "causal") return <CausalDiagram frame={frame} width={width} height={height}/>;
+  if (variant === "evidence") return <EvidenceDiagram frame={frame} width={width} height={height}/>;
+  if (variant === "code") return <CodeDiagram frame={frame} width={width} height={height}/>;
   return null;
 }
 
