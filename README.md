@@ -40,4 +40,6 @@ Research -> Narration / Timeline -> Storyboard -> Overlay / Primitives -> G1 Pil
 生产过程中的 artifact 统一归档到 artifacts/<project_id>/，包括 research、script、beats、scene、render-ir、audio、build-groups、runtime、qc、repair 和 delivery。
 
 
+参考生产流程与完成定义：`docs/REFERENCE_PROCESS.md`。
+
 当前项目状态与未完成事项：`docs/PROJECT_STATUS.md`。
