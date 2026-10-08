@@ -121,3 +121,13 @@ CI 已真实走完：materialize IR → build groups → shots → e2e → previ
 - [x] 增加第一版 semantic shot variants，并在 RenderIR → Remotion 链路启用。\n- [ ] 扩充更多 semantic shot variants，继续减少 generic fallback。
 - Repair 从 RenderIR patch 升级为源码级 scoped repair。
 - 增加 ASR、更多 TTS 和对象存储 provider。
+
+
+## 2026-10-08 继续推进
+
+- 已完成：视觉构图契约进入 BeatGraph / Scene / RenderIR，强制单焦点、Hero 权重、安全边距、Hero Key 光、紫色强调色。
+- 已完成：叙事时间线自动验收，校验 Script → Sentence → 字幕词级时间 → 双比例 RenderIR 的覆盖与时长一致性。
+- 已完成：双比例 Scene Contract 样例补齐，并接入 CI 质量门禁。
+- 已完成：CI 现在在生产链中执行 visual-grammar、scene-contract、narrative 三层验收。
+- 未完成：真实 ASR 二次校验、TTS provider 抽象、逐镜头参考样片评分、更多语义视觉变体、HyperFrames/分布式渲染、对象存储与缓存。
+- 下一步：把 QC failure 转换为可追溯的 source-level repair patch，并形成“QC → repair → re-render → QC”有次数上限的自动闭环；随后补 ASR 二次校验与镜头级评分。
