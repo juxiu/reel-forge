@@ -11,7 +11,7 @@ const segments = timeline.sentences.map(sentence => {
   const sentenceWords = words.filter(word => Number(word.start) >= (sentence.from - 1) / timeline.fps && Number(word.end) <= sentence.to / timeline.fps + 0.1);
   return {
     id: sentence.id,
-    text: sentenceWords.map(word => String(word.text || "")).join(" ").trim() || sentence.text,
+    text: sentence.text,
     start: (sentence.from - 1) / timeline.fps,
     end: sentence.to / timeline.fps,
     words: sentenceWords,
