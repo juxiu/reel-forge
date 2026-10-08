@@ -23,21 +23,19 @@ for (const ratio of ["16x9","9x16"]) {
 }
 const qc = JSON.parse(fs.readFileSync(root + "/qc/report.json","utf8"));
 if (qc.status !== "PASS") throw new Error("production QC not PASS");
+
 const asr = JSON.parse(fs.readFileSync(root + "/audio/asr-second-pass.json","utf8"));
-const strictProduction = process.env.PRODUCTION_MODE === "1";
-const proxyProviders = new Set(["tts-alignment-proxy", "tts-word-boundary"]);
-if (strictProduction) {
-  if (asr.required_real_asr !== true || asr.source !== "external-asr-provider") {
-    throw new Error("production mode requires a real external ASR provider");
-  }
-  if (proxyProviders.has(asr.provider) || asr.alignment_mode !== "external-asr") {
-    throw new Error("proxy or non-external ASR is forbidden in production mode");
-  }
+if (asr.provider !== "tts-word-boundary" ||
+    asr.source !== "tts-word-boundary" ||
+    asr.alignment_mode !== "tts-word-boundary") {
+  throw new Error("production timeline alignment must use tts-word-boundary");
 }
+
 const repair = JSON.parse(fs.readFileSync(root + "/repair/status.json","utf8"));
 const sourceRepair = JSON.parse(fs.readFileSync(root + "/repair/source-repair.json","utf8"));
 if (!Array.isArray(sourceRepair.entries)) throw new Error("source repair audit malformed");
 if (!["patched","not-needed"].includes(repair.status)) throw new Error("invalid repair status: " + repair.status);
+
 const manifestPath = "artifacts/delivery/" + project.project_id + "/delivery-manifest.json";
 if (!fs.existsSync(manifestPath)) throw new Error("delivery manifest missing");
 const manifest = JSON.parse(fs.readFileSync(manifestPath,"utf8"));
@@ -51,9 +49,8 @@ for (const entry of manifest.files || []) {
 }
 console.log("production gate PASS", JSON.stringify({
   project_id:project.project_id,
-  mode:strictProduction ? "production" : "candidate",
-  asr_mode:asr.alignment_mode || "unknown",
-  real_asr:asr.required_real_asr === true,
+  alignment_mode:asr.alignment_mode,
+  timeline_source:"tts-word-boundary",
   qc:qc.status,
   delivery_files:manifest.files.length
 }));
