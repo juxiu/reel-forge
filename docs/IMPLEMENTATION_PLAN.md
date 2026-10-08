@@ -22,9 +22,9 @@ Research → Script → Content QA → Director → Storyboard → Visual → TT
 | P2 | Director→Storyboard→Scene DSL | director.json, storyboard.json, scene.json | npm run verify:p2 | DONE |
 | P3 | Visual/TTS/Timeline | visual.json, audio.json, timeline.json | npm run verify:p3 | DONE |
 | P4 | Remotion Renderer | render output MP4 + metadata | npm run verify:p4 | IN PROGRESS |
-| P5 | HyperFrames Adapter | RenderIR + adapter contract | npm run verify:p5 | IN PROGRESS |
-| P6 | QC Pyramid / 局部重跑 | qc-report.json + rerun plan | npm run verify:p6 | IN PROGRESS |
-| P7 | 批量生产 | artifact graph + cache + delivery | npm run verify:p7 | IN PROGRESS |
+| P5 | HyperFrames Adapter | RenderIR + adapter contract | npm run verify:p5 | DONE |
+| P6 | QC Pyramid / 局部重跑 | qc-report.json + rerun plan | npm run verify:p6 | DONE |
+| P7 | 批量生产 | artifact graph + cache + delivery | npm run verify:p7 | DONE |
 
 ## 可并行执行的工作流
 
@@ -114,7 +114,7 @@ P0
 当前状态：
 - 修复后的 CI 正在验证真实 MP4 输出；尚未标记 DONE。
 
-### P5 — IN PROGRESS
+### P5 — DONE
 已完成：
 - Scene DSL → RenderIR。
 - RenderIR → HyperFrames HTML adapter。
@@ -123,10 +123,10 @@ P0
 已发现并修复：
 - RenderIR scene graph 误套一层的嵌套问题。
 
-当前状态：
-- 修复后的 CI 正在验证 adapter；尚未标记 DONE。
+验证：
+- verify:p5 PASS（run 37738852451）。
 
-### P6 — IN PROGRESS
+### P6 — DONE
 已完成：
 - content / scene / timeline QC。
 - downstream affected-node 计算。
@@ -135,17 +135,17 @@ P0
 已发现并修复：
 - CI 在干净环境没有先生成 P2 Scene Artifact。
 
-当前状态：
-- verify:p6 已补齐 P2 → P3 → P6 依赖，CI 正在复验。
+验证：
+- verify:p6 PASS（run 37738856901）。
 
-### P7 — IN PROGRESS
+### P7 — DONE
 已完成：
 - Artifact cache key。
 - 多变体 delivery manifest。
 - shared research/script cache reuse 验证。
 
-当前状态：
-- verify:p7 在 advanced CI 中独立验证，尚未标记 DONE。
+验证：
+- verify:p7 PASS（run 37738856901）。
 
 ## 当前最近提交
 
@@ -155,4 +155,4 @@ P0
 
 ## 下一执行门
 
-只有 P4/P5/P6/P7 对应 CI 全部 PASS，才进入统一生产链整合；之后再实现真实 Agent provider、真实 TTS、视觉素材 provider 和批量 render scheduler。
+P5/P6/P7 对应 CI 已 PASS。P4 必须通过最新 ffmpeg 验收门后，才进入统一生产链整合；之后再实现真实 Agent provider、真实 TTS、视觉素材 provider 和批量 render scheduler。
