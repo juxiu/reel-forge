@@ -26,7 +26,7 @@ export function ReelForgeComposition({renderIR, captions = [], timeline = null, 
       return <Sequence key={scene.id} from={Math.round(scene.start * renderIR.fps)} durationInFrames={Math.max(1, Math.round(scene.duration * renderIR.fps))}>
         <Shot scene={scene} />
       </Sequence>;
-    })}
+    }) : null}
     <ProgressBar chapters={timeline?.chapters || []} totalFrames={Math.ceil(renderIR.duration * renderIR.fps)} />
     <ChapterCard timeline={timeline} />
     <Captions captions={captions} />
