@@ -8,7 +8,7 @@ const RULES = [
   {variant:"network", job:"mechanism", weight:1, patterns:[/\bconnect\b/i,/\bconnection\b/i,/\btransport\b/i,/连接|关系|传递|网络|链路/]},
   {variant:"split", job:"explain", weight:1, patterns:[/content-digest/i,/repr-digest/i,/拆分|分成|两类|两部分|分别/]},
   {variant:"structured", job:"explain", weight:.9, patterns:[/structured/i,/结构化|字段|层级|组织|格式/]},
-  {variant:"preference", job:"hook", weight:.9, patterns:[/want-content-digest/i,/want-repr-digest/i,/偏好|选择|想要|需要|目标/]},
+  {variant:"preference", job:"hook", weight:.9, patterns:[/want-content-digest/i,/want-repr-digest/i,/\bpreference\b/i,/\bwanted\b/i,/偏好|选择|想要|需要|目标/]},
 ];
 
 function scoreRule(rule, text) {
