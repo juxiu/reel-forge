@@ -4,7 +4,7 @@
 
 ## 总体状态
 
-**状态：基础生产链、双比例质量门禁、语义导演、ASR 契约与镜头评分已接入；当前继续补齐真实 ASR、真实参考资产与源级可回写修复。**
+**状态：基础生产链、双比例质量门禁、语义导演、TTS 词边界时间轴、ASR 契约与镜头评分已接入；当前继续补齐真实 ASR、真实参考资产与源级可回写修复。**
 
 当前主干已经覆盖：
 
@@ -88,7 +88,8 @@ CI 已真实走完：materialize IR → build groups → shots → e2e → previ
 
 - 视觉表现继续向 anything2explainer 样片靠拢：更多语义图元、镜头级专属动画、更加严格的反 PPT 构图。
 - CI 已默认自动批准四个 checkpoint；交互生产模式仍可保持暂停/恢复。
-- [x] ASR 二次对齐契约与 CI 门禁；当前默认使用 TTS word-boundary 代理，`ASR_REQUIRED=1` 时强制要求真实 ASR provider。
+- [x] TTS WordBoundary 主时间轴与独立词边界验收；无真实 ASR API 时，二次验收使用明确标记的 `tts-word-boundary`。
+- [~] 真实 ASR 二次验收：已有 Provider 接口与 Production Gate，待获得真实 ASR API 后启用。
 - 更多本地 TTS provider。
 - [x] Repair 输出 scene → source_ref 修复映射；[ ] 继续实现真正的源代码节点回写。
 - [x] 建立第一版逐镜头质量评分标尺；[ ] 继续接入真实参考样片/反例资产。
@@ -135,7 +136,8 @@ CI 已真实走完：materialize IR → build groups → shots → e2e → previ
 - 已完成：双比例 Scene Contract 样例补齐，并接入 CI 质量门禁。
 - 已完成：CI 现在在生产链中执行 visual-grammar、semantic-director、scene-contract、shot-score、narrative、ASR 多层验收。
 - 已完成：ASR 二次对齐契约、第一版逐镜头评分、source_ref 修复追踪。
-- 已完成：真实 ASR provider 接口（通过 `ASR_REQUIRED=1` + `ASR_COMMAND` 接入真实 provider；未配置时生产默认仍使用显式标记的 proxy）。
+- 已完成：参考 anything2explainer 的 TTS WordBoundary 主时间轴方案：逐句 TTS 产出词级时间边界，字幕/分镜读取同一时间轴，新增独立词边界覆盖与漂移验收；未配置真实 ASR 时不伪装成 provider-backed 结果。
+- 已完成：真实 ASR provider 接口（通过 `ASR_REQUIRED=1` + `ASR_COMMAND` 接入真实 provider）；Strict Production 仍强制 external ASR。
 - 未完成：真实参考样片/反例资产、更多语义视觉变体、HyperFrames/分布式渲染、对象存储与缓存。
 - 已完成：QC → repair → re-render → QC 限次自动闭环入口，CI 默认最多执行 2 次修复循环。
 - 下一步：接入真实参考样片/反例资产评分，并把 repair patch 与具体源节点建立可回写映射；交付包已强制纳入 ASR 二次校验结果与双比例 RenderIR。
