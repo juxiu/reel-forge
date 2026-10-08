@@ -130,4 +130,4 @@ CI 已真实走完：materialize IR → build groups → shots → e2e → previ
 - 已完成：双比例 Scene Contract 样例补齐，并接入 CI 质量门禁。
 - 已完成：CI 现在在生产链中执行 visual-grammar、scene-contract、narrative 三层验收。
 - 未完成：真实 ASR 二次校验、TTS provider 抽象、逐镜头参考样片评分、更多语义视觉变体、HyperFrames/分布式渲染、对象存储与缓存。
-- 下一步：把 QC failure 转换为可追溯的 source-level repair patch，并形成“QC → repair → re-render → QC”有次数上限的自动闭环；随后补 ASR 二次校验与镜头级评分。
+- 已完成：QC → repair → re-render → QC 限次自动闭环入口，CI 默认最多执行 2 次修复循环。\n- 下一步：补 ASR 二次校验与镜头级参考样片评分，并把 repair patch 与具体源节点建立更细粒度映射。
