@@ -19,6 +19,7 @@
     "verify:repair": "node scripts/verify-repair.mjs",
     "verify:hyperframes": "node scripts/verify-hyperframes.mjs",
     "verify:shots": "node scripts/verify-shots.mjs",
+    "verify:authored-shots": "node scripts/verify-authored-shots.mjs",
     "tts": "node scripts/tts_build.mjs",
     "verify:word-boundary": "node scripts/verify-word-boundary.mjs",
     "storyboard": "python3 scripts/render_storyboard.py",
@@ -65,4 +66,4 @@
     "react-dom": "19.3.0",
     "remotion": "4.0.534"
   }
-}\n
+}

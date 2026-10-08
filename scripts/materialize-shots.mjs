@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const ir = JSON.parse(fs.readFileSync("fixtures/render-ir-16x9.json", "utf8"));
-const maxPerGroup = Number(process.env.MAX_SHOTS_PER_GROUP || 5);
+const maxPerGroup = Number(process.env.MAX_SHOTS_PER_GROUP || 6);
 if (!Number.isInteger(maxPerGroup) || maxPerGroup < 1) throw new Error("MAX_SHOTS_PER_GROUP must be a positive integer");
 
 const root = "src/shots";
@@ -28,7 +28,8 @@ for (let i = 0; i < ir.scenes.length; i += maxPerGroup) {
         [
           'import React from "react";',
           'import {ExplainerShot} from "../Shot.jsx";',
-          'export function ' + shotId + '({scene}) { return <ExplainerShot scene={scene} />; }',
+          'export const SHOT_RECIPE = { shot_id: "' + shotId + '", variant: "' + (scene.variant || "generic") + '", settle_frames: 30 };',
+          'export function ' + shotId + '({scene}) { return <ExplainerShot scene={scene} recipe={SHOT_RECIPE} />; }',
           "",
         ].join("\n"),
       );
@@ -57,15 +58,11 @@ for (let i = 0; i < ir.scenes.length; i += maxPerGroup) {
         Math.round(scene.start * ir.fps) + "–" + Math.round((scene.start + scene.duration) * ir.fps) + "f"
       ),
       "",
-      "每个镜头独立组件，共用 ExplainerShot 图元。",
+      "每个镜头独立组件，共用 ExplainerShot 图元；已有 authored scene 不会被覆盖。",
     ].join("\n") + "\n",
   );
 
-  groups.push({
-    id,
-    scene_ids: scenes.map((scene) => scene.id),
-    status: "generated",
-  });
+  groups.push({id, scene_ids: scenes.map((scene) => scene.id), status: "generated"});
 }
 
 const registryImports = groups.map((group) =>

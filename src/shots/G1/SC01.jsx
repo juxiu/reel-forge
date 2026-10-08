@@ -1,9 +1,12 @@
 import React from "react";
-import {SemanticShot} from "../SemanticShots.jsx";
+import {ExplainerShot} from "../Shot.jsx";
 
 export const SHOT_RECIPE = {
+  shot_id:"SC01",
   variant:"network",
   hero_size:210,
+  camera:"pan",
+  settle_frames:30,
   support_count:6,
   layout:"orbit",
   seed:1001,
@@ -13,5 +16,5 @@ export const SHOT_RECIPE = {
 };
 
 export function SC01({scene}) {
-  return <SemanticShot scene={scene} recipe={SHOT_RECIPE} />;
+  return <ExplainerShot scene={{...scene, variant:SHOT_RECIPE.variant}} recipe={SHOT_RECIPE} />;
 }
