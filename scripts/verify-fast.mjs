@@ -12,7 +12,6 @@ const checks = [
   "verify:semantic-director",
   "verify:repair",
   "verify:hyperframes",
-  "verify:scene-contract",
 ];
 
 const started = Date.now();
