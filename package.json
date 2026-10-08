@@ -20,6 +20,7 @@
     "verify:hyperframes": "node scripts/verify-hyperframes.mjs",
     "verify:shots": "node scripts/verify-shots.mjs",
     "tts": "node scripts/tts_build.mjs",
+    "verify:word-boundary": "node scripts/verify-word-boundary.mjs",
     "storyboard": "python3 scripts/render_storyboard.py",
     "selfcheck": "python3 scripts/selfcheck.py",
     "materialize-ir": "node scripts/materialize-ir.mjs",
