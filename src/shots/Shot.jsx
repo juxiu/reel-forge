@@ -61,11 +61,52 @@ function StructuredDiagram({frame, width, height}) {
   </div>;
 }
 
+function ComparisonDiagram({frame, width, height}) {
+  const p = easeOut(clamp01((frame - 8) / 26));
+  return <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",gap:22}}>
+    {["A","B"].map((label,i)=><div key={label} style={{width:width*.28,height:170,border:"2px solid "+(i===0?PALETTE.line:PALETTE.purple),borderRadius:22,display:"flex",alignItems:"center",justifyContent:"center",fontSize:54,fontWeight:900,color:i===0?PALETTE.white:PALETTE.purpleLight,transform:"translateY("+((1-p)*(i?18:-18))+"px) scale("+(0.94+0.06*p)+")"}}>{label}</div>)}
+    <div style={{position:"absolute",fontSize:24,fontWeight:900,color:PALETTE.grey,top:"50%"}}>VS</div>
+  </div>;
+}
+function TransformationDiagram({frame, width, height}) {
+  const p = easeOut(clamp01((frame - 8) / 30));
+  return <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",gap:28}}>
+    <div style={{width:width*.24,height:130,border:"2px solid "+PALETTE.line,borderRadius:20,display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,fontWeight:900,opacity:1-p}}>BEFORE</div>
+    <div style={{fontSize:38,color:PALETTE.purple,transform:"translateX("+(p*10)+"px)"}}>→</div>
+    <div style={{width:width*.24,height:130,border:"2px solid "+PALETTE.purple,borderRadius:20,display:"flex",alignItems:"center",justifyContent:"center",fontSize:28,fontWeight:900,color:PALETTE.purpleLight,transform:"scale("+(0.9+0.1*p)+")",opacity:.35+.65*p}}>AFTER</div>
+  </div>;
+}
+function SequenceDiagram({frame, width, height}) {
+  return <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",gap:12}}>
+    {[1,2,3].map((n,i)=>{const p=easeOut(clamp01((frame-i*9)/18));return <React.Fragment key={n}><div style={{width:width*.18,height:92,border:"2px solid "+(i===2?PALETTE.purple:PALETTE.line),borderRadius:18,display:"flex",alignItems:"center",justifyContent:"center",fontSize:34,fontWeight:900,opacity:p,transform:"translateY("+(1-p)*24+"px)"}}>{n}</div>{i<2?<div style={{width:28,height:3,background:PALETTE.purple,opacity:p}}/>:null}</React.Fragment>})}
+  </div>;
+}
+function CausalDiagram({frame, width, height}) {
+  const p=easeOut(clamp01((frame-8)/30));
+  return <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",gap:24}}>
+    {["CAUSE","MECHANISM","RESULT"].map((label,i)=><React.Fragment key={label}><div style={{width:width*.2,height:105,border:"2px solid "+(i===1?PALETTE.purple:PALETTE.line),borderRadius:18,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,fontWeight:900,color:i===1?PALETTE.purpleLight:PALETTE.white,opacity:easeOut(clamp01((frame-i*8)/18))}}>{label}</div>{i<2?<div style={{fontSize:28,color:PALETTE.purple,opacity:p}}>→</div>:null}</React.Fragment>)}
+  </div>;
+}
+function EvidenceDiagram({frame, width, height}) {
+  const p=easeOut(clamp01((frame-10)/24));
+  return <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",gap:18}}>
+    {[["SOURCE",.25],["CLAIM",.5],["EVIDENCE",.75]].map(([label,x],i)=><div key={label} style={{width:width*.22,height:120,border:"2px solid "+(i===2?PALETTE.purple:PALETTE.line),borderRadius:18,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,fontWeight:900,color:i===2?PALETTE.purpleLight:PALETTE.white,transform:"translateY("+((1-p)*(i-1)*24)+"px)",opacity:p}}>{label}</div>)}
+  </div>;
+}
+function CodeDiagram({frame, width, height}) {
+  const p=easeOut(clamp01((frame-6)/24));
+  return <div style={{position:"absolute",inset:0,padding:"8%",fontFamily:"monospace",fontSize:24,lineHeight:1.6,color:PALETTE.white}}>
+    <div style={{borderLeft:"3px solid "+PALETTE.purple,paddingLeft:22,opacity:p}}>{"const result = explain(input)"}</div>
+    <div style={{borderLeft:"3px solid "+PALETTE.line,paddingLeft:22,opacity:p*.82}}>{"return transform(result)"}</div>
+    <div style={{borderLeft:"3px solid "+PALETTE.purpleLight,paddingLeft:22,opacity:p*.65}}>{"→ verified"}</div>
+  </div>;
+}
+
 function VariantDiagram({variant, frame, width, height, tall}) {
   if (variant === "network") return <NetworkDiagram frame={frame} width={width} height={height} tall={tall}/>;
   if (variant === "split") return <SplitDigestDiagram frame={frame} width={width} height={height}/>;
   if (variant === "preference") return <PreferenceDiagram frame={frame} width={width} height={height}/>;
-  if (variant === "structured") return <StructuredDiagram frame={frame} width={width} height={height}/>;
+  if (variant === "structured") return <StructuredDiagram frame={frame} width={width} height={height}/>;\n  if (variant === "comparison") return <ComparisonDiagram frame={frame} width={width} height={height}/>;\n  if (variant === "transformation") return <TransformationDiagram frame={frame} width={width} height={height}/>;\n  if (variant === "sequence") return <SequenceDiagram frame={frame} width={width} height={height}/>;\n  if (variant === "causal") return <CausalDiagram frame={frame} width={width} height={height}/>;\n  if (variant === "evidence") return <EvidenceDiagram frame={frame} width={width} height={height}/>;\n  if (variant === "code") return <CodeDiagram frame={frame} width={width} height={height}/>;
   return null;
 }
 
