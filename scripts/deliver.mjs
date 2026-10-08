@@ -13,6 +13,9 @@ const required = [
   "artifacts/" + project.project_id + "/research.md",
   "artifacts/" + project.project_id + "/script.json",
   "artifacts/" + project.project_id + "/qc/report.json",
+  "artifacts/" + project.project_id + "/audio/asr-second-pass.json",
+  "fixtures/render-ir-16x9.json",
+  "fixtures/render-ir-9x16.json",
 ];
 const optional = [
   "artifacts/" + project.project_id + "/audio/voice-manifest.json",
@@ -21,6 +24,7 @@ const optional = [
   "artifacts/" + project.project_id + "/runtime/checkpoints.json",
   "artifacts/preview/manifest.json",
   "artifacts/" + project.project_id + "/repair/repair-plan.json",
+  "artifacts/" + project.project_id + "/repair/status.json",
 ];
 const files = [...required, ...optional.filter((file) => fs.existsSync(file))];
 for (const file of required) {
