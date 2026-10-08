@@ -6,7 +6,7 @@ import {runNamedAgent} from "../src/agents/orchestrator.mjs";
 
 const ir=JSON.parse(fs.readFileSync("fixtures/render-ir-16x9.json","utf8"));
 const project=JSON.parse(fs.readFileSync(process.env.PROJECT_FILE||"fixtures/project.json","utf8"));
-const maxPerGroup=Number(process.env.MAX_SHOTS_PER_GROUP||5);
+const maxPerGroup=Number(process.env.MAX_SHOTS_PER_GROUP||6);
 const concurrency=Number(process.env.BUILD_CONCURRENCY||4);
 const agent=createAgentProvider();
 const strict=process.env.AGENT_STRICT==="1";
