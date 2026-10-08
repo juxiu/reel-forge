@@ -13,6 +13,13 @@ function checkpointPath(projectId, root = "artifacts") {
   return path.join(root, projectId, "runtime", "checkpoints.json");
 }
 
+const CHECKPOINT_DEPENDENCIES = {
+  "length-language": [],
+  "narration-signoff": ["length-language"],
+  "voiceover": ["narration-signoff"],
+  "pilot-preview": ["voiceover"],
+};
+
 const ARTIFACT_PATTERNS = {
   "length-language": ["fixtures/project.json"],
   "narration-signoff": ["fixtures/script.json", "script/narration.txt", "script/storyboard_src.md"],
@@ -61,6 +68,12 @@ export function resolveCheckpoint(projectId, name, status = "approved", root = "
   if (!["pending", "approved", "rejected"].includes(status)) throw new Error("invalid checkpoint status");
   const state = initCheckpoints(projectId, root);
   if (status === "approved") {
+    for (const dependency of CHECKPOINT_DEPENDENCIES[name] || []) {
+      const value = state.checkpoints[dependency];
+      if (!value || value.status !== "approved" || !value.artifact_hash) {
+        throw new Error("checkpoint dependency not approved: " + dependency + " -> " + name);
+      }
+    }
     const artifact = checkpointArtifactHash(name, root);
     state.checkpoints[name] = {status, resolved_at: new Date().toISOString(), artifact_hash: artifact.hash, artifact_files: artifact.files};
   } else {
