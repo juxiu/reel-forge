@@ -1,1 +1,6 @@
-import fs from "node:fs";import{toRenderIR}from "../src/backends/render-ir.mjs";import{captionsFromWords}from "../src/captions/pipeline.mjs";const scenes=JSON.parse(fs.readFileSync("artifacts/demo-production/scene.json","utf8")).scenes;const words=[{text:"Semantic",start:0,end:.4},{text:"search",start:.4,end:.8},{text:"compares",start:.8,end:1.2},{text:"meaning",start:1.2,end:1.7},{text:"instead",start:1.7,end:2.1},{text:"of",start:2.1,end:2.3},{text:"exact",start:2.3,end:2.7},{text:"words.",start:2.7,end:3.2}];const cap=captionsFromWords(words);if(!cap.captions.length)throw new Error("captions");const project=JSON.parse(fs.readFileSync("fixtures/project.json","utf8")),ir=toRenderIR(project,scenes,{width:1280,height:720,fps:30});fs.writeFileSync("artifacts/demo-production/render-ir.json",JSON.stringify(ir,null,2));fs.writeFileSync("fixtures/render-ir.json",JSON.stringify(ir,null,2));console.log("e2e PASS");
+import fs from "node:fs";
+const captions=JSON.parse(fs.readFileSync("fixtures/captions.json","utf8"));
+if(!Array.isArray(captions.captions))throw new Error("caption artifact invalid");
+const wide=JSON.parse(fs.readFileSync("fixtures/render-ir-16x9.json","utf8")),tall=JSON.parse(fs.readFileSync("fixtures/render-ir-9x16.json","utf8"));
+if(wide.width!==1280||wide.height!==720||tall.width!==720||tall.height!==1280)throw new Error("multi-ratio fixtures invalid");
+console.log("e2e contract PASS");

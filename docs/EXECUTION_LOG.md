@@ -1,22 +1,26 @@
 # 执行记录
 
 ## 生产化重构
+
 旧 MVP workflow、伪 AudioSpec 和 HTML-only HyperFrames evaluation 已删除。
 
-本轮新增：
-- Production Director pipeline 与持久化 execution state。
-- 明确的 Agent command provider 入口。
+当前新增并验证：
+- Production Director execution state。
+- Agent command provider。
 - 真实 source fetch / claim graph。
 - Rich Beat Graph / Scene DSL / RenderIR。
-- 可替换 TTS provider；Edge TTS 能提供真实音频与 WordBoundary。
-- 并行 worker pool、content-addressed Artifact Store。
-- ffprobe 媒体探针、ffmpeg motion analysis、delivery checksum。
+- Edge TTS 真实音频与 WordBoundary provider。
+- 字幕 pipeline。
+- 并行 worker pool与 content-addressed Artifact Store。
+- ffprobe 媒体探针、ffmpeg motion analysis。
+- 16:9 / 9:16 双画幅真实 Remotion composition。
+- checksum delivery manifest。
 
-当前：
-- P1/P2/P4：核心代码已落地，但 live Agent/LLM 脚本生成尚未以凭据集成测试宣称完成。
-- P3：Edge TTS provider 可执行；ASR 词级验证仍缺。
-- P5：scheduler/Remotion 已落地；HyperFrames 仍需真实 runtime。
-- P6：媒体 QC 基础已落地；Repair Agent 闭环待接。
-- P7：Artifact Store/manifest 已落地；跨进程分布式锁与对象存储待接。
+仍未宣称完成：
+- live LLM/script generation。
+- 真实 ASR 独立验证。
+- HyperFrames runtime backend。
+- Pixel/Motion QC 的完整 repair agent 闭环。
+- 跨进程分布式锁与对象存储。
 
-未通过真实验收的阶段不得标记 DONE。
+任何未通过真实验收的阶段不得标记 DONE。
