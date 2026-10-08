@@ -1,5 +1,66 @@
 import fs from "node:fs";
-const ratios=[["16x9","fixtures/render-ir-16x9.json"],["9x16","fixtures/render-ir-9x16.json"]]; const issues=[];
-for(const [ratio,file] of ratios){if(!fs.existsSync(file)){issues.push(ratio+":missing-render-ir");continue;} const ir=JSON.parse(fs.readFileSync(file,"utf8")); const safe=ir.width>ir.height?{left:72,right:72,top:82,bottom:122}:{left:44,right:44,top:92,bottom:184}; if(!(ir.width>0&&ir.height>0&&ir.fps>0))issues.push(ratio+":invalid-canvas"); if(!(ir.duration>0))issues.push(ratio+":invalid-duration"); const ids=new Set(); let previousEnd=0;
-for(const scene of ir.scenes||[]){if(ids.has(scene.id))issues.push(ratio+":"+scene.id+":duplicate");ids.add(scene.id);const start=Number(scene.start),duration=Number(scene.duration);if(!(duration>0))issues.push(ratio+":"+scene.id+":invalid-duration");if(start<previousEnd-.01)issues.push(ratio+":"+scene.id+":overlap");previousEnd=Math.max(previousEnd,start+duration);if(!scene.source_ref || !(Number.isInteger(scene.source_ref.segment_index) && scene.source_ref.segment_index>=0))issues.push(ratio+":"+scene.id+":missing-source-ref");if(!scene.variant)issues.push(ratio+":"+scene.id+":missing-variant");if(!Array.isArray(scene.elements)||!scene.elements.some(x=>x.id==="hero"))issues.push(ratio+":"+scene.id+":missing-hero");const camera=(scene.motion||[]).find(x=>x.target==="stage");if(!camera||!(Number(camera.amount)>0))issues.push(ratio+":"+scene.id+":missing-camera-motion");const c=scene.composition||{},l=scene.light||{};if(!["single-hero","hero-plus-flow"].includes(c.focus))issues.push(ratio+":"+scene.id+":invalid-focus-mode");if(!(Number(c.hero_weight)>=.45))issues.push(ratio+":"+scene.id+":hero-weight-too-low");if(!(Number(c.safe_margin)>=.05&&Number(c.safe_margin)<=.18))issues.push(ratio+":"+scene.id+":invalid-safe-margin");if(!["hero-key","soft-key"].includes(l.mode))issues.push(ratio+":"+scene.id+":invalid-light-mode");if(!(Number(l.key_intensity)>0&&Number(l.key_intensity)<=1))issues.push(ratio+":"+scene.id+":invalid-key-light");if(l.accent!=="purple")issues.push(ratio+":"+scene.id+":missing-purple-accent");if(!safe.left||!safe.bottom)issues.push(ratio+":"+scene.id+":invalid-safe-area");} if(Math.abs(previousEnd-Number(ir.duration))>.1)issues.push(ratio+":duration-does-not-cover-scenes");}
-if(issues.length){console.error("scene contract FAIL");issues.forEach(x=>console.error("- "+x));process.exit(1);} console.log("scene contract PASS");
+
+const ratios = [
+  ["16x9", "fixtures/render-ir-16x9.json"],
+  ["9x16", "fixtures/render-ir-9x16.json"],
+];
+const issues = [];
+
+for (const [ratio, file] of ratios) {
+  if (!fs.existsSync(file)) {
+    issues.push(ratio + ":missing-render-ir");
+    continue;
+  }
+
+  const ir = JSON.parse(fs.readFileSync(file, "utf8"));
+  const safe = ir.width > ir.height
+    ? {left:72, right:72, top:82, bottom:122}
+    : {left:44, right:44, top:92, bottom:184};
+
+  if (!(ir.width > 0 && ir.height > 0 && ir.fps > 0)) issues.push(ratio + ":invalid-canvas");
+  if (!(ir.duration > 0)) issues.push(ratio + ":invalid-duration");
+
+  const ids = new Set();
+  let maxSceneEnd = 0;
+
+  for (const scene of ir.scenes || []) {
+    if (ids.has(scene.id)) issues.push(ratio + ":" + scene.id + ":duplicate");
+    ids.add(scene.id);
+
+    const start = Number(scene.start);
+    const duration = Number(scene.duration);
+    if (!(duration > 0)) issues.push(ratio + ":" + scene.id + ":invalid-duration");
+
+    if (start < maxSceneEnd - 0.01) issues.push(ratio + ":" + scene.id + ":overlap");
+    maxSceneEnd = Math.max(maxSceneEnd, start + duration);
+
+    if (!scene.source_ref || !(Number.isInteger(scene.source_ref.segment_index) && scene.source_ref.segment_index >= 0)) issues.push(ratio + ":" + scene.id + ":missing-source-ref");
+    if (!scene.variant) issues.push(ratio + ":" + scene.id + ":missing-variant");
+    if (!Array.isArray(scene.elements) || !scene.elements.some((x) => x.id === "hero")) issues.push(ratio + ":" + scene.id + ":missing-hero");
+
+    const camera = (scene.motion || []).find((x) => x.target === "stage");
+    if (!camera || !(Number(camera.amount) > 0)) issues.push(ratio + ":" + scene.id + ":missing-camera-motion");
+
+    const c = scene.composition || {};
+    const l = scene.light || {};
+    if (!["single-hero", "hero-plus-flow"].includes(c.focus)) issues.push(ratio + ":" + scene.id + ":invalid-focus-mode");
+    if (!(Number(c.hero_weight) >= 0.45)) issues.push(ratio + ":" + scene.id + ":hero-weight-too-low");
+    if (!(Number(c.safe_margin) >= 0.05 && Number(c.safe_margin) <= 0.18)) issues.push(ratio + ":" + scene.id + ":invalid-safe-margin");
+    if (!["hero-key", "soft-key"].includes(l.mode)) issues.push(ratio + ":" + scene.id + ":invalid-light-mode");
+    if (!(Number(l.key_intensity) > 0 && Number(l.key_intensity) <= 1)) issues.push(ratio + ":" + scene.id + ":invalid-key-light");
+    if (l.accent !== "purple") issues.push(ratio + ":" + scene.id + ":missing-purple-accent");
+    if (!safe.left || !safe.bottom) issues.push(ratio + ":" + scene.id + ":invalid-safe-area");
+  }
+
+  if (Number(ir.duration) + 0.1 < maxSceneEnd) {
+    issues.push(ratio + ":duration-does-not-cover-scenes");
+  }
+}
+
+if (issues.length) {
+  console.error("scene contract FAIL");
+  issues.forEach((issue) => console.error("- " + issue));
+  process.exit(1);
+}
+
+console.log("scene contract PASS");
