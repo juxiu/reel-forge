@@ -39,7 +39,7 @@ for(const item of items){
   sentences.push({id:"S"+String(sentences.length+1).padStart(2,"0"),chapter:chapter,from:Math.round((start)*30)+1,to:Math.round(end*30),text:item.text,para:item.paragraphEnd,subs});
   cursor=end;
 }
-const firstChapter=items.find(x=>x.type==="chapter");const chapters=firstChapter?[{n:firstChapter.chapter,title:firstChapter.title,from:1}]:[{n:1,title:"",from:1}];
+const chapterItems=items.filter(x=>x.type==="chapter");const chapters=chapterItems.length?chapterItems.map(x=>({n:x.chapter,title:x.title,from:1})): [{n:1,title:"",from:1}];
 const total_frames=Math.max(1,Math.round(result.manifest.duration_s*30)+90);
 const timeline={fps:30,total_frames,engine:"edge-tts",voice:result.manifest.voice,rate:result.manifest.rate,chapters,sentences};
 fs.mkdirSync("script",{recursive:true});fs.writeFileSync("script/timeline.json",JSON.stringify(timeline,null,2));
