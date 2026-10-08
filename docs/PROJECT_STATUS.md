@@ -4,13 +4,13 @@
 
 ## 总体状态
 
-**状态：功能链已达到 anything2explainer 的基础生产阶段覆盖，当前处于“代码加固完成，等待完整 CI 重新验收”阶段。**
+**状态：基础生产链已通过完整 GitHub Actions 验收，可实际产出双比例 MP4；当前进入画面语义化与参考样片质量提升阶段。**
 
 当前主干已经覆盖：
 
 Research → Narration / Timeline → Storyboard → Overlay / Primitives → G1 Pilot → Parallel Build → Render → Quantitative QC → Repair / Recheck → Delivery。
 
-上一轮主干 CI 在 npm run selfcheck 因 Python 字符串/整数比较失败；该问题已经修复，并继续向后段 CI 可能暴露的真实问题推进。
+本轮 CI 已真实跑通 Research → TTS → Storyboard → Selfcheck → Render → Frame/Motion QC → QC → Delivery，全链路通过。
 
 ## 已完成
 
@@ -65,7 +65,11 @@ Research → Narration / Timeline → Storyboard → Overlay / Primitives → G1
 
 ### 当前阻塞项
 
-**1. 完整生产 CI 尚未取得新的绿色结果。**
+**当前没有 P0 阻塞。**
+
+本轮 GitHub Actions 已取得绿色结果：Workflow `verify`，Run `37752344623`（Run #172），目标 PR #9；Render、双比例量化 QC、Delivery Verification 全部通过。
+
+此前失败记录：
 
 已知上一轮失败为：
 - Workflow：verify
@@ -76,14 +80,14 @@ Research → Narration / Timeline → Storyboard → Overlay / Primitives → G1
 
 该根因已经修复；当前通过 GitHub 连接器可确认代码提交，但无法直接读取这些新 push 所对应的 Actions run 列表，因此不能把新提交声明为 CI 全绿。
 
-**2. 最终媒体验收仍需由 CI 实际执行确认。**
+**2. 最终媒体验收已完成。**
 
-必须让新一轮 verify 真实走完：materialize IR → build groups → shots → e2e → preview → pilot → render 双比例 → frame metrics → motion check → qc → repair/recheck（如需）→ delivery → delivery verification。
+CI 已真实走完：materialize IR → build groups → shots → e2e → preview → pilot → render 双比例 → frame metrics → motion check → qc → repair/recheck fallback → delivery → delivery verification。
 
 ### 仍属增强项
 
 - 视觉表现继续向 anything2explainer 样片靠拢：更多语义图元、镜头级专属动画、更加严格的反 PPT 构图。
-- 第 1–3 个确认点目前是持久化 checkpoint 能力，但不是默认生产脚本的交互阻塞点。
+- CI 已默认自动批准四个 checkpoint；交互生产模式仍可保持暂停/恢复。
 - 独立 ASR 二次校验。
 - 更多本地 TTS provider。
 - 更强 Repair Agent：从 QC issue 自动修改源码并闭环重渲染。
@@ -93,12 +97,13 @@ Research → Narration / Timeline → Storyboard → Overlay / Primitives → G1
 
 ## 计划
 
-### P0：完成当前基线验收
+### P0：已完成
 
-1. 让修复后的主干继续跑完整 verify。
-2. 处理下一个真实失败点，不跳过后续阶段。
-3. 直到双比例 Render、Quantitative QC、Repair/Recheck、Delivery、Delivery Verification 全部通过。
-4. 把最后一次绿色 CI run 记录进本文件。
+1. 修复 selfcheck 白名单解析异常。
+2. 补齐 frame/motion QC 的 Python 依赖。
+3. 修正 npm → motion_check 参数传递。
+4. 修正 FFmpeg scene filter 的 JavaScript 转义。
+5. 取得完整绿色 CI Run #172，并记录到本文件。
 
 ### P1：把四个确认点产品化
 

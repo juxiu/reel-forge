@@ -26,9 +26,19 @@
 - 真实媒体生产：已闭环。
 - 尚属增强项：独立 ASR 交叉校验、更多本地 TTS provider、对象存储、分布式 worker 和更复杂的 Motion Grammar。
 
-当前原则：先保证功能链真实可运行，再提升画面表现和生产效率。
+当前验收已完成：
+- verify Run #172 / ID 37752344623：PASS。
+- 自动批准 length-language、narration-signoff、voiceover、pilot-preview 四个确认点。
+- 真实 Render：16:9 + 9:16。
+- Frame Metrics：16:9 + 9:16 PASS。
+- Motion Check：16:9 + 9:16 PASS。
+- QC：PASS。
+- Delivery + checksum verification：PASS。
+- 关键 CI 修复：白名单解析、Python QC 依赖、npm motion-check 参数、FFmpeg scene filter 转义。
+
+当前原则：先保证功能链真实可运行，再提升画面表现、镜头语义化和生产效率。
 
 
 ## 当前验收状态
 
-详细状态见 `docs/PROJECT_STATUS.md`。最近一次主干 CI run `37747763804` 在 `npm run selfcheck` 失败；此前 Research、Runtime、Build、Visual、Repair、TTS、Storyboard 等步骤已通过。当前优先修复 selfcheck，然后继续跑完 Render → QC → Repair/Recheck → Delivery。
+详细状态见 `docs/PROJECT_STATUS.md`。此前主干 CI run `37747763804` 在 `npm run selfcheck` 失败；经过连续修复，最新完整生产验收已由 verify Run #172（ID `37752344623`）全部通过。

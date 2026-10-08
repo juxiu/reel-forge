@@ -31,6 +31,9 @@ jobs:
       - run: npm run verify:hyperframes
       - run: npm run run-production
       - run: npm run tts
+      - run: node scripts/checkpoint.mjs length-language approved
+      - run: node scripts/checkpoint.mjs narration-signoff approved
+      - run: node scripts/checkpoint.mjs voiceover approved
       - run: npm run storyboard
       - run: npm run selfcheck
       - run: npm run materialize-ir
@@ -44,8 +47,8 @@ jobs:
       - run: npm run render
       - run: npm run frame-metrics -- --frames artifacts/frames/16x9 --render-ir fixtures/render-ir-16x9.json --out artifacts/digest-explainer/qc/frame_metrics_16x9.json
       - run: npm run frame-metrics -- --frames artifacts/frames/9x16 --render-ir fixtures/render-ir-9x16.json --out artifacts/digest-explainer/qc/frame_metrics_9x16.json
-      - run: npm run motion-check artifacts/frames/16x9 --render-ir fixtures/render-ir-16x9.json --report artifacts/digest-explainer/qc/motion_16x9.json
-      - run: npm run motion-check artifacts/frames/9x16 --render-ir fixtures/render-ir-9x16.json --report artifacts/digest-explainer/qc/motion_9x16.json
+      - run: npm run motion-check -- artifacts/frames/16x9 --render-ir fixtures/render-ir-16x9.json --report artifacts/digest-explainer/qc/motion_16x9.json
+      - run: npm run motion-check -- artifacts/frames/9x16 --render-ir fixtures/render-ir-9x16.json --report artifacts/digest-explainer/qc/motion_9x16.json
       - run: npm run qc || (npm run repair && AUTO_APPROVE=1 npm run render && npm run qc)
       - run: npm run verify:qc
       - run: npm run deliver
