@@ -30,3 +30,17 @@
 ## 与参考仓库的差异
 
 reel-forge 保留了更偏工程化的 Typed Artifact Contract、项目锁、外部 Agent provider 和 HyperFrames contract。这些属于扩展能力，不会改变 anything2explainer 的基础生产顺序。
+
+## 当前验收说明
+
+上述“完成”表示阶段能力已经具备对应实现入口，不等于最终生产验收已经通过。最终完成以 docs/PROJECT_STATUS.md 的 P0 结果与 GitHub Actions 全绿为准。
+
+本轮针对真实后段风险新增：
+- selfcheck 强化；
+- Pilot preview manifest；
+- 逐镜头 frame/motion metrics；
+- QC issue → node/ratio；
+- scoped repair；
+- delivery 实际 checksum 重算；
+- canonical timeline-source artifact；
+- 双比例 QC verifier。
