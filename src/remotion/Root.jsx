@@ -30,6 +30,6 @@ export function ReelForgeComposition({renderIR, captions = [], timeline = null})
     <ProgressBar chapters={timeline?.chapters || []} totalFrames={Math.ceil(renderIR.duration * renderIR.fps)} />
     <ChapterCard timeline={timeline} />
     <Captions captions={captions} />
-    <EndingCredit show={endShow} />
+    <EndingCredit show={endShow} startFrame={lastSceneFrame + 12} />
   </AbsoluteFill>;
 }
