@@ -43,3 +43,5 @@ Research -> Narration / Timeline -> Storyboard -> Overlay / Primitives -> G1 Pil
 参考生产流程与完成定义：`docs/REFERENCE_PROCESS.md`。
 
 当前项目状态与未完成事项：`docs/PROJECT_STATUS.md`。
+
+视觉语法与质量基线：`docs/VISUAL_GRAMMAR.md`。
