@@ -46,7 +46,8 @@
     "verify:asr": "node scripts/verify-asr.mjs",
     "verify:shot-score": "node scripts/verify-shot-score.mjs",
     "verify:semantic-director": "node scripts/verify-semantic-director.mjs",
-    "verify:production": "node scripts/verify-production.mjs"
+    "verify:production": "node scripts/verify-production.mjs",
+    "verify:fast": "node scripts/verify-fast.mjs"
   },
   "dependencies": {
     "@remotion/cli": "4.0.534",
