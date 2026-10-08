@@ -1,5 +1,5 @@
 const RULES = [
-  {variant:"comparison", job:"compare", weight:1, patterns:[/\bversus\b/i,/\bvs\.?\b/i,/相比|对比|区别|差异|优于|劣于/]},
+  {variant:"comparison", job:"compare", weight:1, patterns:[/\bversus\b/i,/\bvs\.?\b/i,/\bcompare\b/i,/\bcomparison\b/i,/相比|对比|区别|差异|优于|劣于/]},
   {variant:"transformation", job:"transform", weight:1, patterns:[/\bbefore\b/i,/\bafter\b/i,/变成|转化|转换|演变|改成|从.*到/]},
   {variant:"causal", job:"mechanism", weight:1, patterns:[/\bbecause\b/i,/\btherefore\b/i,/\bcaus(e|al)\b/i,/因为|因此|导致|原因|机制|原理/]},
   {variant:"evidence", job:"evidence", weight:1, patterns:[/\bevidence\b/i,/\bsource\b/i,/\bproof\b/i,/证据|来源|证明|依据|数据|研究/]},
