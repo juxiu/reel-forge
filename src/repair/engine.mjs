@@ -26,11 +26,7 @@ function ratioForRenderIR(renderIR) {
 
 function applicableIssues(renderIR, issues) {
   const ratio = ratioForRenderIR(renderIR);
-  return (issues || []).filter((issue) =>
-    !issue.ratio ||
-    issue.ratio === ratio ||
-    (issue.node && issue.node.startsWith("scene-"))
-  );
+  return (issues || []).filter((issue) => !issue.ratio || issue.ratio === ratio);
 }
 
 export function repairRenderIR(renderIR, issues) {
