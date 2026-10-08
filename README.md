@@ -38,3 +38,6 @@ Research -> Narration / Timeline -> Storyboard -> Overlay / Primitives -> G1 Pil
 - npm run still -- <frame>：渲染指定帧静帧用于目检。
 
 生产过程中的 artifact 统一归档到 artifacts/<project_id>/，包括 research、script、beats、scene、render-ir、audio、build-groups、runtime、qc、repair 和 delivery。
+
+
+当前项目状态与未完成事项：`docs/PROJECT_STATUS.md`。
