@@ -5,7 +5,7 @@ export function buildBeatGraph(script, timeline = null) {
   const beats = script.segments.map((segment, i) => {
     const timed = timeline?.sentences?.[i]; const start = timed ? Math.max(0, (timed.from - 1) / 30) : cursor;
     const end = timed ? timed.to / 30 : start + Math.max(4, Math.min(7, segment.text.length / 8)); const duration = Math.max(0.5, end - start); cursor = end;
-    return {id:"beat-"+String(i+1).padStart(3,"0"),start,duration,narrative_job:i===0?"hook":"explain",hero:{type:"concept",size:"large"},state_change:"enter -> transform -> settle",camera:{type:i%2?"pan":"push",amount:0.04,duration_frames:Math.round(duration*30)},settle_frames:30,idle_frames:0,text_role:"narration",asset_need:"diagram-or-code",visual_variant:visualVariant(segment.text),composition:{focus:"hero-plus-flow",hero_weight:0.68,safe_margin:0.08},light:{mode:"hero-key",key_intensity:0.82,accent:"purple"},ppt_risk:"static-card"};
+    return {id:"beat-"+String(i+1).padStart(3,"0"),start,duration,narrative_job:i===0?"hook":"explain",hero:{type:"concept",size:"large"},state_change:"enter -> transform -> settle",camera:{type:i%2?"pan":"push",amount:0.04,duration_frames:Math.round(duration*30)},settle_frames:30,idle_frames:0,text_role:"narration",asset_need:"diagram-or-code",source_ref:{segment_index:i,script_id:segment.id||null},visual_variant:visualVariant(segment.text),composition:{focus:"hero-plus-flow",hero_weight:0.68,safe_margin:0.08},light:{mode:"hero-key",key_intensity:0.82,accent:"purple"},ppt_risk:"static-card"};
   });
   return {duration:cursor,beats};
 }
