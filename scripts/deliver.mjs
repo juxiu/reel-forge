@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import {packageDelivery} from "../src/delivery/package.mjs";
 
-const project = JSON.parse(fs.readFileSync("fixtures/project.json", "utf8"));
+const project = JSON.parse(fs.readFileSync(process.env.PROJECT_FILE || "fixtures/project.json", "utf8"));
 const base = "artifacts/" + project.project_id + "/";
 const required = [
   "artifacts/render/reel-forge-16x9.mp4",
@@ -19,6 +19,8 @@ const required = [
   base + "qc/frame_metrics_9x16.json",
   base + "qc/motion_16x9.json",
   base + "qc/motion_9x16.json",
+  base + "qc/visual_regression_16x9.json",
+  base + "qc/visual_regression_9x16.json",
   base + "audio/asr-second-pass.json",
   "fixtures/render-ir-16x9.json",
   "fixtures/render-ir-9x16.json",
@@ -48,8 +50,9 @@ if (qc.status !== "PASS") throw new Error("delivery requires PASS QC");
 for (const ratio of ["16x9", "9x16"]) {
   const frame = JSON.parse(fs.readFileSync(base + "qc/frame_metrics_" + ratio + ".json", "utf8"));
   const motion = JSON.parse(fs.readFileSync(base + "qc/motion_" + ratio + ".json", "utf8"));
-  if (frame.summary?.status !== "PASS" || motion.summary?.status !== "PASS") {
-    throw new Error("delivery requires PASS frame/motion metrics: " + ratio);
+  const visual = JSON.parse(fs.readFileSync(base + "qc/visual_regression_" + ratio + ".json", "utf8"));
+  if (frame.summary?.status !== "PASS" || motion.summary?.status !== "PASS" || visual.status !== "PASS") {
+    throw new Error("delivery requires PASS frame/motion/visual metrics: " + ratio);
   }
 }
 
@@ -57,9 +60,10 @@ const result = packageDelivery({
   projectId: project.project_id,
   files,
   metadata: {
-    contract_version: "0.2",
+    contract_version: "0.3",
     ratios: ["16x9", "9x16"],
     qc_status: qc.status,
+    visual_regression: "PASS",
     asr_provider: asr.provider,
     real_asr: asr.required_real_asr === true,
     required_files: required.map((file) => file.split("/").pop()),
