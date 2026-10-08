@@ -28,6 +28,7 @@ fs.mkdirSync(outDir, {recursive: true});
 for (const group of built) {
   fs.writeFileSync(path.join(outDir, group.id + ".json"), JSON.stringify(group, null, 2));
 }
+fs.writeFileSync("fixtures/build-groups.json", JSON.stringify({project_id: ir.project_id, groups: built.map((group) => ({id: group.id, scene_ids: group.scene_ids}))}, null, 2));
 fs.writeFileSync(path.join(outDir, "manifest.json"), JSON.stringify({
   project_id: ir.project_id,
   concurrency: Number(process.env.BUILD_CONCURRENCY || 4),
