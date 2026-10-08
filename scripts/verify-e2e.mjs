@@ -10,6 +10,7 @@ const research = JSON.parse(fs.readFileSync("artifacts/" + project.project_id + 
 
 if (script.project_id !== project.project_id) throw new Error("script project mismatch");
 if (!timeline.sentences.length || timeline.total_frames < 1) throw new Error("timeline missing");
+if (!fs.existsSync("script/timeline-source.json") || !fs.statSync("script/timeline-source.json").size) throw new Error("timeline source missing");
 if (!Array.isArray(captions) || !captions.length) throw new Error("captions missing");
 if (!fs.existsSync("public/audio.mp3") || !fs.statSync("public/audio.mp3").size) throw new Error("final audio missing");
 if (wide.width !== 1280 || wide.height !== 720 || tall.width !== 720 || tall.height !== 1280) throw new Error("multi-ratio IR invalid");
