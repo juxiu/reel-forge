@@ -4,7 +4,7 @@
 
 ## 总体状态
 
-**状态：基础生产链已通过完整 GitHub Actions 验收，可实际产出双比例 MP4；当前进入画面语义化与参考样片质量提升阶段。**
+**状态：基础生产链已通过完整 GitHub Actions 验收，可实际产出双比例 MP4；确认点产物哈希门禁与第一版视觉语法 lint 已落地，进入语义镜头与闭环修复增强阶段。**
 
 当前主干已经覆盖：
 
@@ -91,8 +91,11 @@ CI 已真实走完：materialize IR → build groups → shots → e2e → previ
 - 独立 ASR 二次校验。
 - 更多本地 TTS provider。
 - 更强 Repair Agent：从 QC issue 自动修改源码并闭环重渲染。
+- [ ] 建立完整参考样片/反例资产与逐镜头质量标尺。
 - 对象存储、分布式 worker / lock。
 - HyperFrames 真正 runtime render backend。
+- 四个确认点现在记录对应产物 SHA-256，并在后续阶段校验产物未被静默替换。
+- 第一版视觉语法 lint：主角、视觉意图、状态变化、运镜与最小镜头时长。
 - 性能与缓存优化。
 
 ## 计划
@@ -107,13 +110,14 @@ CI 已真实走完：materialize IR → build groups → shots → e2e → previ
 
 ### P1：把四个确认点产品化
 
-- 将 length-language、narration-signoff、voiceover、pilot-preview 统一接入生产导演状态机。
-- 支持非交互 CI 的显式批准模式，以及交互生产模式的暂停/恢复。
-- 每个 checkpoint 绑定对应 artifact hash，防止批准后输入被静默替换。
+- [x] 将 length-language、narration-signoff、voiceover、pilot-preview 纳入渲染前门禁。
+- [x] 支持非交互 CI 的显式批准模式，以及交互生产模式的暂停/恢复。
+- [x] 每个 checkpoint 绑定对应 artifact hash，防止批准后输入被静默替换。
+- [ ] 将 checkpoint 进一步接入导演状态机的阶段依赖与回滚。
 
 ### P2：质量提升
 
-- 把 anything2explainer 的 Motion Grammar、Composition/Light、Narration 规则进一步转成 machine-checkable lint。
-- 增加更多 semantic shot variants，减少 generic fallback。
+- [~] 第一版 Motion Grammar 已转成 machine-checkable lint，继续补齐 Composition/Light、Narration 与章界规则。
+- [ ] 增加更多 semantic shot variants，减少 generic fallback。
 - Repair 从 RenderIR patch 升级为源码级 scoped repair。
 - 增加 ASR、更多 TTS 和对象存储 provider。
