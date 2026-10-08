@@ -20,6 +20,17 @@ try {
   });
 
   fs.mkdirSync(root + "/" + project.project_id, {recursive: true});
+  fs.writeFileSync(root + "/" + project.project_id + "/research.md",
+    [
+      "# Research",
+      "",
+      "## Sources",
+      ...result.research.sources.map((source) => "- " + source.id + " — " + source.title + " — " + source.url),
+      "",
+      "## Claims",
+      ...result.research.claims.map((claim) => "- " + claim.id + " — " + claim.statement + " [" + claim.source_ids.join(", ") + "]"),
+    ].join("\n")
+  );
   for (const [name, value] of [
     ["research", result.research],
     ["script", result.script],
