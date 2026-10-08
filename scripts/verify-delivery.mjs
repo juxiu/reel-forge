@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import crypto from "node:crypto";
 
-const project = JSON.parse(fs.readFileSync("fixtures/project.json", "utf8"));
+const project = JSON.parse(fs.readFileSync(process.env.PROJECT_FILE || "fixtures/project.json", "utf8"));
 const manifestPath = "artifacts/delivery/" + project.project_id + "/delivery-manifest.json";
 if (!fs.existsSync(manifestPath)) throw new Error("delivery manifest missing");
 
@@ -26,6 +26,8 @@ const required = [
   "frame_metrics_9x16.json",
   "motion_16x9.json",
   "motion_9x16.json",
+  "visual_regression_16x9.json",
+  "visual_regression_9x16.json",
   "asr-second-pass.json",
   "render-ir-16x9.json",
   "render-ir-9x16.json",
@@ -40,6 +42,7 @@ if (entries.has("source-repair.json")) {
 const missing = required.filter((name) => !entries.has(name));
 if (missing.length) throw new Error("delivery missing: " + missing.join(","));
 if (manifest.metadata?.qc_status !== "PASS") throw new Error("delivery metadata QC is not PASS");
+if (manifest.metadata?.visual_regression !== "PASS") throw new Error("delivery visual regression metadata is not PASS");
 if (JSON.stringify(manifest.metadata?.ratios || []) !== JSON.stringify(["16x9", "9x16"])) {
   throw new Error("delivery ratio metadata mismatch");
 }
@@ -56,7 +59,8 @@ if (asr.required_real_asr === true && asr.source !== "external-asr-provider") {
 for (const ratio of ["16x9", "9x16"]) {
   const frame = JSON.parse(fs.readFileSync(manifestDir + "/frame_metrics_" + ratio + ".json", "utf8"));
   const motion = JSON.parse(fs.readFileSync(manifestDir + "/motion_" + ratio + ".json", "utf8"));
-  if (frame.summary?.status !== "PASS" || motion.summary?.status !== "PASS") {
+  const visual = JSON.parse(fs.readFileSync(manifestDir + "/visual_regression_" + ratio + ".json", "utf8"));
+  if (frame.summary?.status !== "PASS" || motion.summary?.status !== "PASS" || visual.status !== "PASS") {
     throw new Error("delivery metrics not PASS: " + ratio);
   }
 }

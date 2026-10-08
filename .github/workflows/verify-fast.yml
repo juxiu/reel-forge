@@ -37,3 +37,4 @@ jobs:
           node-version: 22
       - run: npm install --no-audit --no-fund
       - run: npm run verify:fast
+      - run: npm run verify:authored-shots

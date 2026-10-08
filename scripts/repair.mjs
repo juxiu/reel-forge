@@ -3,7 +3,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import {repairRenderIR, makeRepairPlan} from "../src/repair/engine.mjs";
 
-const project = JSON.parse(fs.readFileSync("fixtures/project.json", "utf8"));
+const project = JSON.parse(fs.readFileSync(process.env.PROJECT_FILE || "fixtures/project.json", "utf8"));
 const qcFile = path.join("artifacts", project.project_id, "qc", "report.json");
 if (!fs.existsSync(qcFile)) throw new Error("QC report missing; run npm run qc first");
 
@@ -19,7 +19,7 @@ if (report.status === "PASS") {
 }
 
 const maxRetries = Number(process.env.REPAIR_RETRIES || 2);
-if (!Number.isInteger(maxRetries) || maxRetries < 1) throw new Error("REPAIR_RETRIES must be a positive integer");
+if (!Number.isInteger(maxRetries) || maxRetries < 1) throw new Error("REPAIR_RETRIES must be positive");
 
 const plan = makeRepairPlan(report, maxRetries);
 const plansDir = path.join("artifacts", project.project_id, "repair");
@@ -37,10 +37,13 @@ if (fs.existsSync(beatsFile)) {
     const beat = graph.beats?.[index];
     if (!beat) continue;
     const before = structuredClone(beat);
-    if (issue.type === "motion_too_low" || issue.type === "freeze") {
-      beat.camera = {...beat.camera, amount: Math.min(0.12, Number(beat.camera?.amount || 0.04) + 0.035)};
+    if (issue.type === "motion_too_low" || issue.type === "freeze" || issue.type === "visual_regression_fail") {
+      beat.camera = {...beat.camera, amount: Math.min(0.12, Number(beat.camera?.amount || 0.04) + (issue.type === "visual_regression_fail" ? 0.02 : 0.035))};
     }
-    if (issue.type === "hero_too_small") beat.hero = {...beat.hero, size: "xlarge"};
+    if (issue.type === "hero_too_small" || issue.type === "visual_regression_fail") {
+      beat.hero = {...beat.hero, size: "xlarge"};
+      beat.composition = {...beat.composition, hero_weight: Math.min(0.86, Number(beat.composition?.hero_weight || 0.68) + 0.08)};
+    }
     const after = structuredClone(beat);
     sourceRepairMap.push({
       node: issue.node,

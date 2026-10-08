@@ -1,23 +1,28 @@
 import fs from "node:fs";
 
-const text = fs.readFileSync("SKILL.md", "utf8");
-if (!text.startsWith("---\n")) throw new Error("SKILL.md frontmatter missing");
-const end = text.indexOf("\n---\n", 4);
+const skill = fs.readFileSync("SKILL.md", "utf8");
+if (!skill.startsWith("---\n")) throw new Error("SKILL.md frontmatter missing");
+const end = skill.indexOf("\n---\n", 4);
 if (end < 0) throw new Error("SKILL.md frontmatter malformed");
-const frontmatter = text.slice(4, end);
-const body = text.slice(end + 5);
+const frontmatter = skill.slice(4, end);
+const body = skill.slice(end + 5);
 
 for (const field of ["name:", "description:"]) {
   if (!frontmatter.split("\n").some(line => line.startsWith(field))) throw new Error("SKILL.md missing frontmatter field: " + field);
 }
-const required = ["# reel-forge Skill","## 目标","## 何时使用","## 输入契约","## 硬性原则","## 执行阶段","## 两级验证策略","## Skill 完成定义"];
+const required = ["# reel-forge Skill","## 目标","## 四个人工确认点","## 样片级硬规则","## Build Agent","## TTS","## B-roll","## Still / 性能","## QC","## 一键入口","## 完成定义"];
 for (const section of required) {
   if (!body.includes(section)) throw new Error("SKILL.md missing section: " + section);
 }
-for (const token of ["tts-word-boundary","npm run verify:fast"]) {
+for (const token of ["tts-word-boundary","STRICT_STILLS=1","G1…Gn","npm run skill --","--resume"]){
   if (!body.includes(token)) throw new Error("SKILL.md missing contract token: " + token);
 }
 const match = /^name:\s*(.+)$/m.exec(frontmatter);
 const name = match ? match[1].trim() : "";
 if (name !== "reel-forge") throw new Error("invalid skill name: " + name);
-console.log("skill contract PASS", JSON.stringify({name, sections: required.length}));
+
+const script = fs.readFileSync("scripts/skill.mjs","utf8");
+for (const token of ["--source","--auto-approve","scripts/run-production.mjs","scripts/visual_regression.py","verify:production"]) {
+  if (!script.includes(token)) throw new Error("skill runner missing token: " + token);
+}
+console.log("skill contract PASS", JSON.stringify({name, sections: required.length, cli:"npm run skill"}));

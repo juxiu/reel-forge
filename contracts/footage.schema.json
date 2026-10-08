@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "from",
+      "to",
+      "src",
+      "srcFrom"
+    ],
+    "properties": {
+      "from": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "to": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "src": {
+        "type": "string",
+        "pattern": "^assets/"
+      },
+      "srcFrom": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "zoomKf": {
+        "type": "array"
+      },
+      "panKf": {
+        "type": "array"
+      },
+      "panYKf": {
+        "type": "array"
+      },
+      "opacityKf": {
+        "type": "array"
+      },
+      "originX": {
+        "type": "number"
+      },
+      "originY": {
+        "type": "number"
+      },
+      "grade": {
+        "enum": [
+          "dark",
+          "none"
+        ]
+      },
+      "filter": {
+        "type": "string"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "minItems": 1
+      },
+      "then": {
+        "maxItems": 1
+      }
+    }
+  ]
+}\n

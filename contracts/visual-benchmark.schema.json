@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "version",
+    "embedding",
+    "thresholds",
+    "sampling",
+    "positives",
+    "anti"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "embedding": {
+      "type": "string"
+    },
+    "thresholds": {
+      "type": "object"
+    },
+    "sampling": {
+      "type": "object"
+    },
+    "positives": {
+      "type": "array",
+      "minItems": 1
+    },
+    "anti": {
+      "type": "array",
+      "minItems": 1
+    }
+  },
+  "additionalProperties": false
+}
