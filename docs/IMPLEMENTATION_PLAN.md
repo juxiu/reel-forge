@@ -19,7 +19,7 @@ Research → Script → Content QA → Director → Storyboard → Visual → TT
 |---|---|---|---|---|
 | P0 | 基线/契约/CI | README, contracts, CI, plan | npm run verify:p0 | DONE |
 | P1 | Research→Script→Content QA | research.json, script.json, content-qa.json | npm run verify:p1 | DONE |
-| P2 | Director→Storyboard→Scene DSL | director.json, storyboard.json, scene.json | npm run verify:p2 | IN PROGRESS |
+| P2 | Director→Storyboard→Scene DSL | director.json, storyboard.json, scene.json | npm run verify:p2 | DONE |
 | P3 | Visual/TTS/Timeline | visual.json, audio.json, timeline.json | npm run verify:p3 | TODO |
 | P4 | Remotion Renderer | render output MP4 + metadata | npm run verify:p4 | TODO |
 | P5 | HyperFrames Adapter | RenderIR + adapter contract | npm run verify:p5 | TODO |
@@ -28,7 +28,7 @@ Research → Script → Content QA → Director → Storyboard → Visual → TT
 
 ## 可并行执行的工作流
 
-P1、P2、P3 的部分 Contract/Schema 可以并行设计，但只有通过上游 Artifact 验收后才允许接入生产链。
+P1、P2、P3 的 Contract/Schema 可以并行设计，但只有通过上游 Artifact 验收后才允许接入生产链。
 
 推荐并行轨道：
 - Content：Research / Script / Content QA
@@ -61,17 +61,53 @@ P0
 - 明确记录实际产出路径。
 - 失败场景至少有一个回归测试。
 
-## 当前执行日志
+## 执行记录
 
-### P0
-- 建立仓库基线、架构约束、Artifact 目录和 CI。
-- Gate：verify:p0。
+### P0 — DONE
+产物：
+- `README.md`
+- `docs/IMPLEMENTATION_PLAN.md`
+- `docs/ARCHITECTURE.md`
+- `contracts/research.schema.json`
+- `contracts/script.schema.json`
+- `fixtures/demo-input.json`
+- `.github/workflows/verify.yml`
+- `scripts/verify-p0.mjs`
 
-### P1
-- 建立 ResearchSpec / ClaimGraph / ScriptSpec。
-- 建立 deterministic demo pipeline，暂不依赖外部模型 API。
-- Gate：verify:p1。
+验证：
+- GitHub Actions workflow `verify` 成功。
+- commit：`0970888c2e53417dbb3feee541d2fc3a14d15b2d`
+- run：`37738234477`
 
-### P2
-- 正在建立 Director / Storyboard / Scene DSL。
-- Gate：verify:p2。
+### P1 — DONE
+产物：
+- `artifacts/demo-semantic-search/research.json`
+- `artifacts/demo-semantic-search/script.json`
+- `artifacts/demo-semantic-search/content-qa.json`
+- `scripts/run-p1.mjs`
+- `scripts/verify-p1.mjs`
+
+验证：
+- Research → Script → Content QA 成功。
+- Claim coverage PASS。
+- Content QA 负向回归通过。
+- CI 的 `npm run verify:p1` 成功。
+
+### P2 — DONE
+产物：
+- `artifacts/demo-semantic-search/director.json`
+- `artifacts/demo-semantic-search/storyboard.json`
+- `artifacts/demo-semantic-search/scene.json`
+- `contracts/scene.schema.json`
+- `scripts/run-p2.mjs`
+- `scripts/verify-p2.mjs`
+
+验证：
+- Director → Storyboard → Scene DSL 成功。
+- 产生 2 个 scene。
+- timeline overlap 负向回归通过。
+- CI 的 `npm run verify:p2` 成功。
+
+### 下一执行单元
+P3：VisualSpec + AudioSpec + TTS alignment + unified timeline。
+完成后必须新增 `verify:p3` 并确认可生成对应 Artifact，才能进入 P4/P5。
