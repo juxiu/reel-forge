@@ -3,7 +3,7 @@ const VARIANT_RULES = {
   structured: {hero: 0.9, motion: 0.85},
   split: {hero: 0.8, motion: 0.9},
   network: {hero: 0.75, motion: 0.95},
-  generic: {hero: 0.65, motion: 0.65},
+  generic: {hero: 0.65, motion: 0.65},\n  comparison: {hero: 0.85, motion: 0.9},\n  transformation: {hero: 0.85, motion: 0.95},\n  sequence: {hero: 0.8, motion: 0.9},\n  causal: {hero: 0.85, motion: 0.9},\n  evidence: {hero: 0.8, motion: 0.8},\n  code: {hero: 0.8, motion: 0.75},
 };
 
 export function scoreShot(scene) {
