@@ -34,6 +34,8 @@ export function buildBeatGraph(script, timeline = null) {
       text_role: "narration",
       asset_need: "diagram-or-code",
       visual_variant: visualVariant(segment.text),
+      composition: {focus: "hero-plus-flow", hero_weight: 0.68, safe_margin: 0.08},
+      light: {mode: "hero-key", key_intensity: 0.82, accent: "purple"},
       ppt_risk: "static-card",
     };
   });
@@ -47,6 +49,8 @@ export function beatToScene(beat, segment) {
     duration: beat.duration,
     narration: {text: segment.text},
     variant: beat.visual_variant,
+    composition: beat.composition,
+    light: beat.light,
     visual: {
       type: "explainer",
       objects: [
