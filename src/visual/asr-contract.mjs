@@ -41,12 +41,10 @@ export function lintAsrSecondPass(script, timeline, asr) {
     }
   }
 
-  const mode = asr.alignment_mode || (asr.required_real_asr ? "external-asr" : "tts-word-boundary");
-  if (asr.required_real_asr && (mode !== "external-asr" || asr.source !== "external-asr-provider")) {
-    issues.push("asr:real-provider-required");
-  }
-  if (!asr.required_real_asr && mode !== "tts-word-boundary") {
-    issues.push("asr:candidate-mode-must-use-tts-word-boundary");
+  if (asr.provider !== "tts-word-boundary" ||
+      asr.source !== "tts-word-boundary" ||
+      asr.alignment_mode !== "tts-word-boundary") {
+    issues.push("asr:must-use-tts-word-boundary");
   }
   return issues;
 }
