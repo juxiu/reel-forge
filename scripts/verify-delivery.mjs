@@ -19,6 +19,9 @@ const required = [
   "research.md",
   "script.json",
   "report.json",
+  "asr-second-pass.json",
+  "render-ir-16x9.json",
+  "render-ir-9x16.json",
 ];
 
 const entries = new Map((manifest.files || []).map((file) => [file.name, file]));
