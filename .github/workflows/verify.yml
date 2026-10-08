@@ -13,6 +13,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - run: npm install
       - run: npm run verify:p0
       - run: npm run verify:p1
       - run: npm run verify:p2
+      - run: npm run verify:p3
+      - run: npm run verify:p4
