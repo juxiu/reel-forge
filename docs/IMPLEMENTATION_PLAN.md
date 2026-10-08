@@ -21,35 +21,33 @@ Research → Script → Content QA → Director → Storyboard → Visual → TT
 | P1 | Research→Script→Content QA | research.json, script.json, content-qa.json | npm run verify:p1 | DONE |
 | P2 | Director→Storyboard→Scene DSL | director.json, storyboard.json, scene.json | npm run verify:p2 | DONE |
 | P3 | Visual/TTS/Timeline | visual.json, audio.json, timeline.json | npm run verify:p3 | DONE |
-| P4 | Remotion Renderer | render output MP4 + metadata | npm run verify:p4 | IN PROGRESS |
+| P4 | Remotion Renderer | render output MP4 + metadata | npm run verify:p4 | DONE |
 | P5 | HyperFrames Adapter | RenderIR + adapter contract | npm run verify:p5 | DONE |
 | P6 | QC Pyramid / 局部重跑 | qc-report.json + rerun plan | npm run verify:p6 | DONE |
 | P7 | 批量生产 | artifact graph + cache + delivery | npm run verify:p7 | DONE |
 
 ## 可并行执行的工作流
 
-P1、P2、P3 的 Contract/Schema 可以并行设计；Render、HyperFrames、QC、Batch 采用独立 CI job 并行验证。只有对应阶段验收门通过，阶段才可标记 DONE。
-
-并行轨道：
 - core：P0 → P1 → P2 → P3
 - renderer：P4 Remotion
 - backend：P5 HyperFrames
 - quality：P6 QC / scoped rerun
 - scale：P7 batch / cache
 
-依赖关系：
+只有对应阶段验收门通过，阶段才标记 DONE。
+
+## 阶段依赖
 
 ```
 P0
- ├── P1 ──┐
- ├── P2 ──┼──> P3
- └────────┘      │
-          ┌──────┼──────┐
-          ▼      ▼      ▼
-         P4     P5     P6
-                  \      /
-                   \    /
-                     P7
+ ├── P1
+ ├── P2
+ └── P3
+      ├── P4
+      ├── P5
+      └── P6
+            ↓
+           P7
 ```
 
 ## 每阶段的完成定义
@@ -101,18 +99,19 @@ P0
 - 非法 audio timing 负向回归 PASS。
 - CI 的 `verify:p3` PASS。
 
-### P4 — IN PROGRESS
+### P4 — DONE
 已完成：
 - Remotion 4.0.534 依赖锁定。
 - Scene DSL → Remotion composition。
-- 最小 1280×720 / 30fps render fixture。
+- 1280×720 / 30fps render fixture。
 - MP4 + ffprobe 验收脚本。
+- CI 自动安装 ffmpeg 并执行真实 render。
 
-已发现并修复：
-- entrypoint 缺少 `registerRoot()`。
-
-当前状态：
-- 修复后的 CI 正在验证真实 MP4 输出；尚未标记 DONE。
+验证：
+- 最新 workflow run 37739025568 SUCCESS。
+- core、Remotion、HyperFrames 均通过。
+- Remotion 真实输出 `artifacts/render/demo.mp4`，180 frames、约 25.4 KB。
+- 原 entrypoint 缺少 `registerRoot()` 的问题已修复。
 
 ### P5 — DONE
 已完成：
@@ -120,11 +119,9 @@ P0
 - RenderIR → HyperFrames HTML adapter。
 - 对缺少 `visual.objects` 的 scene 做默认归一化。
 
-已发现并修复：
-- RenderIR scene graph 误套一层的嵌套问题。
-
 验证：
-- verify:p5 PASS（run 37738852451）。
+- verify:p5 PASS。
+- 最新主流水线中的 HyperFrames job PASS。
 
 ### P6 — DONE
 已完成：
@@ -132,11 +129,9 @@ P0
 - downstream affected-node 计算。
 - qc-report / rerun-plan 输出。
 
-已发现并修复：
-- CI 在干净环境没有先生成 P2 Scene Artifact。
-
 验证：
-- verify:p6 PASS（run 37738856901）。
+- verify:p6 PASS。
+- scoped rerun 负向验证 PASS。
 
 ### P7 — DONE
 已完成：
@@ -145,14 +140,20 @@ P0
 - shared research/script cache reuse 验证。
 
 验证：
-- verify:p7 PASS（run 37738856901）。
+- verify:p7 PASS。
+- batch/cache job PASS。
 
-## 当前最近提交
+## 最终状态
 
-- P4 修复：`098c2f0515f215fc26022bfaadb1c52fe7af7950`
-- P5 修复：`395fdca518b04c10c39c8e12ab07ea4a544993d5`
-- P6 修复：`2a4bb16ef1f91ffb9d569cb559f037c8c63d4e08`
+P0–P7 全部通过验收，仓库已经形成可重复验证的 MVP 闭环：
 
-## 下一执行门
+Research → Script → QA → Director → Storyboard → Scene DSL → Visual/Audio/Timeline → Remotion/RenderIR → QC → Batch/Cache
 
-P5/P6/P7 对应 CI 已 PASS。P4 必须通过最新 ffmpeg 验收门后，才进入统一生产链整合；之后再实现真实 Agent provider、真实 TTS、视觉素材 provider 和批量 render scheduler。
+## 后续生产化范围
+
+后续不再是本次 MVP 的验收阻塞项，主要包括：
+- 真实 LLM Agent/provider 接入。
+- 真实 TTS provider 和 word-level timestamps。
+- 真实视觉素材/stock/image provider。
+- 真正的并行 artifact scheduler、retry、持久化缓存与对象存储。
+- 完整 editorial QC 与人机协作流程。
