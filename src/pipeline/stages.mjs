@@ -1,0 +1,1 @@
+export const STAGES=["scaffold","research","narration","storyboard","primitives","pilot","parallel-build","render","qc","repair","delivery"];export const STAGE_ORDER=Object.fromEntries(STAGES.map((x,i)=>[x,i]));export function nextStage(current){const i=STAGE_ORDER[current];return STAGES[i+1]||null;}

@@ -1,0 +1,2 @@
+import fs from "node:fs";import{requestApproval}from "../src/runtime/approval.mjs";
+const project=JSON.parse(fs.readFileSync("fixtures/project.json","utf8"));const file="artifacts/preview/preview.mp4";if(!fs.existsSync(file))throw new Error("preview missing; run npm run preview first");const gate=requestApproval(project.project_id,{preview:file,stage:"pilot-G1"});console.log("PILOT APPROVAL REQUIRED",gate);

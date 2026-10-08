@@ -4,10 +4,11 @@ import edge_tts
 
 def main():
     ap=argparse.ArgumentParser()
-    ap.add_argument("--text",required=True);ap.add_argument("--voice",required=True);ap.add_argument("--audio",required=True);ap.add_argument("--timings",required=True)
+    ap.add_argument("--text",required=True);ap.add_argument("--voice",required=True);ap.add_argument("--rate",default="+0%");ap.add_argument("--audio",required=True);ap.add_argument("--timings",required=True)
     a=ap.parse_args()
     async def run():
-        communicate=edge_tts.Communicate(a.text,a.voice);words=[]
+        communicate=edge_tts.Communicate(a.text,a.voice,rate=a.rate,boundary="WordBoundary")
+        words=[]
         with open(a.audio,"wb") as f:
             async for chunk in communicate.stream():
                 if chunk["type"]=="audio": f.write(chunk["data"])

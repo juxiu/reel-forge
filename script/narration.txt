@@ -1,0 +1,9 @@
+# CHAPTER 1 HTTP Integrity
+
+When an HTTP message crosses more than one connection, transport-layer integrity checks only protect individual connections.
+
+RFC 9530 defines Digest Fields for HTTP integrity, including Content-Digest for message content and Repr-Digest for representation data.
+
+Senders can also use Want-Content-Digest and Want-Repr-Digest to express preferences about receiving those integrity fields.
+
+The standard uses Structured Fields for one consistent encoding format and replaces the older Digest and Want-Digest fields.

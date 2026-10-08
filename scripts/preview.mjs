@@ -1,2 +1,0 @@
-import fs from "node:fs";import{requestApproval}from "../src/runtime/approval.mjs";
-const project=JSON.parse(fs.readFileSync("fixtures/project.json","utf8"));const file="artifacts/render/reel-forge-16x9.mp4";if(!fs.existsSync(file))throw new Error("render preview first");const gate=requestApproval(project.project_id,{preview:file,duration_target_s:30});console.log("approval required:",gate);

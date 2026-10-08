@@ -1,6 +1,10 @@
 import fs from "node:fs";
+const timeline=JSON.parse(fs.readFileSync("script/timeline.json","utf8"));
 const captions=JSON.parse(fs.readFileSync("fixtures/captions.json","utf8"));
-if(!Array.isArray(captions.captions))throw new Error("caption artifact invalid");
-const wide=JSON.parse(fs.readFileSync("fixtures/render-ir-16x9.json","utf8")),tall=JSON.parse(fs.readFileSync("fixtures/render-ir-9x16.json","utf8"));
-if(wide.width!==1280||wide.height!==720||tall.width!==720||tall.height!==1280)throw new Error("multi-ratio fixtures invalid");
-console.log("e2e contract PASS");
+const wide=JSON.parse(fs.readFileSync("fixtures/render-ir-16x9.json","utf8"));
+const tall=JSON.parse(fs.readFileSync("fixtures/render-ir-9x16.json","utf8"));
+if(!timeline.sentences.length||timeline.total_frames<1)throw new Error("timeline missing");
+if(!Array.isArray(captions)||!captions.length)throw new Error("captions missing");
+if(wide.width!==1280||wide.height!==720||tall.width!==720||tall.height!==1280)throw new Error("multi-ratio IR invalid");
+for(const s of timeline.sentences)if(!(s.to>=s.from))throw new Error("invalid sentence timing");
+console.log("e2e contract PASS",timeline.total_frames,"frames",captions.length,"caption blocks");

@@ -2,9 +2,21 @@
 
 Agent-native 视频生产引擎。
 
-目标：给定主题或脚本，完成研究、真实配音、词级时间轴、视觉导演、并行镜头生产、真实渲染、像素/运动/编辑质检、局部修复，并交付 16:9 与 9:16 成片。
+当前先按 anything2explainer 的生产过程完成可用功能，再做优化。
 
-边界：Agent/Skill 负责理解、研究、导演、判断和修复；Typed Artifact Contract 是唯一稳定接口；确定性媒体核心负责时间轴、布局、渲染、编码、缓存和验证；Provider 可替换且不能污染上层契约；真实媒体时间来自真实音频/ASR，不允许按字数伪造。
+生产过程：
+1. Research：来源、事实、证据。
+2. Narration：定稿文案、段落和字幕块。
+3. TTS/Timeline：真实配音、WordBoundary、帧级时间轴。
+4. Storyboard：从时间轴 token 生成分镜表。
+5. Overlay/Primitives：统一字幕、HUD、进度条、视觉图元。
+6. Pilot：先生成 G1 / 前 30 秒 preview，并暂停等审批。
+7. Parallel Build：按 G1…Gn 拆镜头并行生产。
+8. Render：16:9 / 9:16 成片。
+9. Quantitative QC：frame metrics / motion / media probe。
+10. Repair / Recheck：问题按 node 局部修复，再复验。
+11. Delivery：checksum manifest 和归档。
 
-计划：docs/IMPLEMENTATION_PLAN.md
-参考：docs/REFERENCES.md
+参考方法来自 anything2explainer：它明确采用 Research → Narration & Timeline → Storyboard → Overlays & primitives → G1 Pilot → Parallel Build → Render → QC & fixes → Delivery，并以完整样片的源码、报告和成片帧作为质量标尺。
+
+核心边界仍然保持：Agent/Skill 负责理解、研究、导演、判断和修复；Typed Artifact Contract 是稳定接口；真实媒体时间来自真实音频/ASR，不允许按字数伪造。

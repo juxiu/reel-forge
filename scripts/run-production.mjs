@@ -1,1 +1,10 @@
-import fs from "node:fs";import{runProduction}from "../src/director/pipeline.mjs";const project=JSON.parse(fs.readFileSync(process.argv[2]||"fixtures/project.json","utf8"));const script=JSON.parse(fs.readFileSync(process.argv[3]||"fixtures/script.json","utf8"));const result=await runProduction(project,{script});fs.mkdirSync("artifacts/"+project.project_id,{recursive:true});for(const [name,value] of [["research",result.research],["script",result.script],["beats",result.beats],["scene",{"project_id":project.project_id,"scenes":result.scenes}],["render-ir",result.renderIR]])fs.writeFileSync("artifacts/"+project.project_id+"/"+name+".json",JSON.stringify(value,null,2));console.log("production PASS",result.execution.id);
+import fs from "node:fs";
+import{runProduction}from "../src/director/pipeline.mjs";
+const project=JSON.parse(fs.readFileSync(process.argv[2]||"fixtures/project.json","utf8"));
+const script=JSON.parse(fs.readFileSync(process.argv[3]||"fixtures/script.json","utf8"));
+const result=await runProduction(project,{script});
+const claimIds=new Set(result.research.claims.map(c=>c.id));
+for(const segment of script.segments)for(const id of segment.claim_ids||[])if(!claimIds.has(id))throw new Error("script claim has no research evidence: "+id);
+fs.mkdirSync("artifacts/"+project.project_id,{recursive:true});
+for(const [name,value] of [["research",result.research],["script",result.script],["beats",result.beats],["scene",{"project_id":project.project_id,"scenes":result.scenes}],["render-ir",result.renderIR]])fs.writeFileSync("artifacts/"+project.project_id+"/"+name+".json",JSON.stringify(value,null,2));
+console.log("production PASS",result.execution.id);
