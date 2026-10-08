@@ -81,10 +81,10 @@ export function ChapterCard({timeline}) {
   </div>;
 }
 
-export function EndingCredit({show = false}) {
+export function EndingCredit({show = false, startFrame = 0}) {
   if (!show) return null;
   const frame = useCurrentFrame();
-  const p = easeOut(frame / 24);
+  const p = easeOut((frame - startFrame) / 24);
   return <div style={{position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "#000", opacity: p, zIndex: 30}}>
     <div style={{textAlign: "center", fontFamily: "Arial,sans-serif", color: PALETTE.white}}>
       <div style={{fontSize: 18, letterSpacing: 5, color: PALETTE.grey}}>REEL FORGE</div>
