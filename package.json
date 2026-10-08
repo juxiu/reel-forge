@@ -7,7 +7,17 @@
     "verify:p0":"node scripts/verify-p0.mjs",
     "verify:p1":"node scripts/verify-p1.mjs",
     "verify:p2":"node scripts/verify-p2.mjs",
+    "verify:p3":"node scripts/verify-p3.mjs",
+    "render:p4":"node scripts/render-p4.mjs",
+    "verify:p4":"node scripts/verify-p4.mjs",
     "demo:p1":"node scripts/run-p1.mjs",
-    "demo:p2":"node scripts/run-p2.mjs"
+    "demo:p2":"node scripts/run-p2.mjs",
+    "demo:p3":"node scripts/run-p3.mjs"
+  },
+  "dependencies":{
+    "@remotion/cli":"4.0.534",
+    "react":"19.3.0",
+    "react-dom":"19.3.0",
+    "remotion":"4.0.534"
   }
 }
