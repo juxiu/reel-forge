@@ -33,6 +33,7 @@ jobs:
       - run: npm run verify:hyperframes
       - run: npm run run-production
       - run: npm run tts
+      - run: npm run verify:word-boundary
       - run: npm run asr-second-pass
       - run: npm run verify:asr
       - run: node scripts/checkpoint.mjs length-language approved
