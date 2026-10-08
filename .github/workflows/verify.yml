@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  verify:
+  core:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,4 +18,23 @@ jobs:
       - run: npm run verify:p1
       - run: npm run verify:p2
       - run: npm run verify:p3
+
+  remotion:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
       - run: npm run verify:p4
+
+  hyperframes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run verify:p5
