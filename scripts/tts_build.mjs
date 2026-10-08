@@ -78,13 +78,11 @@ function alignedChunks(text, chunks, words, duration) {
 
   for (const word of words) {
     const raw = String(word.text ?? "");
-    const clean = raw.replace(/[\\s，。、！？：；“”（）,.!?:;()\-—…]/g, "");
+    const clean = raw.replace(/[\\s，。、！？：；“”（）,.!?:;()\\-—…]/g, "");
     if (!clean) continue;
 
     let pos = text.indexOf(clean, cursor);
-    if (pos < 0) {
-      pos = text.indexOf(clean[0], cursor);
-    }
+    if (pos < 0) pos = text.indexOf(clean[0], cursor);
     if (pos < 0) continue;
 
     for (let i = pos; i < Math.min(text.length, pos + clean.length); i++) {
@@ -94,15 +92,16 @@ function alignedChunks(text, chunks, words, duration) {
   }
 
   const result = [];
-  let offset = 0;
+  let searchCursor = 0;
   for (const chunk of chunks) {
-    const startOffset = offset;
-    const endOffset = offset + chunk.length;
-    offset = endOffset;
+    const startOffset = Math.max(0, text.indexOf(chunk, searchCursor));
+    const actualStart = startOffset < 0 ? searchCursor : startOffset;
+    const endOffset = actualStart + chunk.length;
+    searchCursor = endOffset;
 
     let start = null;
     let end = null;
-    for (let i = startOffset; i < endOffset; i++) {
+    for (let i = actualStart; i < Math.min(text.length, endOffset); i++) {
       if (charTiming[i]) {
         start ??= charTiming[i].start;
         end = charTiming[i].end;
@@ -110,7 +109,7 @@ function alignedChunks(text, chunks, words, duration) {
     }
 
     if (start == null || end == null) {
-      const ratioStart = startOffset / Math.max(1, text.length);
+      const ratioStart = actualStart / Math.max(1, text.length);
       const ratioEnd = endOffset / Math.max(1, text.length);
       start = ratioStart * duration;
       end = ratioEnd * duration;
@@ -180,7 +179,8 @@ for (const item of items) {
   }
 
   cursorSeconds += item.gapBefore / FPS;
-  const cleanText = item.text.replaceAll("|", "");
+  const chunks = item.text.split("|").map((value) => value.trim()).filter(Boolean);
+  const cleanText = chunks.join(language === "en" ? " " : "");
   const chapterDir = path.join(root, `sentence-${String(sentenceIndex + 1).padStart(3, "0")}`);
   const result = await edgeTts({text: cleanText, voice, outDir: chapterDir});
   const words = JSON.parse(fs.readFileSync(result.timings, "utf8")).words;
@@ -195,7 +195,6 @@ for (const item of items) {
     });
   }
 
-  const chunks = item.text.split("|").map((value) => value.trim()).filter(Boolean);
   const timings = alignedChunks(cleanText, chunks, words, result.manifest.duration_s);
   const from = Math.round((offset + Number(words[0].start)) * FPS) + 1;
   const to = Math.max(from, Math.round((offset + Number(words.at(-1).end)) * FPS));
