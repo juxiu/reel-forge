@@ -37,6 +37,17 @@ for (const [ratio, file] of ratios) {
     }
     const camera = (scene.motion || []).find((item) => item.target === "stage");
     if (!camera || !(Number(camera.amount) > 0)) issues.push(ratio + ":" + scene.id + ":missing-camera-motion");
+
+    const composition = scene.composition || {};
+    if (!["single-hero", "hero-plus-flow"].includes(composition.focus)) issues.push(ratio + ":" + scene.id + ":invalid-focus-mode");
+    if (!(Number(composition.hero_weight) >= 0.45)) issues.push(ratio + ":" + scene.id + ":hero-weight-too-low");
+    if (!(Number(composition.safe_margin) >= 0.05 && Number(composition.safe_margin) <= 0.18)) issues.push(ratio + ":" + scene.id + ":invalid-safe-margin");
+
+    const light = scene.light || {};
+    if (!["hero-key", "soft-key"].includes(light.mode)) issues.push(ratio + ":" + scene.id + ":invalid-light-mode");
+    if (!(Number(light.key_intensity) > 0 && Number(light.key_intensity) <= 1)) issues.push(ratio + ":" + scene.id + ":invalid-key-light");
+    if (light.accent !== "purple") issues.push(ratio + ":" + scene.id + ":missing-purple-accent");
+
     if (!safe.left || !safe.bottom) issues.push(ratio + ":" + scene.id + ":invalid-safe-area");
   }
 
