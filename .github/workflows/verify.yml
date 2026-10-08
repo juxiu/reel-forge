@@ -1,8 +1,8 @@
 name: verify
 on:
-  push:
-    branches: ["main"]
-  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 2 * * *"
 concurrency:
   group: verify-${{ github.ref }}
   cancel-in-progress: true
