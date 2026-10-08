@@ -1,0 +1,7 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"VisualSpec",
+  "type":"object",
+  "required":["project_id","scenes"],
+  "properties":{"project_id":{"type":"string"},"scenes":{"type":"array","items":{"type":"object","required":["scene_id","type","objects"],"properties":{"scene_id":{"type":"string"},"type":{"type":"string"},"objects":{"type":"array"}}}}}
+}
