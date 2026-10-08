@@ -40,7 +40,10 @@
     "verify:visual-grammar": "node scripts/verify-visual-grammar.mjs",
     "verify:scene-contract": "node scripts/verify-scene-contract.mjs",
     "verify:narrative": "node scripts/verify-narrative.mjs",
-    "repair-cycle": "node scripts/repair-cycle.mjs"
+    "repair-cycle": "node scripts/repair-cycle.mjs",
+    "asr-second-pass": "node scripts/asr_second_pass.mjs",
+    "verify:asr": "node scripts/verify-asr.mjs",
+    "verify:shot-score": "node scripts/verify-shot-score.mjs"
   },
   "dependencies": {
     "@remotion/cli": "4.0.534",
