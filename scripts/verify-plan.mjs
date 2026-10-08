@@ -1,1 +1,2 @@
-import fs from "node:fs";const t=fs.readFileSync("docs/IMPLEMENTATION_PLAN.md","utf8");for(const k of ["P1 Agent Runtime","P7 Persistent Production","真实 TTS","Scoped Repair"])if(!t.includes(k))throw new Error("plan missing "+k);console.log("plan PASS");
+import fs from "node:fs";const t=fs.readFileSync("docs/IMPLEMENTATION_PLAN.md","utf8");for(const k of ["P1 Agent Runtime","P7 Persistent Production","真实 TTS","Scoped Repair"])if(!t.includes(k))throw new Error("plan missing "+k);
+if(!fs.existsSync("docs/REFERENCE_PROCESS.md"))throw new Error("reference process doc missing");console.log("plan PASS");
