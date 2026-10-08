@@ -1,0 +1,7 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"AudioSpec",
+  "type":"object",
+  "required":["project_id","duration","segments"],
+  "properties":{"project_id":{"type":"string"},"duration":{"type":"number","minimum":0},"segments":{"type":"array","items":{"type":"object","required":["id","text","start","end","words"],"properties":{"id":{"type":"string"},"text":{"type":"string"},"start":{"type":"number","minimum":0},"end":{"type":"number","exclusiveMinimum":0},"words":{"type":"array"}}}}}
+}
