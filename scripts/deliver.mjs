@@ -32,6 +32,7 @@ const optional = [
   "artifacts/preview/manifest.json",
   base + "repair/repair-plan.json",
   base + "repair/status.json",
+  base + "repair/source-repair.json",
 ];
 const files = [...required, ...optional.filter((file) => fs.existsSync(file))];
 for (const file of required) {
