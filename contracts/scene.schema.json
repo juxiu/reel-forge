@@ -1,0 +1,16 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "title":"SceneDSL",
+  "type":"object",
+  "required":["scene_id","start","duration","narration","visual"],
+  "properties":{
+    "scene_id":{"type":"string","minLength":1},
+    "start":{"type":"number","minimum":0},
+    "duration":{"type":"number","exclusiveMinimum":0},
+    "narration":{"type":"object","required":["text"],"properties":{"text":{"type":"string","minLength":1}}},
+    "visual":{"type":"object","required":["type"],"properties":{"type":{"type":"string","minLength":1},"objects":{"type":"array"}}},
+    "motion":{"type":"array"},
+    "caption":{"type":"object"}
+  },
+  "additionalProperties":false
+}
