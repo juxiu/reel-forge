@@ -1,0 +1,2 @@
+import{spawnSync}from "node:child_process";import fs from "node:fs";
+const frame=String(process.argv[2]||0);const out=process.argv[3]||("artifacts/stills/f_"+frame+".png");fs.mkdirSync("artifacts/stills",{recursive:true});const r=spawnSync("npx",["remotion","still","src/remotion/index.jsx","ReelForge16x9",out,"--frame="+frame],{stdio:"inherit"});if(r.status!==0)process.exit(r.status??1);if(!fs.existsSync(out)||!fs.statSync(out).size)throw new Error("still render empty");console.log("still PASS",out);
