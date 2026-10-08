@@ -38,6 +38,7 @@
     "repair": "node scripts/repair.mjs",
     "deliver": "node scripts/deliver.mjs",
     "still": "node scripts/still.mjs",
+    "verify:skill": "node scripts/verify-skill.mjs",
     "verify:visual-grammar": "node scripts/verify-visual-grammar.mjs",
     "verify:scene-contract": "node scripts/verify-scene-contract.mjs",
     "verify:narrative": "node scripts/verify-narrative.mjs",
