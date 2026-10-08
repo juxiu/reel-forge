@@ -4,146 +4,111 @@
 
 ## 总体状态
 
-**状态：功能链基本完成，生产验收尚未最终通过。**
+**状态：功能链已达到 anything2explainer 的基础生产阶段覆盖，当前处于“代码加固完成，等待完整 CI 重新验收”阶段。**
 
-当前实现已经覆盖参考项目 anything2explainer 的基础生产顺序：
+当前主干已经覆盖：
 
 Research → Narration / Timeline → Storyboard → Overlay / Primitives → G1 Pilot → Parallel Build → Render → Quantitative QC → Repair / Recheck → Delivery。
 
-但当前主干最近一次 GitHub Actions 验收仍未全绿，因此项目状态不能标记为“最终完成”。
+上一轮主干 CI 在 npm run selfcheck 因 Python 字符串/整数比较失败；该问题已经修复，并继续向后段 CI 可能暴露的真实问题推进。
 
 ## 已完成
 
 ### 生产链
 
 - Research：真实 source fetch。
-- 多来源 claim graph。
-- claim → source → evidence 追踪。
+- 多来源 claim graph 与 claim → source → evidence 追踪。
 - script claim_id 证据校验。
-- 逐句真实 TTS。
-- WordBoundary 词级时间。
-- 逐句音频拼接与最终音轨。
-- 中英文字幕分块与时间对齐。
-- timeline JSON / Markdown / timeline-source。
+- 逐句真实 TTS、WordBoundary、最终音轨。
+- 中英文字幕分块与真实时间对齐。
+- script/timeline.json、script/timeline.md、script/timeline-source.json 标准归档。
 - Storyboard token → 分镜表。
-- Storyboard / Timeline 覆盖自检入口。
+- selfcheck：帧号、时间轴覆盖、镜头时长、持续动作、末拍稳定期、Glitch/扫光白名单。
 - Overlay / Primitives：背景、HUD、章节卡、进度条、字幕安全区、片尾。
-- 独立镜头 JSX。
-- G1…Gn 构建组 manifest。
-- 构建组动态物化。
-- 并行 worker。
-- 16:9 与 9:16 RenderIR。
-- Remotion 双比例渲染入口。
-- G1 Pilot / preview / approval artifact。
-- pilot-preview 渲染门禁。
-- runtime 执行状态持久化。
-- execution state 恢复入口。
-- 项目级文件锁。
-- 外部 Agent JSON provider。
+- 独立镜头 JSX 与 G1…Gn 动态物化。
+- 镜头源码物化的换行问题已修复，verify:shots 会检查源码真实可执行结构。
+- 构建组 manifest 与并行 worker。
+- 16:9 / 9:16 RenderIR 与 Remotion 双比例渲染入口。
+- Pilot preview、approval artifact、pilot-preview 硬门禁。
+- Runtime 执行状态持久化、恢复、项目锁、外部 Agent JSON provider。
 - HyperFrames project contract。
-- frame metrics。
-- motion check。
-- media QC。
-- scoped repair engine。
-- repair plan / recheck 流程入口。
-- delivery checksum manifest。
-- Research / Timeline / QC / Runtime 等过程证据归档。
-- Overlay 独立预览。
-- G1…Gn 独立预览合成。
-- 指定帧静帧质检入口。
-- 与 anything2explainer 的生产阶段对齐矩阵。
+- frame metrics / motion check 已支持逐镜头质量范围。
+- QC 会把问题映射到具体镜头和 ratio。
+- Repair 只作用于匹配 ratio 与命中的 node，并要求实际产生变更后才算成功。
+- Repair plan / status 审计文件。
+- Delivery checksum manifest；verify:delivery 会重新计算交付目录中的实际 SHA-256 与 size。
+- Pilot preview manifest。
+- anything2explainer 对齐矩阵与本生产流程规范已记录在仓库。
 
-### 当前 CI 已确认通过的阶段
+### 本轮主要修复提交
 
-最近一次完整 CI 在 selfcheck 之前已经确认：
-
-- plan
-- contracts
-- runtime
-- approval
-- build
-- scheduler
-- store
-- research
-- visual
-- repair
-- hyperframes
-- production
-- TTS / Timeline
-- storyboard
+- d961b8b6 fix: 修复 selfcheck 帧号类型比较
+- 03d6793d fix: 正确生成镜头源码换行
+- c75d0202 test: 强化镜头源码物化校验
+- 44852cec test: 校验交付包实际 checksum 与文件
+- 8f0f3d0a feat: 完善分镜与动效规则自检
+- 16b15baf feat: 完善 Pilot 预览与清单归档
+- 53844d5d feat: 增加逐镜头帧级质量指标
+- 862d4053 feat: 增加逐镜头动作质量检查
+- 8b6b87c5 fix: 将 QC 问题映射到具体镜头
+- 93aac258 ci: 为 QC 输出接入逐镜头范围
+- bccd8efd fix: 实现按比例和镜头的局部修复
+- dcb5602e fix: 强化修复变更校验与归档
+- 6b36ed01 fix: 固化时间轴源码标准归档路径
+- 7823f6f2 test: 校验完整时间轴证据链
+- 725b1b31 test: 完善双比例 QC 最终验收
+- 550cbb5c fix: 限制修复只作用于匹配比例
+- bde7a2d5 fix: 允许时间轴段落间的设计留白
+- 70c60ef0 test: 完成双比例媒体 QC 验收
 
 ## 未完成
 
 ### 当前阻塞项
 
-**1. selfcheck 尚未通过**
+**1. 完整生产 CI 尚未取得新的绿色结果。**
 
-最近一次主干验收运行：
-
+已知上一轮失败为：
 - Workflow：verify
 - Run：37747763804
 - Commit：effe73e6b1bce993707b481f5f400a28ac8d96a9
 - 失败步骤：npm run selfcheck
+- 原因：帧号从正则提取后仍为字符串，和整数 prev 比较触发 TypeError。
 
-失败原因是 scripts/selfcheck.py 对正则提取出的帧号仍存在字符串/整数比较问题，导致 TypeError。
+该根因已经修复；当前通过 GitHub 连接器可确认代码提交，但无法直接读取这些新 push 所对应的 Actions run 列表，因此不能把新提交声明为 CI 全绿。
 
-因此后续的 materialize IR、build groups、shot verification、preview、render、QC、delivery 在该轮 CI 中都没有执行到。
+**2. 最终媒体验收仍需由 CI 实际执行确认。**
 
-**2. 全链路最终绿色验收尚未取得**
+必须让新一轮 verify 真实走完：materialize IR → build groups → shots → e2e → preview → pilot → render 双比例 → frame metrics → motion check → qc → repair/recheck（如需）→ delivery → delivery verification。
 
-需要修复 selfcheck 后重新跑完整 CI，并确认 preview、pilot、render 16:9 / 9:16、frame metrics、motion check、media QC、repair/recheck、delivery、delivery verification 全部通过。
+### 仍属增强项
 
-### 非阻塞增强项
-
-- 独立 ASR 交叉校验。
+- 视觉表现继续向 anything2explainer 样片靠拢：更多语义图元、镜头级专属动画、更加严格的反 PPT 构图。
+- 第 1–3 个确认点目前是持久化 checkpoint 能力，但不是默认生产脚本的交互阻塞点。
+- 独立 ASR 二次校验。
 - 更多本地 TTS provider。
-- 对象存储。
-- 真正的分布式 worker / 分布式锁。
-- 更复杂的 Motion Grammar。
-- 更丰富的视觉图元与逐镜头专属动效。
+- 更强 Repair Agent：从 QC issue 自动修改源码并闭环重渲染。
+- 对象存储、分布式 worker / lock。
+- HyperFrames 真正 runtime render backend。
 - 性能与缓存优化。
-- HyperFrames 真正 runtime render 后端。
-- 更智能的 Repair Agent 自动修改源码并循环重渲染。
 
 ## 计划
 
-### P0：先恢复 CI 全绿
+### P0：完成当前基线验收
 
-1. 修复 scripts/selfcheck.py 的帧号类型转换。
-2. 重新运行完整 verify。
-3. 继续处理 CI 暴露的第一个真实失败点，不跳过后续阶段。
-4. 直到 render、QC、repair/recheck、delivery 全部通过。
+1. 让修复后的主干继续跑完整 verify。
+2. 处理下一个真实失败点，不跳过后续阶段。
+3. 直到双比例 Render、Quantitative QC、Repair/Recheck、Delivery、Delivery Verification 全部通过。
+4. 把最后一次绿色 CI run 记录进本文件。
 
-### P1：完成最终生产验收
+### P1：把四个确认点产品化
 
-- 检查 16:9 / 9:16 实际视频尺寸、时长、音频存在性。
-- 检查 Pilot preview 与最终时间轴一致。
-- 检查镜头注册与构建组一致。
-- 检查 frame/motion/media QC 全通过。
-- 检查 delivery manifest 包含完整过程证据和 SHA-256。
-- 将最后一次绿色 CI run 记录在本文件。
+- 将 length-language、narration-signoff、voiceover、pilot-preview 统一接入生产导演状态机。
+- 支持非交互 CI 的显式批准模式，以及交互生产模式的暂停/恢复。
+- 每个 checkpoint 绑定对应 artifact hash，防止批准后输入被静默替换。
 
-### P2：质量优化
+### P2：质量提升
 
-基础链路稳定后，再做：
-
-- 更细粒度 Motion Grammar。
-- 更高质量的镜头专属动画。
-- 独立 ASR 对配音做二次校验。
-- 更强的 Repair Agent。
-- 对象存储 / 分布式生产。
-- 性能与缓存优化。
-
-## 完成定义
-
-只有同时满足以下条件，项目才标记为“完成”：
-
-1. 生产链所有阶段可以独立运行。
-2. Pilot 审批门禁有效。
-3. 16:9 / 9:16 实际成片生成成功。
-4. Quantitative QC 全部通过。
-5. QC 失败可以执行 scoped repair 并重新验证。
-6. Delivery manifest 完整且 checksum 有效。
-7. GitHub Actions 完整生产验收为绿色。
-
-在第 7 项完成前，项目保持“功能基本完成、验收未完成”状态。
+- 把 anything2explainer 的 Motion Grammar、Composition/Light、Narration 规则进一步转成 machine-checkable lint。
+- 增加更多 semantic shot variants，减少 generic fallback。
+- Repair 从 RenderIR patch 升级为源码级 scoped repair。
+- 增加 ASR、更多 TTS 和对象存储 provider。
