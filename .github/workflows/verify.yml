@@ -53,3 +53,22 @@ jobs:
       - run: npm run verify:qc
       - run: npm run deliver
       - run: npm run verify:delivery
+      - name: 归档生产成片与验收产物
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: reel-forge-${{ github.sha }}
+          if-no-files-found: error
+          compression-level: 0
+          path: |
+            artifacts/render/reel-forge-16x9.mp4
+            artifacts/render/reel-forge-9x16.mp4
+            artifacts/preview/preview.mp4
+            artifacts/preview/manifest.json
+            artifacts/digest-explainer/qc/report.json
+            artifacts/digest-explainer/qc/report.md
+            artifacts/digest-explainer/qc/frame_metrics_16x9.json
+            artifacts/digest-explainer/qc/frame_metrics_9x16.json
+            artifacts/digest-explainer/qc/motion_16x9.json
+            artifacts/digest-explainer/qc/motion_9x16.json
+            artifacts/delivery/digest-explainer/**
