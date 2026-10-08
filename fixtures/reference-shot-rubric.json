@@ -1,7 +1,8 @@
 {
-  "version": "0.1",
+  "version": "0.2",
   "name": "reference-shot-rubric",
-  "source": "anything2explainer-aligned-reference",
+  "source": "reel-forge-visual-benchmark",
+  "benchmark_manifest": "fixtures/visual-benchmark.json",
   "positive": [
     "single dominant concept",
     "mechanism shown visually",
@@ -17,12 +18,17 @@
     "unsafe subtitle area"
   ],
   "weights": {
-    "semantic_variant": 0.22,
-    "hero": 0.18,
-    "motion": 0.2,
-    "composition": 0.18,
-    "light": 0.08,
-    "safety": 0.14
+    "semantic": 0.16,
+    "hero": 0.12,
+    "motion": 0.14,
+    "composition": 0.12,
+    "light": 0.06,
+    "safety": 0.10,
+    "reference_similarity": 0.14,
+    "visual_complexity": 0.05,
+    "text_density": 0.03,
+    "hero_consistency": 0.04,
+    "layout_stability": 0.04
   },
   "thresholds": {
     "pass": 0.72,
