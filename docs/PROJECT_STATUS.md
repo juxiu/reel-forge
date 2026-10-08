@@ -141,3 +141,11 @@ CI 已真实走完：materialize IR → build groups → shots → e2e → previ
 - 未完成：真实参考样片/反例资产、更多语义视觉变体、HyperFrames/分布式渲染、对象存储与缓存。
 - 已完成：QC → repair → re-render → QC 限次自动闭环入口，CI 默认最多执行 2 次修复循环。
 - 下一步：接入真实参考样片/反例资产评分，并把 repair patch 与具体源节点建立可回写映射；交付包已强制纳入 ASR 二次校验结果与双比例 RenderIR。
+
+## CI 验证策略
+
+为避免每次提交都等待完整渲染链，验证已拆成两级：
+
+- **快速验证**：push / PR 默认触发 `.github/workflows/verify-fast.yml`，只运行本地契约、导演、视觉语法、Repair、HyperFrames、Scene Contract 等静态/轻量验收，不执行联网 Research、TTS、Preview、Remotion 双比例渲染、QC 与交付打包。
+- **完整验收**：`.github/workflows/verify.yml` 改为手动 `workflow_dispatch` + 每日定时运行，完整执行 Research → TTS → ASR → Preview → Render → QC → Repair → Delivery → Production Gate。
+- 两级均采用并发取消旧 run，避免连续提交堆积。
