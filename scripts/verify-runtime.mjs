@@ -27,8 +27,11 @@ try {
 lock.release();
 if (!blocked) throw new Error("project lock failed");
 
-initCheckpoints("checkpoint-test");
-resolveCheckpoint("checkpoint-test","pilot-preview","approved");
-requireCheckpoint("checkpoint-test","pilot-preview");
+const checkpointRoot = "artifacts/runtime-checkpoint-test";
+fs.mkdirSync(checkpointRoot + "/artifacts/preview", {recursive:true});
+fs.writeFileSync(checkpointRoot + "/artifacts/preview/preview.mp4", "test-preview");
+initCheckpoints("checkpoint-test", checkpointRoot);
+resolveCheckpoint("checkpoint-test","pilot-preview","approved", checkpointRoot);
+requireCheckpoint("checkpoint-test","pilot-preview", checkpointRoot);
 
 console.log("runtime PASS");
