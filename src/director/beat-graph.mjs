@@ -1,4 +1,4 @@
-const VARIANTS = [["want-", "preference"],["structured", "structured"],["content-digest", "split"],["repr-digest", "split"],["connection", "network"],["transport", "network"]];
+const VARIANTS = [["want-", "preference"],["structured", "structured"],["content-digest", "split"],["repr-digest", "split"],["connection", "network"],["transport", "network"],["compare", "comparison"],["versus", "comparison"],["before", "transformation"],["after", "transformation"],["step", "sequence"],["first", "sequence"],["then", "sequence"],["because", "causal"],["therefore", "causal"],["evidence", "evidence"],["source", "evidence"],["code", "code"],["api", "code"]];
 function visualVariant(text = "") { const hit = VARIANTS.find(([needle]) => text.toLowerCase().includes(needle)); return hit?.[1] || "generic"; }
 export function buildBeatGraph(script, timeline = null) {
   let cursor = 0;
