@@ -1,12 +1,22 @@
 import fs from "node:fs";
 
+// verify:e2e 是"跑完一次生产之后"的端到端契约校验，不是 CI 快速校验。
+// 它依赖运行产物（TTS 时间轴 / 配音 / 调研），这些不入库，因此缺文件时给出可执行的提示。
+const REMIND = "\n提示：先执行 npm run tts（生成 public/audio.mp3 与 script/timeline.json），再执行 npm run run-production。";
+function need(file, hint) {
+  if (!fs.existsSync(file) || !fs.statSync(file).size) {
+    throw new Error("缺少运行产物：" + file + (hint ? "（应由 " + hint + " 生成）" : "") + REMIND);
+  }
+  return JSON.parse(fs.readFileSync(file, "utf8"));
+}
+
 const project = JSON.parse(fs.readFileSync("fixtures/project.json", "utf8"));
-const script = JSON.parse(fs.readFileSync("fixtures/script.json", "utf8"));
-const timeline = JSON.parse(fs.readFileSync("script/timeline.json", "utf8"));
-const captions = JSON.parse(fs.readFileSync("fixtures/captions.json", "utf8"));
-const wide = JSON.parse(fs.readFileSync("fixtures/render-ir-16x9.json", "utf8"));
-const tall = JSON.parse(fs.readFileSync("fixtures/render-ir-9x16.json", "utf8"));
-const research = JSON.parse(fs.readFileSync("artifacts/" + project.project_id + "/research.json", "utf8"));
+const script = need("fixtures/script.json", "npm run run-production");
+const timeline = need("script/timeline.json", "npm run tts");
+const captions = need("fixtures/captions.json", "npm run tts");
+const wide = need("fixtures/render-ir-16x9.json", "npm run materialize-ir");
+const tall = need("fixtures/render-ir-9x16.json", "npm run materialize-ir");
+const research = need("artifacts/" + project.project_id + "/research.json", "npm run run-production");
 
 if (script.project_id !== project.project_id) throw new Error("script project mismatch");
 if (!timeline.sentences.length || timeline.total_frames < 1) throw new Error("timeline missing");

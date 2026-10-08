@@ -88,6 +88,21 @@ npm run verify:fast
 npm run verify:authored-shots
 ~~~
 
+这两项不需要运行产物。
+
+**渲染、<code>verify:e2e</code> 与后续所有质量门需要 TTS 产物**（<code>public/audio.mp3</code>、<code>script/timeline.json</code>、<code>script/timeline.md</code>、<code>script/timeline-source.json</code>、<code>分镜表.md</code>）。这些由 <code>npm run tts</code> 与 <code>scripts/render_storyboard.py</code> 生成，已在 <code>.gitignore</code> 中排除——因为 <code>src/remotion/index.jsx</code> 会 import 时间轴、<code>&lt;Audio&gt;</code> 依赖配音文件，入库会造成"仓库里的样片产物与真实运行产物不同步"。
+
+全新 clone 的正确顺序：
+
+~~~bash
+npm install
+pip install -r requirements.txt
+npm run verify:fast          # 无需 TTS
+npm run tts# 生成配音与词边界时间轴
+npm run run-production       # 生成调研 / claims / beats
+npm run verify:e2e           # 端到端契约校验（需要以上产物）
+~~~
+
 ## 5. 作为 Skill 使用
 
 最重要的入口：
