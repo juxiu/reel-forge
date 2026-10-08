@@ -38,7 +38,7 @@ fs.writeFileSync(out,JSON.stringify(manifest,null,2));
 if(strict){
   for(const scene of scenes){
     const shot=Number(scene.scene_id.split("-").at(-1));
-    const group="G"+String(Math.floor((shot-1)/5)+1);
+    const group="G"+String(Math.floor((shot-1)/6)+1);
     const frames=scene.frames.map(x=>x.frame).join(",");
     const target=path.resolve("artifacts/stills",group,scene.scene_id);
     fs.mkdirSync(target,{recursive:true});
