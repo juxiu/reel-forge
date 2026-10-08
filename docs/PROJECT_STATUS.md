@@ -4,7 +4,7 @@
 
 ## 总体状态
 
-**状态：基础生产链、双比例质量门禁、语义导演、TTS 词边界时间轴、ASR 契约与镜头评分已接入；当前继续补齐真实 ASR、真实参考资产与源级可回写修复。**
+**状态：基础生产链、双比例质量门禁、语义导演、TTS WordBoundary 主时间轴、镜头评分与 Skill 执行规范已接入；当前继续提升视觉质量与源级修复能力。**
 
 当前主干已经覆盖：
 
@@ -89,7 +89,7 @@ CI 已真实走完：materialize IR → build groups → shots → e2e → previ
 - 视觉表现继续向 anything2explainer 样片靠拢：更多语义图元、镜头级专属动画、更加严格的反 PPT 构图。
 - CI 已默认自动批准四个 checkpoint；交互生产模式仍可保持暂停/恢复。
 - [x] TTS WordBoundary 主时间轴与独立词边界验收；无真实 ASR API 时，二次验收使用明确标记的 `tts-word-boundary`。
-- [~] 真实 ASR 二次验收：已有 Provider 接口与 Production Gate，待获得真实 ASR API 后启用。
+- [x] ASR 二次验收采用与参考项目一致的 TTS WordBoundary 方案；不设置独立严格生产放行等级。
 - 更多本地 TTS provider。
 - [x] Repair 输出 scene → source_ref 修复映射；[ ] 继续实现真正的源代码节点回写。
 - [x] 建立第一版逐镜头质量评分标尺；[ ] 继续接入真实参考样片/反例资产。
