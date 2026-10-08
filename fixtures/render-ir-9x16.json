@@ -1,1 +1,92 @@
-{"version":"0.3","project_id":"demo-production","width":720,"height":1280,"fps":30,"duration":10,"scenes":[{"id":"scene-001","start":0,"duration":5,"elements":[{"id":"hero","type":"card","text":"Semantic search compares meaning instead of exact words."}],"motion":[{"type":"enter","preset":"rise"},{"type":"transform","preset":"travel"}]},{"id":"scene-002","start":5,"duration":5,"elements":[{"id":"hero","type":"card","text":"The relationship changes visibly on screen."}],"motion":[{"type":"enter","preset":"rise"},{"type":"camera","preset":"pan"}]}]}
+{
+  "version": "0.3",
+  "project_id": "demo-production",
+  "width": 720,
+  "height": 1280,
+  "fps": 30,
+  "duration": 10,
+  "scenes": [
+    {
+      "id": "scene-001",
+      "start": 0,
+      "duration": 5,
+      "variant": "network",
+      "composition": {
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
+        "safe_margin": 0.08
+      },
+      "light": {
+        "mode": "hero-key",
+        "key_intensity": 0.82,
+        "accent": "purple"
+      },
+      "elements": [
+        {
+          "id": "hero",
+          "type": "card",
+          "text": "Semantic search compares meaning instead of exact words."
+        }
+      ],
+      "motion": [
+        {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
+          "type": "camera",
+          "target": "stage",
+          "preset": "push",
+          "amount": 0.04
+        }
+      ]
+    },
+    {
+      "id": "scene-002",
+      "start": 5,
+      "duration": 5,
+      "variant": "structured",
+      "composition": {
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
+        "safe_margin": 0.08
+      },
+      "light": {
+        "mode": "hero-key",
+        "key_intensity": 0.82,
+        "accent": "purple"
+      },
+      "elements": [
+        {
+          "id": "hero",
+          "type": "card",
+          "text": "The relationship changes visibly on screen."
+        }
+      ],
+      "motion": [
+        {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
+          "type": "camera",
+          "target": "stage",
+          "preset": "pan",
+          "amount": 0.04
+        }
+      ]
+    }
+  ]
+}
