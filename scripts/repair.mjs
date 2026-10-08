@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 import {repairRenderIR, makeRepairPlan} from "../src/repair/engine.mjs";
 
 const project = JSON.parse(fs.readFileSync("fixtures/project.json", "utf8"));
@@ -30,14 +31,34 @@ if (fs.existsSync(beatsFile)) {
     const index = Number(match[1]) - 1;
     const beat = graph.beats?.[index];
     if (!beat) continue;
+    const before = structuredClone(beat);
     if (issue.type === "motion_too_low" || issue.type === "freeze") {
       beat.camera = {...beat.camera, amount: Math.min(0.12, Number(beat.camera?.amount || 0.04) + 0.035)};
     }
     if (issue.type === "hero_too_small") beat.hero = {...beat.hero, size: "xlarge"};
-    sourceRepairMap.push({node: issue.node, type: issue.type, source_ref: beat.source_ref || {segment_index: index}});
+    const after = structuredClone(beat);
+    sourceRepairMap.push({
+      node: issue.node,
+      type: issue.type,
+      source_ref: beat.source_ref || {segment_index: index},
+      before_sha256: crypto.createHash("sha256").update(JSON.stringify(before)).digest("hex"),
+      after_sha256: crypto.createHash("sha256").update(JSON.stringify(after)).digest("hex"),
+      changed: JSON.stringify(before) !== JSON.stringify(after),
+    });
   }
   if (sourceRepairMap.length) fs.writeFileSync(beatsFile, JSON.stringify(graph, null, 2));
 }
+
+fs.writeFileSync(
+  path.join(plansDir, "source-repair.json"),
+  JSON.stringify({
+    version: "0.2",
+    source: "artifacts/" + project.project_id + "/beats.json",
+    entries: sourceRepairMap,
+    writeback_count: sourceRepairMap.filter((entry) => entry.changed).length,
+  }, null, 2),
+);
+
 const repairs = [];
 for (const ratio of ["16x9", "9x16"]) {
   const file = "fixtures/render-ir-" + ratio + ".json";
@@ -47,9 +68,7 @@ for (const ratio of ["16x9", "9x16"]) {
     .filter((scene, index) => JSON.stringify(scene) !== JSON.stringify(ir.scenes[index]))
     .map((scene) => scene.id);
 
-  if (changedNodes.length) {
-    fs.writeFileSync(file, JSON.stringify(repaired, null, 2));
-  }
+  if (changedNodes.length) fs.writeFileSync(file, JSON.stringify(repaired, null, 2));
   repairs.push({ratio, changed_nodes: changedNodes});
 }
 
@@ -62,8 +81,12 @@ fs.writeFileSync(
     status: "patched",
     repaired_at: new Date().toISOString(),
     changed_nodes: changed,
+    source_writeback_count: sourceRepairMap.filter((entry) => entry.changed).length,
     by_ratio: repairs,
   }, null, 2),
 );
 
-console.log("repair PASS: IR patched", JSON.stringify({changed_nodes: changed}));
+console.log("repair PASS: IR and source patched", JSON.stringify({
+  changed_nodes: changed,
+  source_writeback_count: sourceRepairMap.filter((entry) => entry.changed).length,
+}));
