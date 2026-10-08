@@ -27,6 +27,7 @@ jobs:
         with:
           node-version: 22
       - run: npm install
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - run: npm run verify:p4
 
   hyperframes:
