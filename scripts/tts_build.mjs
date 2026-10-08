@@ -278,6 +278,15 @@ fs.writeFileSync(
   ].join("\n"),
 );
 fs.writeFileSync(path.join(root, "timeline-source.json"), JSON.stringify(allWords, null, 2));
+fs.writeFileSync(path.join(root, "voice-manifest.json"), JSON.stringify({
+  provider: "edge-tts",
+  voice,
+  rate: process.env.TTS_RATE || "+0%",
+  sentence_count: audioParts.length,
+  final_audio: audioFile,
+  audio_sha256: require("node:crypto").createHash("sha256").update(fs.readFileSync(audioFile)).digest("hex"),
+  duration_s: totalSeconds,
+}, null, 2));
 fs.writeFileSync("fixtures/captions.json", JSON.stringify(captionSource.captions, null, 2));
 
 console.log(
