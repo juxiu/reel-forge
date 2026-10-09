@@ -13,7 +13,7 @@ export const SHOT_RECIPE = {
   shot_id: "SC07",
   variant: "sequence",
   hero_size: 190,
-  camera: "pan",
+  camera: "push",
   settle_frames: 30,
   hero_role: "handshake",
   mirror: false,
@@ -23,6 +23,7 @@ export const SHOT_RECIPE = {
       kind: "pipeline3",
       focus: [0,40,80],
       caption: "摘要认证要走完这三步",
+    subs: ["服务端发起挑战", "客户端算出摘要", "服务端比对结果"],
       items: [
         {id: "s1", icon: "shield", text: "挑战"},
         {id: "s2", icon: "key", text: "回应"},

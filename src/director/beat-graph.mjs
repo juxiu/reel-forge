@@ -14,4 +14,8 @@ export function buildBeatGraph(script, timeline = null) {
   });
   return {duration:cursor,beats};
 }
-export function beatToScene(beat, segment) { return {scene_id:"scene-"+beat.id.slice(5),start:beat.start,duration:beat.duration,narration:{text:segment.text},source_ref:beat.source_ref,variant:beat.visual_variant,narrative_job:beat.narrative_job,semantic_confidence:beat.semantic_confidence,matched_rules:beat.matched_rules||[],composition:beat.composition,light:beat.light,visual:{type:"explainer",objects:[{id:"hero",type:"card",text:segment.text},{id:"flow",type:"signal"}]},motion:[{type:"enter",target:"hero",preset:"rise"},{type:"transform",target:"flow",preset:"travel"},{type:"camera",target:"stage",preset:beat.camera.type,amount:beat.camera.amount}]};}
+export function beatToScene(beat, segment) { return {scene_id:"scene-"+beat.id.slice(5),start:beat.start,duration:beat.duration,narration:{text:segment.text},source_ref:beat.source_ref,variant:beat.visual_variant,narrative_job:beat.narrative_job,semantic_confidence:beat.semantic_confidence,matched_rules:beat.matched_rules||[],composition:beat.composition,light:beat.light,// ⚠ hero 元素标成 narration 而不是 card：它带的是**这一镜的解说词全文**，
+  //   而 a2e 硬规则是「整句解说词不进画面」（plan.mjs 的 heroTextOf 拒收 >12 宽度单位）。
+  //   标成 card 会让 verify:text-provenance 判它「画面文案无出处」—— 门没骂错，是类型标错了。
+  //   画面文案由各镜 recipe.stage.items 提供（走 B 段字面量白名单）。
+  visual:{type:"explainer",objects:[{id:"hero",type:"narration",text:segment.text},{id:"flow",type:"signal"}]},motion:[{type:"enter",target:"hero",preset:"rise"},{type:"transform",target:"flow",preset:"travel"},{type:"camera",target:"stage",preset:beat.camera.type,amount:beat.camera.amount}]};}

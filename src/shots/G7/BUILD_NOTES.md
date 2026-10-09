@@ -6,3 +6,4 @@
 
 ## 机器登记
 - G7 由 scripts/materialize-shots.mjs 登记 6 镜：SC37(scene-37) SC38(scene-38) SC39(scene-39) SC40(scene-40) SC41(scene-41) SC42(scene-42)
+- G7 由 scripts/materialize-shots.mjs 登记 6 镜：SC37(scene-037) SC38(scene-038) SC39(scene-039) SC40(scene-040) SC41(scene-041) SC42(scene-042)

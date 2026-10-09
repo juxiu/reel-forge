@@ -4,23 +4,28 @@
   "width": 720,
   "height": 1280,
   "fps": 30,
-  "duration": 255.233333,
+  "duration": 441.1666666666667,
   "scenes": [
     {
-      "id": "scene-01",
-      "start": 1.333333,
-      "duration": 5.6,
+      "id": "scene-001",
+      "start": 1.6,
+      "duration": 12.233333333333334,
       "source_ref": {
         "segment_index": 0,
         "script_id": "seg-001"
       },
       "variant": "network",
       "narrative_job": "hook",
-      "semantic_confidence": 1,
-      "matched_rules": [],
+      "semantic_confidence": 0.5,
+      "matched_rules": [
+        "\\bconnect\\b",
+        "\\bconnection\\b",
+        "\\btransport\\b",
+        "连接|关系|传递|网络|链路"
+      ],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -31,8 +36,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "一次摘要认证牵涉到的角色，比想象的多。,客户端、服务端、代理、时钟、缓存，缺一环就校验不过。,先把这张关系网摆出来。"
         },
         {
           "id": "flow",
@@ -41,112 +46,153 @@
       ],
       "motion": [
         {
-          "type": "camera",
-          "target": "stage",
-          "preset": "pan",
-          "amount": 0.05
-        }
-      ]
-    },
-    {
-      "id": "scene-02",
-      "start": 6.933333,
-      "duration": 5.6,
-      "source_ref": {
-        "segment_index": 1,
-        "script_id": "seg-002"
-      },
-      "variant": "split",
-      "narrative_job": "mechanism",
-      "semantic_confidence": 1,
-      "matched_rules": [],
-      "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
         },
         {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "parallax",
-          "amount": 0.05
-        }
-      ]
-    },
-    {
-      "id": "scene-03",
-      "start": 12.533333,
-      "duration": 5.6,
-      "source_ref": {
-        "segment_index": 2,
-        "script_id": "seg-003"
-      },
-      "variant": "preference",
-      "narrative_job": "negotiation",
-      "semantic_confidence": 1,
-      "matched_rules": [],
-      "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
         },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
         {
           "type": "camera",
           "target": "stage",
           "preset": "push",
-          "amount": 0.05
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-04",
-      "start": 18.133333,
-      "duration": 5.6,
+      "id": "scene-002",
+      "start": 14.933333333333334,
+      "duration": 11.733333333333334,
+      "source_ref": {
+        "segment_index": 1,
+        "script_id": "seg-002"
+      },
+      "variant": "structured",
+      "narrative_job": "explain",
+      "semantic_confidence": 0.45,
+      "matched_rules": [
+        "structured",
+        "结构化|字段|层级|组织|格式"
+      ],
+      "composition": {
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
+        "safe_margin": 0.08
+      },
+      "light": {
+        "mode": "hero-key",
+        "key_intensity": 0.82,
+        "accent": "purple"
+      },
+      "elements": [
+        {
+          "id": "hero",
+          "type": "narration",
+          "text": "报文本身是明文，头部却带着一串看不懂的字段。,这些字段叫摘要字段，是把口令换成不可逆的凭证。,换句话说，网络上看不到口令。"
+        },
+        {
+          "id": "flow",
+          "type": "signal"
+        }
+      ],
+      "motion": [
+        {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
+          "type": "camera",
+          "target": "stage",
+          "preset": "pan",
+          "amount": 0.04
+        }
+      ]
+    },
+    {
+      "id": "scene-003",
+      "start": 27.766666666666666,
+      "duration": 8.933333333333337,
+      "source_ref": {
+        "segment_index": 2,
+        "script_id": "seg-003"
+      },
+      "variant": "network",
+      "narrative_job": "mechanism",
+      "semantic_confidence": 0.5,
+      "matched_rules": [
+        "\\bconnect\\b",
+        "\\bconnection\\b",
+        "\\btransport\\b",
+        "连接|关系|传递|网络|链路"
+      ],
+      "composition": {
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
+        "safe_margin": 0.08
+      },
+      "light": {
+        "mode": "hero-key",
+        "key_intensity": 0.82,
+        "accent": "purple"
+      },
+      "elements": [
+        {
+          "id": "hero",
+          "type": "narration",
+          "text": "并不是每套系统都值得上摘要。,公网链路该上，内网链路可以省。,差别在于链路上有没有不可信的跳。"
+        },
+        {
+          "id": "flow",
+          "type": "signal"
+        }
+      ],
+      "motion": [
+        {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
+          "type": "camera",
+          "target": "stage",
+          "preset": "push",
+          "amount": 0.04
+        }
+      ]
+    },
+    {
+      "id": "scene-004",
+      "start": 37.8,
+      "duration": 12.666666666666671,
       "source_ref": {
         "segment_index": 3,
         "script_id": "seg-004"
       },
       "variant": "structured",
-      "narrative_job": "unification",
-      "semantic_confidence": 1,
-      "matched_rules": [],
+      "narrative_job": "explain",
+      "semantic_confidence": 0.45,
+      "matched_rules": [
+        "structured",
+        "结构化|字段|层级|组织|格式"
+      ],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -157,8 +203,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "摘要不是凭空来的，它由四个部分拼成。,算法、字段顺序、规范化方式、拼接顺序，缺一不可。,任何一处不同，两侧算出的摘要就不一样。"
         },
         {
           "id": "flow",
@@ -167,28 +213,43 @@
       ],
       "motion": [
         {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
           "type": "camera",
           "target": "stage",
           "preset": "pan",
-          "amount": 0.05
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-05",
-      "start": 23.733333,
-      "duration": 5.6,
+      "id": "scene-005",
+      "start": 51.56666666666667,
+      "duration": 10.733333333333327,
       "source_ref": {
         "segment_index": 4,
         "script_id": "seg-005"
       },
-      "variant": "comparison",
-      "narrative_job": "compare",
-      "semantic_confidence": 1,
-      "matched_rules": [],
+      "variant": "network",
+      "narrative_job": "mechanism",
+      "semantic_confidence": 0.5,
+      "matched_rules": [
+        "\\bconnect\\b",
+        "\\bconnection\\b",
+        "\\btransport\\b",
+        "连接|关系|传递|网络|链路"
+      ],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -199,8 +260,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "覆盖一跳还是覆盖整条链，是两种设计。,单跳校验便宜，但代理能读到原文。,端到端贵一些，整条链路都不可读。"
         },
         {
           "id": "flow",
@@ -209,28 +270,43 @@
       ],
       "motion": [
         {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
           "type": "camera",
           "target": "stage",
-          "preset": "parallax",
-          "amount": 0.05
+          "preset": "push",
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-06",
-      "start": 29.333333,
-      "duration": 5.6,
+      "id": "scene-006",
+      "start": 63.4,
+      "duration": 9.833333333333336,
       "source_ref": {
         "segment_index": 5,
         "script_id": "seg-006"
       },
-      "variant": "transformation",
-      "narrative_job": "transform",
-      "semantic_confidence": 1,
-      "matched_rules": [],
+      "variant": "causal",
+      "narrative_job": "mechanism",
+      "semantic_confidence": 0.5,
+      "matched_rules": [
+        "\\bbecause\\b",
+        "\\btherefore\\b",
+        "\\bcaus(e|al)\\b",
+        "因为|因此|导致|原因|机制|原理"
+      ],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -241,8 +317,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "于是报文被压成一个固定长度的摘要。,服务器只拿摘要比对，口令始终不出网关。,这是摘要机制最核心的一次转换。"
         },
         {
           "id": "flow",
@@ -251,28 +327,38 @@
       ],
       "motion": [
         {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
           "type": "camera",
           "target": "stage",
-          "preset": "push",
-          "amount": 0.05
+          "preset": "pan",
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-07",
-      "start": 34.933333,
-      "duration": 5.6,
+      "id": "scene-007",
+      "start": 74.33333333333333,
+      "duration": 9.466666666666669,
       "source_ref": {
         "segment_index": 6,
         "script_id": "seg-007"
       },
-      "variant": "sequence",
-      "narrative_job": "handshake",
-      "semantic_confidence": 1,
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
       "matched_rules": [],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -283,8 +369,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "摘要认证要走完三步。,服务端先发挑战，客户端算摘要回应，服务端比对。,少任何一步都算不上一次认证。"
         },
         {
           "id": "flow",
@@ -293,28 +379,38 @@
       ],
       "motion": [
         {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
           "type": "camera",
           "target": "stage",
-          "preset": "pan",
-          "amount": 0.05
+          "preset": "push",
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-08",
-      "start": 40.533333,
-      "duration": 5.6,
+      "id": "scene-008",
+      "start": 84.9,
+      "duration": 8.133333333333326,
       "source_ref": {
         "segment_index": 7,
         "script_id": "seg-008"
       },
-      "variant": "causal",
-      "narrative_job": "motivation",
-      "semantic_confidence": 1,
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
       "matched_rules": [],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -325,8 +421,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "为什么不用明文口令？,抓包就能读到，代理和日志都会留一份。,同一份凭据还能被反复重放。"
         },
         {
           "id": "flow",
@@ -335,28 +431,43 @@
       ],
       "motion": [
         {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
           "type": "camera",
           "target": "stage",
-          "preset": "parallax",
-          "amount": 0.05
+          "preset": "pan",
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-09",
-      "start": 46.133333,
-      "duration": 5.6,
+      "id": "scene-009",
+      "start": 94.13333333333334,
+      "duration": 11.36666666666666,
       "source_ref": {
         "segment_index": 8,
         "script_id": "seg-009"
       },
-      "variant": "evidence",
-      "narrative_job": "evidence",
-      "semantic_confidence": 1,
-      "matched_rules": [],
+      "variant": "causal",
+      "narrative_job": "mechanism",
+      "semantic_confidence": 0.5,
+      "matched_rules": [
+        "\\bbecause\\b",
+        "\\btherefore\\b",
+        "\\bcaus(e|al)\\b",
+        "因为|因此|导致|原因|机制|原理"
+      ],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -367,8 +478,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "摘要认证不是新发明，它是 HTTP 里的一项可选机制。,规范定义了字段、算法和拼接方式。,我们按规范里的例子来讲。"
         },
         {
           "id": "flow",
@@ -377,28 +488,41 @@
       ],
       "motion": [
         {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
           "type": "camera",
           "target": "stage",
           "preset": "push",
-          "amount": 0.05
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-10",
-      "start": 51.733333,
-      "duration": 5.6,
+      "id": "scene-010",
+      "start": 106.6,
+      "duration": 11,
       "source_ref": {
         "segment_index": 9,
         "script_id": "seg-010"
       },
-      "variant": "code",
-      "narrative_job": "wire",
-      "semantic_confidence": 1,
-      "matched_rules": [],
+      "variant": "structured",
+      "narrative_job": "explain",
+      "semantic_confidence": 0.45,
+      "matched_rules": [
+        "structured",
+        "结构化|字段|层级|组织|格式"
+      ],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -409,8 +533,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "客户端真正发出去的，就是这一行头。,用户名、域、路径、还有一串计数器。,这些字段拼起来，才得到最终的摘要。"
         },
         {
           "id": "flow",
@@ -419,28 +543,38 @@
       ],
       "motion": [
         {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
           "type": "camera",
           "target": "stage",
           "preset": "pan",
-          "amount": 0.05
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-11",
-      "start": 57.333333,
-      "duration": 5.6,
+      "id": "scene-011",
+      "start": 118.7,
+      "duration": 9.86666666666666,
       "source_ref": {
         "segment_index": 10,
         "script_id": "seg-011"
       },
-      "variant": "network",
-      "narrative_job": "cast",
-      "semantic_confidence": 1,
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
       "matched_rules": [],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -451,8 +585,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "一次请求牵涉的角色可以列成一圈。,客户端负责算，服务端负责比。,代理、缓存、日志各取所需。"
         },
         {
           "id": "flow",
@@ -461,28 +595,38 @@
       ],
       "motion": [
         {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
           "type": "camera",
           "target": "stage",
-          "preset": "parallax",
-          "amount": 0.05
+          "preset": "push",
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-12",
-      "start": 62.933333,
-      "duration": 5.6,
+      "id": "scene-012",
+      "start": 129.66666666666666,
+      "duration": 8.033333333333331,
       "source_ref": {
         "segment_index": 11,
         "script_id": "seg-012"
       },
-      "variant": "split",
-      "narrative_job": "division",
-      "semantic_confidence": 1,
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
       "matched_rules": [],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -493,8 +637,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "职责天然落在两侧。,客户端算摘要，服务端生成挑战并比对。,两边共享的只有那把密钥。"
         },
         {
           "id": "flow",
@@ -503,28 +647,38 @@
       ],
       "motion": [
         {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
           "type": "camera",
           "target": "stage",
-          "preset": "push",
-          "amount": 0.05
+          "preset": "pan",
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-13",
-      "start": 70.033333,
-      "duration": 5.6,
+      "id": "scene-013",
+      "start": 139.63333333333333,
+      "duration": 9.133333333333354,
       "source_ref": {
         "segment_index": 12,
         "script_id": "seg-013"
       },
-      "variant": "preference",
-      "narrative_job": "choice",
-      "semantic_confidence": 1,
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
       "matched_rules": [],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -535,8 +689,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "算法分三档，按需选。,弱摘要容易撞，强摘要成本高。,多数新系统直接从第三档起步。"
         },
         {
           "id": "flow",
@@ -545,112 +699,44 @@
       ],
       "motion": [
         {
-          "type": "camera",
-          "target": "stage",
-          "preset": "pan",
-          "amount": 0.05
-        }
-      ]
-    },
-    {
-      "id": "scene-14",
-      "start": 75.633333,
-      "duration": 5.6,
-      "source_ref": {
-        "segment_index": 13,
-        "script_id": "seg-014"
-      },
-      "variant": "structured",
-      "narrative_job": "anatomy",
-      "semantic_confidence": 1,
-      "matched_rules": [],
-      "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
         },
         {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "parallax",
-          "amount": 0.05
-        }
-      ]
-    },
-    {
-      "id": "scene-15",
-      "start": 81.233333,
-      "duration": 5.6,
-      "source_ref": {
-        "segment_index": 14,
-        "script_id": "seg-015"
-      },
-      "variant": "comparison",
-      "narrative_job": "compare",
-      "semantic_confidence": 1,
-      "matched_rules": [],
-      "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
         },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
         {
           "type": "camera",
           "target": "stage",
           "preset": "push",
-          "amount": 0.05
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-16",
-      "start": 86.833333,
-      "duration": 5.6,
+      "id": "scene-014",
+      "start": 149.86666666666667,
+      "duration": 10.133333333333326,
       "source_ref": {
-        "segment_index": 15,
-        "script_id": "seg-016"
+        "segment_index": 13,
+        "script_id": "seg-014"
       },
-      "variant": "transformation",
-      "narrative_job": "transform",
-      "semantic_confidence": 1,
-      "matched_rules": [],
+      "variant": "sequence",
+      "narrative_job": "sequence",
+      "semantic_confidence": 0.5,
+      "matched_rules": [
+        "\\bfirst\\b",
+        "\\bthen\\b",
+        "\\bnext\\b",
+        "\\bstep\\b",
+        "首先|然后|接着|下一步|步骤|流程"
+      ],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -661,8 +747,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "摘要值来自四层东西。,先定算法，再定字段顺序，然后规范化和拼接。,顺序一旦定错，摘要必然不等。"
         },
         {
           "id": "flow",
@@ -670,29 +756,39 @@
         }
       ],
       "motion": [
+        {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
         {
           "type": "camera",
           "target": "stage",
           "preset": "pan",
-          "amount": 0.05
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-17",
-      "start": 92.433333,
-      "duration": 5.6,
+      "id": "scene-015",
+      "start": 161.1,
+      "duration": 9.700000000000017,
       "source_ref": {
-        "segment_index": 16,
-        "script_id": "seg-017"
+        "segment_index": 14,
+        "script_id": "seg-015"
       },
-      "variant": "sequence",
-      "narrative_job": "levels",
-      "semantic_confidence": 1,
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
       "matched_rules": [],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -703,8 +799,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "新旧写法逐项对照，差别不小。,旧写法里算法是缺省的，新写法必须写明。,用户名是否进摘要也换了约定。"
         },
         {
           "id": "flow",
@@ -713,28 +809,147 @@
       ],
       "motion": [
         {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
           "type": "camera",
           "target": "stage",
-          "preset": "parallax",
-          "amount": 0.05
+          "preset": "push",
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-18",
-      "start": 98.033333,
-      "duration": 5.6,
+      "id": "scene-016",
+      "start": 171.9,
+      "duration": 7.900000000000006,
+      "source_ref": {
+        "segment_index": 15,
+        "script_id": "seg-016"
+      },
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
+      "matched_rules": [],
+      "composition": {
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
+        "safe_margin": 0.08
+      },
+      "light": {
+        "mode": "hero-key",
+        "key_intensity": 0.82,
+        "accent": "purple"
+      },
+      "elements": [
+        {
+          "id": "hero",
+          "type": "narration",
+          "text": "口令本身不会离开客户端。,它先被压成摘要，再进网。,服务器只见到摘要这一种形态。"
+        },
+        {
+          "id": "flow",
+          "type": "signal"
+        }
+      ],
+      "motion": [
+        {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
+          "type": "camera",
+          "target": "stage",
+          "preset": "pan",
+          "amount": 0.04
+        }
+      ]
+    },
+    {
+      "id": "scene-017",
+      "start": 180.9,
+      "duration": 7.933333333333337,
+      "source_ref": {
+        "segment_index": 16,
+        "script_id": "seg-017"
+      },
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
+      "matched_rules": [],
+      "composition": {
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
+        "safe_margin": 0.08
+      },
+      "light": {
+        "mode": "hero-key",
+        "key_intensity": 0.82,
+        "accent": "purple"
+      },
+      "elements": [
+        {
+          "id": "hero",
+          "type": "narration",
+          "text": "强度可以分三档看。,不加密、弱摘要、强摘要。,公网场景基本只考虑第三档。"
+        },
+        {
+          "id": "flow",
+          "type": "signal"
+        }
+      ],
+      "motion": [
+        {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
+          "type": "camera",
+          "target": "stage",
+          "preset": "push",
+          "amount": 0.04
+        }
+      ]
+    },
+    {
+      "id": "scene-018",
+      "start": 189.93333333333334,
+      "duration": 7.633333333333326,
       "source_ref": {
         "segment_index": 17,
         "script_id": "seg-018"
       },
       "variant": "causal",
-      "narrative_job": "deprecation",
-      "semantic_confidence": 1,
-      "matched_rules": [],
+      "narrative_job": "mechanism",
+      "semantic_confidence": 0.5,
+      "matched_rules": [
+        "\\bbecause\\b",
+        "\\btherefore\\b",
+        "\\bcaus(e|al)\\b",
+        "因为|因此|导致|原因|机制|原理"
+      ],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -745,8 +960,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "弱算法被淘汰是有原因的。,摘要长度有限，可以被穷举。,碰撞也更容易被构造出来。"
         },
         {
           "id": "flow",
@@ -755,28 +970,38 @@
       ],
       "motion": [
         {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
           "type": "camera",
           "target": "stage",
-          "preset": "push",
-          "amount": 0.05
+          "preset": "pan",
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-19",
-      "start": 103.633333,
-      "duration": 5.6,
+      "id": "scene-019",
+      "start": 198.66666666666666,
+      "duration": 7.666666666666686,
       "source_ref": {
         "segment_index": 18,
         "script_id": "seg-019"
       },
-      "variant": "evidence",
-      "narrative_job": "evidence",
-      "semantic_confidence": 1,
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
       "matched_rules": [],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -787,8 +1012,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "拼接顺序必须是双方约定的。,规范给出了规范串的定义。,顺序错了，摘要就对不上。"
         },
         {
           "id": "flow",
@@ -797,112 +1022,42 @@
       ],
       "motion": [
         {
-          "type": "camera",
-          "target": "stage",
-          "preset": "pan",
-          "amount": 0.05
-        }
-      ]
-    },
-    {
-      "id": "scene-20",
-      "start": 109.233333,
-      "duration": 5.6,
-      "source_ref": {
-        "segment_index": 19,
-        "script_id": "seg-020"
-      },
-      "variant": "code",
-      "narrative_job": "canonical",
-      "semantic_confidence": 1,
-      "matched_rules": [],
-      "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
         },
         {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "parallax",
-          "amount": 0.05
-        }
-      ]
-    },
-    {
-      "id": "scene-21",
-      "start": 114.833333,
-      "duration": 5.6,
-      "source_ref": {
-        "segment_index": 20,
-        "script_id": "seg-021"
-      },
-      "variant": "network",
-      "narrative_job": "authority",
-      "semantic_confidence": 1,
-      "matched_rules": [],
-      "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
         },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
         {
           "type": "camera",
           "target": "stage",
           "preset": "push",
-          "amount": 0.05
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-22",
-      "start": 120.433333,
-      "duration": 5.6,
+      "id": "scene-020",
+      "start": 207.43333333333334,
+      "duration": 10.066666666666663,
       "source_ref": {
-        "segment_index": 21,
-        "script_id": "seg-022"
+        "segment_index": 19,
+        "script_id": "seg-020"
       },
-      "variant": "split",
-      "narrative_job": "sides",
-      "semantic_confidence": 1,
-      "matched_rules": [],
+      "variant": "transformation",
+      "narrative_job": "transform",
+      "semantic_confidence": 0.5,
+      "matched_rules": [
+        "\\bbefore\\b",
+        "\\bafter\\b",
+        "变成|转化|转换|演变|改成|从.*到"
+      ],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -913,8 +1068,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "规范化之后，请求变成四段。,方法、路径、认证参数、摘要前缀。,它们按固定顺序排好，再拼起来。"
         },
         {
           "id": "flow",
@@ -922,29 +1077,39 @@
         }
       ],
       "motion": [
+        {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
         {
           "type": "camera",
           "target": "stage",
           "preset": "pan",
-          "amount": 0.05
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-23",
-      "start": 126.033333,
-      "duration": 5.6,
+      "id": "scene-021",
+      "start": 218.6,
+      "duration": 8.833333333333343,
       "source_ref": {
-        "segment_index": 22,
-        "script_id": "seg-023"
+        "segment_index": 20,
+        "script_id": "seg-021"
       },
-      "variant": "preference",
-      "narrative_job": "order",
-      "semantic_confidence": 1,
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
       "matched_rules": [],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -955,8 +1120,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "谁有权定义这个顺序？,规范说了算，客户端和服务端都照它执行。,测试向量用来保证两边一致。"
         },
         {
           "id": "flow",
@@ -965,28 +1130,148 @@
       ],
       "motion": [
         {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
           "type": "camera",
           "target": "stage",
-          "preset": "parallax",
-          "amount": 0.05
+          "preset": "push",
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-24",
-      "start": 131.633333,
-      "duration": 5.6,
+      "id": "scene-022",
+      "start": 228.53333333333333,
+      "duration": 8.199999999999989,
+      "source_ref": {
+        "segment_index": 21,
+        "script_id": "seg-022"
+      },
+      "variant": "structured",
+      "narrative_job": "explain",
+      "semantic_confidence": 0.45,
+      "matched_rules": [
+        "structured",
+        "结构化|字段|层级|组织|格式"
+      ],
+      "composition": {
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
+        "safe_margin": 0.08
+      },
+      "light": {
+        "mode": "hero-key",
+        "key_intensity": 0.82,
+        "accent": "purple"
+      },
+      "elements": [
+        {
+          "id": "hero",
+          "type": "narration",
+          "text": "请求侧和响应侧的字段不一样。,请求侧关心方法和路径。,响应侧关心摘要本身和随机串。"
+        },
+        {
+          "id": "flow",
+          "type": "signal"
+        }
+      ],
+      "motion": [
+        {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
+          "type": "camera",
+          "target": "stage",
+          "preset": "pan",
+          "amount": 0.04
+        }
+      ]
+    },
+    {
+      "id": "scene-023",
+      "start": 237.83333333333334,
+      "duration": 8,
+      "source_ref": {
+        "segment_index": 22,
+        "script_id": "seg-023"
+      },
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
+      "matched_rules": [],
+      "composition": {
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
+        "safe_margin": 0.08
+      },
+      "light": {
+        "mode": "hero-key",
+        "key_intensity": 0.82,
+        "accent": "purple"
+      },
+      "elements": [
+        {
+          "id": "hero",
+          "type": "narration",
+          "text": "顺序有三种取法。,手写固定序、按字典序、按规范序。,新系统应该走第三种。"
+        },
+        {
+          "id": "flow",
+          "type": "signal"
+        }
+      ],
+      "motion": [
+        {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
+          "type": "camera",
+          "target": "stage",
+          "preset": "push",
+          "amount": 0.04
+        }
+      ]
+    },
+    {
+      "id": "scene-024",
+      "start": 246.93333333333334,
+      "duration": 8.433333333333337,
       "source_ref": {
         "segment_index": 23,
         "script_id": "seg-024"
       },
       "variant": "structured",
-      "narrative_job": "hierarchy",
-      "semantic_confidence": 1,
-      "matched_rules": [],
+      "narrative_job": "explain",
+      "semantic_confidence": 0.45,
+      "matched_rules": [
+        "structured",
+        "结构化|字段|层级|组织|格式"
+      ],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -997,8 +1282,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "字段本身也分四层。,原始头字段先规范化，再拼接，最后摘要。,每一层都可能出错。"
         },
         {
           "id": "flow",
@@ -1007,28 +1292,38 @@
       ],
       "motion": [
         {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
           "type": "camera",
           "target": "stage",
-          "preset": "push",
-          "amount": 0.05
+          "preset": "pan",
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-25",
-      "start": 138.733333,
-      "duration": 5.6,
+      "id": "scene-025",
+      "start": 257.3,
+      "duration": 8.433333333333337,
       "source_ref": {
         "segment_index": 24,
         "script_id": "seg-025"
       },
-      "variant": "comparison",
-      "narrative_job": "replay",
-      "semantic_confidence": 1,
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
       "matched_rules": [],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -1039,8 +1334,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "有没有计数器，差别很大。,没有计数器，原样重放就能通过。,有了计数器，序号必须递增。"
         },
         {
           "id": "flow",
@@ -1049,28 +1344,38 @@
       ],
       "motion": [
         {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
           "type": "camera",
           "target": "stage",
-          "preset": "pan",
-          "amount": 0.05
+          "preset": "push",
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-26",
-      "start": 144.333333,
-      "duration": 5.6,
+      "id": "scene-026",
+      "start": 266.8333333333333,
+      "duration": 7.03333333333336,
       "source_ref": {
         "segment_index": 25,
         "script_id": "seg-026"
       },
-      "variant": "transformation",
-      "narrative_job": "window",
-      "semantic_confidence": 1,
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
       "matched_rules": [],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -1081,8 +1386,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "重放被压进一个窗口里。,报文进来，先看序号是否用过。,用过就直接拒绝。"
         },
         {
           "id": "flow",
@@ -1091,112 +1396,38 @@
       ],
       "motion": [
         {
-          "type": "camera",
-          "target": "stage",
-          "preset": "parallax",
-          "amount": 0.05
-        }
-      ]
-    },
-    {
-      "id": "scene-27",
-      "start": 149.933333,
-      "duration": 5.6,
-      "source_ref": {
-        "segment_index": 26,
-        "script_id": "seg-027"
-      },
-      "variant": "sequence",
-      "narrative_job": "defense",
-      "semantic_confidence": 1,
-      "matched_rules": [],
-      "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
         },
         {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "push",
-          "amount": 0.05
-        }
-      ]
-    },
-    {
-      "id": "scene-28",
-      "start": 155.533333,
-      "duration": 5.6,
-      "source_ref": {
-        "segment_index": 27,
-        "script_id": "seg-028"
-      },
-      "variant": "causal",
-      "narrative_job": "clockfail",
-      "semantic_confidence": 1,
-      "matched_rules": [],
-      "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
         },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
         {
           "type": "camera",
           "target": "stage",
           "preset": "pan",
-          "amount": 0.05
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-29",
-      "start": 161.133333,
-      "duration": 5.6,
+      "id": "scene-027",
+      "start": 274.96666666666664,
+      "duration": 8,
       "source_ref": {
-        "segment_index": 28,
-        "script_id": "seg-029"
+        "segment_index": 26,
+        "script_id": "seg-027"
       },
-      "variant": "evidence",
-      "narrative_job": "evidence",
-      "semantic_confidence": 1,
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
       "matched_rules": [],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -1207,8 +1438,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "重放防护同样分三档。,只有随机串最弱，加上计数就好些。,再加时间窗口才算稳。"
         },
         {
           "id": "flow",
@@ -1217,70 +1448,202 @@
       ],
       "motion": [
         {
-          "type": "camera",
-          "target": "stage",
-          "preset": "parallax",
-          "amount": 0.05
-        }
-      ]
-    },
-    {
-      "id": "scene-30",
-      "start": 166.733333,
-      "duration": 5.6,
-      "source_ref": {
-        "segment_index": 29,
-        "script_id": "seg-030"
-      },
-      "variant": "code",
-      "narrative_job": "counter",
-      "semantic_confidence": 1,
-      "matched_rules": [],
-      "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
         },
         {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
         {
           "type": "camera",
           "target": "stage",
           "preset": "push",
-          "amount": 0.05
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-31",
-      "start": 172.333333,
-      "duration": 5.6,
+      "id": "scene-028",
+      "start": 284.06666666666666,
+      "duration": 8.366666666666674,
+      "source_ref": {
+        "segment_index": 27,
+        "script_id": "seg-028"
+      },
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
+      "matched_rules": [],
+      "composition": {
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
+        "safe_margin": 0.08
+      },
+      "light": {
+        "mode": "hero-key",
+        "key_intensity": 0.82,
+        "accent": "purple"
+      },
+      "elements": [
+        {
+          "id": "hero",
+          "type": "narration",
+          "text": "时钟偏了就会失败。,客户端快了一点，服务端就判过期。,请求直接被拒，没有补救机会。"
+        },
+        {
+          "id": "flow",
+          "type": "signal"
+        }
+      ],
+      "motion": [
+        {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
+          "type": "camera",
+          "target": "stage",
+          "preset": "pan",
+          "amount": 0.04
+        }
+      ]
+    },
+    {
+      "id": "scene-029",
+      "start": 293.53333333333336,
+      "duration": 7.199999999999989,
+      "source_ref": {
+        "segment_index": 28,
+        "script_id": "seg-029"
+      },
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
+      "matched_rules": [],
+      "composition": {
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
+        "safe_margin": 0.08
+      },
+      "light": {
+        "mode": "hero-key",
+        "key_intensity": 0.82,
+        "accent": "purple"
+      },
+      "elements": [
+        {
+          "id": "hero",
+          "type": "narration",
+          "text": "规范对时钟有明确要求。,两侧时间必须足够接近。,偏差过大会被当成异常。"
+        },
+        {
+          "id": "flow",
+          "type": "signal"
+        }
+      ],
+      "motion": [
+        {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
+          "type": "camera",
+          "target": "stage",
+          "preset": "push",
+          "amount": 0.04
+        }
+      ]
+    },
+    {
+      "id": "scene-030",
+      "start": 301.8333333333333,
+      "duration": 9.700000000000045,
+      "source_ref": {
+        "segment_index": 29,
+        "script_id": "seg-030"
+      },
+      "variant": "structured",
+      "narrative_job": "explain",
+      "semantic_confidence": 0.45,
+      "matched_rules": [
+        "structured",
+        "结构化|字段|层级|组织|格式"
+      ],
+      "composition": {
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
+        "safe_margin": 0.08
+      },
+      "light": {
+        "mode": "hero-key",
+        "key_intensity": 0.82,
+        "accent": "purple"
+      },
+      "elements": [
+        {
+          "id": "hero",
+          "type": "narration",
+          "text": "每次请求都要变的东西有三个。,计数器自增，随机串重算，质量参数固定。,这三个字段是防重放的关键。"
+        },
+        {
+          "id": "flow",
+          "type": "signal"
+        }
+      ],
+      "motion": [
+        {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
+          "type": "camera",
+          "target": "stage",
+          "preset": "pan",
+          "amount": 0.04
+        }
+      ]
+    },
+    {
+      "id": "scene-031",
+      "start": 312.6333333333333,
+      "duration": 7.600000000000023,
       "source_ref": {
         "segment_index": 30,
         "script_id": "seg-031"
       },
       "variant": "network",
-      "narrative_job": "proxies",
-      "semantic_confidence": 1,
-      "matched_rules": [],
+      "narrative_job": "mechanism",
+      "semantic_confidence": 0.5,
+      "matched_rules": [
+        "\\bconnect\\b",
+        "\\bconnection\\b",
+        "\\btransport\\b",
+        "连接|关系|传递|网络|链路"
+      ],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -1291,8 +1654,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "有代理的时候，链路会变长。,每一跳都可能看到明文。,缓存和日志还会各自留一份。"
         },
         {
           "id": "flow",
@@ -1301,112 +1664,38 @@
       ],
       "motion": [
         {
-          "type": "camera",
-          "target": "stage",
-          "preset": "pan",
-          "amount": 0.05
-        }
-      ]
-    },
-    {
-      "id": "scene-32",
-      "start": 177.933333,
-      "duration": 5.6,
-      "source_ref": {
-        "segment_index": 31,
-        "script_id": "seg-032"
-      },
-      "variant": "split",
-      "narrative_job": "scope",
-      "semantic_confidence": 1,
-      "matched_rules": [],
-      "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
         },
         {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "parallax",
-          "amount": 0.05
-        }
-      ]
-    },
-    {
-      "id": "scene-33",
-      "start": 183.533333,
-      "duration": 5.6,
-      "source_ref": {
-        "segment_index": 32,
-        "script_id": "seg-033"
-      },
-      "variant": "preference",
-      "narrative_job": "deployment",
-      "semantic_confidence": 1,
-      "matched_rules": [],
-      "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
         },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
         {
           "type": "camera",
           "target": "stage",
           "preset": "push",
-          "amount": 0.05
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-34",
-      "start": 189.133333,
-      "duration": 5.6,
+      "id": "scene-032",
+      "start": 321.3333333333333,
+      "duration": 8.53333333333336,
       "source_ref": {
-        "segment_index": 33,
-        "script_id": "seg-034"
+        "segment_index": 31,
+        "script_id": "seg-032"
       },
-      "variant": "structured",
-      "narrative_job": "perhop",
-      "semantic_confidence": 1,
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
       "matched_rules": [],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -1417,8 +1706,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "于是有了逐跳和端到端两种做法。,逐跳便宜，但只覆盖一段。,端到端贵，覆盖整条链。"
         },
         {
           "id": "flow",
@@ -1426,29 +1715,39 @@
         }
       ],
       "motion": [
+        {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
         {
           "type": "camera",
           "target": "stage",
           "preset": "pan",
-          "amount": 0.05
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-35",
-      "start": 194.733333,
-      "duration": 5.6,
+      "id": "scene-033",
+      "start": 330.96666666666664,
+      "duration": 9.300000000000011,
       "source_ref": {
-        "segment_index": 34,
-        "script_id": "seg-035"
+        "segment_index": 32,
+        "script_id": "seg-033"
       },
-      "variant": "comparison",
-      "narrative_job": "coverage",
-      "semantic_confidence": 1,
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
       "matched_rules": [],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -1459,8 +1758,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "部署方式常见三种。,全链摘要最彻底，也最贵。,逐跳摘要是折中，边缘摘要介于两者之间。"
         },
         {
           "id": "flow",
@@ -1469,28 +1768,157 @@
       ],
       "motion": [
         {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
           "type": "camera",
           "target": "stage",
-          "preset": "parallax",
-          "amount": 0.05
+          "preset": "push",
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-36",
-      "start": 200.333333,
-      "duration": 5.6,
+      "id": "scene-034",
+      "start": 341.3666666666667,
+      "duration": 9.033333333333303,
+      "source_ref": {
+        "segment_index": 33,
+        "script_id": "seg-034"
+      },
+      "variant": "sequence",
+      "narrative_job": "sequence",
+      "semantic_confidence": 0.5,
+      "matched_rules": [
+        "\\bfirst\\b",
+        "\\bthen\\b",
+        "\\bnext\\b",
+        "\\bstep\\b",
+        "首先|然后|接着|下一步|步骤|流程"
+      ],
+      "composition": {
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
+        "safe_margin": 0.08
+      },
+      "light": {
+        "mode": "hero-key",
+        "key_intensity": 0.82,
+        "accent": "purple"
+      },
+      "elements": [
+        {
+          "id": "hero",
+          "type": "narration",
+          "text": "每一跳要做四件事。,先认证，再转发，然后重新认证，最后落库。,任何一跳漏掉都会断链。"
+        },
+        {
+          "id": "flow",
+          "type": "signal"
+        }
+      ],
+      "motion": [
+        {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
+          "type": "camera",
+          "target": "stage",
+          "preset": "pan",
+          "amount": 0.04
+        }
+      ]
+    },
+    {
+      "id": "scene-035",
+      "start": 351.5,
+      "duration": 6.7666666666666515,
+      "source_ref": {
+        "segment_index": 34,
+        "script_id": "seg-035"
+      },
+      "variant": "network",
+      "narrative_job": "mechanism",
+      "semantic_confidence": 0.5,
+      "matched_rules": [
+        "\\bconnect\\b",
+        "\\bconnection\\b",
+        "\\btransport\\b",
+        "连接|关系|传递|网络|链路"
+      ],
+      "composition": {
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
+        "safe_margin": 0.08
+      },
+      "light": {
+        "mode": "hero-key",
+        "key_intensity": 0.82,
+        "accent": "purple"
+      },
+      "elements": [
+        {
+          "id": "hero",
+          "type": "narration",
+          "text": "覆盖范围的差别不在算法。,在链路长度。,一跳和整条链是两个量级。"
+        },
+        {
+          "id": "flow",
+          "type": "signal"
+        }
+      ],
+      "motion": [
+        {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
+          "type": "camera",
+          "target": "stage",
+          "preset": "push",
+          "amount": 0.04
+        }
+      ]
+    },
+    {
+      "id": "scene-036",
+      "start": 359.3666666666667,
+      "duration": 8.133333333333326,
       "source_ref": {
         "segment_index": 35,
         "script_id": "seg-036"
       },
       "variant": "transformation",
-      "narrative_job": "keyrotate",
-      "semantic_confidence": 1,
-      "matched_rules": [],
+      "narrative_job": "transform",
+      "semantic_confidence": 0.5,
+      "matched_rules": [
+        "\\bbefore\\b",
+        "\\bafter\\b",
+        "变成|转化|转换|演变|改成|从.*到"
+      ],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -1501,8 +1929,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "密钥也随 hops 拆开。,共享密钥变成每跳一把。,好处是任何一把都能单独撤回。"
         },
         {
           "id": "flow",
@@ -1511,28 +1939,41 @@
       ],
       "motion": [
         {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
           "type": "camera",
           "target": "stage",
-          "preset": "push",
-          "amount": 0.05
+          "preset": "pan",
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-37",
-      "start": 207.433333,
-      "duration": 5.6,
+      "id": "scene-037",
+      "start": 369.43333333333334,
+      "duration": 8.133333333333326,
       "source_ref": {
         "segment_index": 36,
         "script_id": "seg-037"
       },
-      "variant": "sequence",
-      "narrative_job": "adopt",
-      "semantic_confidence": 1,
-      "matched_rules": [],
+      "variant": "structured",
+      "narrative_job": "explain",
+      "semantic_confidence": 0.45,
+      "matched_rules": [
+        "structured",
+        "结构化|字段|层级|组织|格式"
+      ],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -1543,8 +1984,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "真正接入要改三处。,选算法、配字段、对齐顺序。,顺序那一步最容易被漏掉。"
         },
         {
           "id": "flow",
@@ -1553,28 +1994,38 @@
       ],
       "motion": [
         {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
           "type": "camera",
           "target": "stage",
-          "preset": "pan",
-          "amount": 0.05
+          "preset": "push",
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-38",
-      "start": 213.033333,
-      "duration": 5.6,
+      "id": "scene-038",
+      "start": 378.6666666666667,
+      "duration": 7.733333333333292,
       "source_ref": {
         "segment_index": 37,
         "script_id": "seg-038"
       },
-      "variant": "causal",
-      "narrative_job": "cost",
-      "semantic_confidence": 1,
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
       "matched_rules": [],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -1585,8 +2036,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "代价也是从这三处来的。,每跳多算一次，两侧顺序要对齐。,调试成本明显上升。"
         },
         {
           "id": "flow",
@@ -1595,28 +2046,43 @@
       ],
       "motion": [
         {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
           "type": "camera",
           "target": "stage",
-          "preset": "parallax",
-          "amount": 0.05
+          "preset": "pan",
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-39",
-      "start": 218.633333,
-      "duration": 5.6,
+      "id": "scene-039",
+      "start": 387.5,
+      "duration": 8.166666666666686,
       "source_ref": {
         "segment_index": 38,
         "script_id": "seg-039"
       },
-      "variant": "evidence",
-      "narrative_job": "evidence",
-      "semantic_confidence": 1,
-      "matched_rules": [],
+      "variant": "causal",
+      "narrative_job": "mechanism",
+      "semantic_confidence": 0.5,
+      "matched_rules": [
+        "\\bbecause\\b",
+        "\\btherefore\\b",
+        "\\bcaus(e|al)\\b",
+        "因为|因此|导致|原因|机制|原理"
+      ],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -1627,8 +2093,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "但要先记住一件事。,摘要是可选机制，不开就没有这些代价。,代价集中在顺序和时钟上。"
         },
         {
           "id": "flow",
@@ -1637,28 +2103,38 @@
       ],
       "motion": [
         {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
           "type": "camera",
           "target": "stage",
           "preset": "push",
-          "amount": 0.05
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-40",
-      "start": 224.233333,
-      "duration": 5.6,
+      "id": "scene-040",
+      "start": 396.76666666666665,
+      "duration": 8.600000000000023,
       "source_ref": {
         "segment_index": 39,
         "script_id": "seg-040"
       },
-      "variant": "code",
-      "narrative_job": "config",
-      "semantic_confidence": 1,
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
       "matched_rules": [],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -1669,8 +2145,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "落到配置上就是这几行。,算法写明，质量参数写明，计数器每次自增。,顺序仍然要对齐。"
         },
         {
           "id": "flow",
@@ -1679,28 +2155,38 @@
       ],
       "motion": [
         {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
           "type": "camera",
           "target": "stage",
           "preset": "pan",
-          "amount": 0.05
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-41",
-      "start": 229.833333,
-      "duration": 5.6,
+      "id": "scene-041",
+      "start": 406.46666666666664,
+      "duration": 7.266666666666708,
       "source_ref": {
         "segment_index": 40,
         "script_id": "seg-041"
       },
-      "variant": "network",
-      "narrative_job": "touchpoints",
-      "semantic_confidence": 1,
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
       "matched_rules": [],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -1711,8 +2197,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "落地会碰到四个组件。,网关、应用、客户端，还有运维。,每一个都要改。"
         },
         {
           "id": "flow",
@@ -1721,70 +2207,38 @@
       ],
       "motion": [
         {
-          "type": "camera",
-          "target": "stage",
-          "preset": "parallax",
-          "amount": 0.05
-        }
-      ]
-    },
-    {
-      "id": "scene-42",
-      "start": 235.433333,
-      "duration": 5.6,
-      "source_ref": {
-        "segment_index": 41,
-        "script_id": "seg-042"
-      },
-      "variant": "split",
-      "narrative_job": "costside",
-      "semantic_confidence": 1,
-      "matched_rules": [],
-      "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
         },
         {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
         {
           "type": "camera",
           "target": "stage",
           "preset": "push",
-          "amount": 0.05
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-43",
-      "start": 241.033333,
-      "duration": 5.6,
+      "id": "scene-042",
+      "start": 414.8333333333333,
+      "duration": 5.933333333333337,
       "source_ref": {
-        "segment_index": 42,
-        "script_id": "seg-043"
+        "segment_index": 41,
+        "script_id": "seg-042"
       },
-      "variant": "preference",
-      "narrative_job": "verdict",
-      "semantic_confidence": 1,
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
       "matched_rules": [],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -1795,8 +2249,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "代价最终落在两侧。,客户端多存一次摘要。,服务端多算一次摘要。"
         },
         {
           "id": "flow",
@@ -1804,29 +2258,44 @@
         }
       ],
       "motion": [
+        {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
         {
           "type": "camera",
           "target": "stage",
           "preset": "pan",
-          "amount": 0.05
+          "amount": 0.04
         }
       ]
     },
     {
-      "id": "scene-44",
-      "start": 246.633333,
-      "duration": 5.6,
+      "id": "scene-043",
+      "start": 421.8666666666667,
+      "duration": 7.2333333333333485,
       "source_ref": {
-        "segment_index": 43,
-        "script_id": "seg-044"
+        "segment_index": 42,
+        "script_id": "seg-043"
       },
-      "variant": "structured",
-      "narrative_job": "criteria",
-      "semantic_confidence": 1,
-      "matched_rules": [],
+      "variant": "evidence",
+      "narrative_job": "evidence",
+      "semantic_confidence": 0.5,
+      "matched_rules": [
+        "\\bevidence\\b",
+        "\\bsource\\b",
+        "\\bproof\\b",
+        "证据|来源|证明|依据|数据|研究"
+      ],
       "composition": {
-        "focus": "authored-stage",
-        "hero_weight": 0.7,
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
         "safe_margin": 0.08
       },
       "light": {
@@ -1837,8 +2306,8 @@
       "elements": [
         {
           "id": "hero",
-          "type": "card",
-          "text": ""
+          "type": "narration",
+          "text": "该不该上摘要，先看场景。,公网该上，纯内网可以省。,真正的判断依据是链路。"
         },
         {
           "id": "flow",
@@ -1847,10 +2316,77 @@
       ],
       "motion": [
         {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
           "type": "camera",
           "target": "stage",
-          "preset": "parallax",
-          "amount": 0.05
+          "preset": "push",
+          "amount": 0.04
+        }
+      ]
+    },
+    {
+      "id": "scene-044",
+      "start": 430.2,
+      "duration": 8.933333333333337,
+      "source_ref": {
+        "segment_index": 43,
+        "script_id": "seg-044"
+      },
+      "variant": "network",
+      "narrative_job": "mechanism",
+      "semantic_confidence": 0.5,
+      "matched_rules": [
+        "\\bconnect\\b",
+        "\\bconnection\\b",
+        "\\btransport\\b",
+        "连接|关系|传递|网络|链路"
+      ],
+      "composition": {
+        "focus": "hero-plus-flow",
+        "hero_weight": 0.68,
+        "safe_margin": 0.08
+      },
+      "light": {
+        "mode": "hero-key",
+        "key_intensity": 0.82,
+        "accent": "purple"
+      },
+      "elements": [
+        {
+          "id": "hero",
+          "type": "narration",
+          "text": "判断有先后顺序。,先看场景，再看链路长度，最后看成本。,顺序反了就会为不需要的安全买单。"
+        },
+        {
+          "id": "flow",
+          "type": "signal"
+        }
+      ],
+      "motion": [
+        {
+          "type": "enter",
+          "target": "hero",
+          "preset": "rise"
+        },
+        {
+          "type": "transform",
+          "target": "flow",
+          "preset": "travel"
+        },
+        {
+          "type": "camera",
+          "target": "stage",
+          "preset": "pan",
+          "amount": 0.04
         }
       ]
     }

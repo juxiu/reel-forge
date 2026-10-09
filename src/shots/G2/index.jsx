@@ -12,10 +12,10 @@ export {SC11} from "./SC11.jsx";
 export {SC12} from "./SC12.jsx";
 
 export const SHOTS_G2 = {
-  "scene-07": SC07,
-  "scene-08": SC08,
-  "scene-09": SC09,
-  "scene-10": SC10,
-  "scene-11": SC11,
-  "scene-12": SC12,
+  "scene-007": SC07,
+  "scene-008": SC08,
+  "scene-009": SC09,
+  "scene-010": SC10,
+  "scene-011": SC11,
+  "scene-012": SC12,
 };

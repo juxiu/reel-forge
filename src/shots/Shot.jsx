@@ -16,7 +16,7 @@ import {SemanticShot} from './SemanticShots.jsx';
  * 由引擎挂到 window-free 的 data 属性并交给 QC 读 plan.issues，不靠肉眼从画面上猜。
  *
  * ---------------------------------------------------------------------------
- * `stage` prop = 组私有舞台（对齐参照片 shots_src/G*/ 里 layout.tsx / g3ui.tsx 的做法）。
+ * `stage` prop = 组私有舞台（对齐参照片 shots_src/Gn/ 里 layout.tsx / g3ui.tsx 的做法）。
  *
  * 为什么需要它：recipe.stage.items 里的坐标只能让引擎把**通用图元**（Box / Icon / CText）
  * 摆到作者指定的位置，能防「塌成一套版式」，但表达不了组内自定义的视觉语汇——

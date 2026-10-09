@@ -6,3 +6,4 @@
 
 ## 机器登记
 - G6 由 scripts/materialize-shots.mjs 登记 6 镜：SC31(scene-31) SC32(scene-32) SC33(scene-33) SC34(scene-34) SC35(scene-35) SC36(scene-36)
+- G6 由 scripts/materialize-shots.mjs 登记 6 镜：SC31(scene-031) SC32(scene-032) SC33(scene-033) SC34(scene-034) SC35(scene-035) SC36(scene-036)

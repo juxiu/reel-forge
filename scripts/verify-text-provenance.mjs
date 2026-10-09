@@ -60,6 +60,14 @@ for (const [ratio, ir] of [["16x9", wide], ["9x16", tall]]) {
     for (const element of scene.elements || []) {
       const text = String(element.text || "").trim();
       if (!text) continue;
+      // ⚠ `type:"narration"` 的元素是**解说词本身**，不是画面文案 ——
+      //   IR 用它带时间轴（这一镜从第几帧到第几帧在说这句），而 a2e 硬规则明确
+      //   「整句解说词不进画面」（plan.mjs 的 heroTextOf 也拒收 >12 宽度单位的句子）。
+      //   所以它不该按「画面文字」判出处。A1 段早先没这个分支，于是整段解说词被判
+      //   「无出处」，88 条issues —— 门在抱怨一件本来就不该发生的事。
+      //   判据：只有会被当画面文案用的类型（card/text/label 之类）才查。
+      const elType = String(element.type || "").toLowerCase();
+      if (elType === "narration" || elType === "caption" || elType === "subtitle") continue;
       facts.push({ ratio, scene: scene.id, element: element.id, chars: text.length });
       const probe = norm(text).slice(0, 80);
       if (probe && !narrationNorm.includes(probe)) {

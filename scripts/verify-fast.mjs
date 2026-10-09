@@ -11,11 +11,19 @@ const checks = [
   // 分镜表链（render_storyboard → selfcheck）用合成时间轴真跑 + 变异；
   // 它的输入是 .gitignore 里的运行产物，不这样跑就本地/CI 都碰不到。
   "verify:storyboard",
+  // 时序单真源：镜区间、字幕块必须与 script/timeline.json（TTS 真实词边界）同源。
+  // 事故：这三份数据曾各自独立，导致 IR 7657 帧 vs 配音 13235 帧 —— 成片比配音短 186 秒，
+  // 而没有任何门发现，因为没有第二个真源跟它 disagreement。
+  "verify:timeline-source",
   "verify:render-layer",
   // JSX 里 `{halo}` 这种「引用了本文件没有的名」是 ReferenceError，而 node --check /
   // verify:imports / verify:render-layer 三道都看不见它（语法合法、不是导入问题、纯函数门禁不解析 JSX）。
   // 真实后果是 44 个镜头全黑而门禁全绿，所以这道门必须进 fast。
   "verify:jsx-symbols",
+  // wrapper 已定位时内部又写一遍同样的绝对坐标 = 偏移两次。comparetable 的框被推出画外、
+  // reshape 的形整个消失，肉眼才知道；syntax / imports / jsx-symbols / render-layer 全绿。
+  //判据是「子坐标表达式与 wrapper 原点表达式相同」，所以对 `cx={s/2}` 这类正确的相对坐标零误报。
+  "verify:relative-coords",
   "verify:spawn",
   // agent 层此前完全无测：三态信封、契约里那条「skipped 不许带结论」、超时会不会真断，
   // 都只能靠读代码相信。它跑的是本地临时脚本当真 provider，不联网、不渲染。
@@ -46,6 +54,10 @@ const checks = [
   // 于是「新增一镜不进蓝图就完全不过门」这件事在本地永远看不见。它只读 44 个 .jsx 文本，秒级。
   "verify:authored-shots",
   "verify:tts-parity",
+  // project.language 与解说词实际字符集必须一致。真实事故：language 一直是 "en"（旧英文样片留下的），
+  // 于是英文声音去念中文，edge-tts 每句报「NoAudioReceived」并把矛头指向参数 ——
+  // 先怀疑文本、再怀疑限流、再怀疑重试退避，真因是这个字段。合成之前就该拦。
+  "verify:language",
   // 原生 TTS 通道（kokoro / piper / kokoro_onnx / 用户 wav）真跑一遍 dispatch。
   // verify:tts-parity 只比对那份「支持哪些引擎」的名单，而名单是脚本里的常量，
   // 删掉 native.mjs 的 kokoro 分支它照样绿 —— 声明与实现之间没有任何连线。

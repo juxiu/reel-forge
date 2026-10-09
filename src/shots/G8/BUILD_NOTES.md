@@ -6,3 +6,4 @@
 
 ## 机器登记
 - G8 由 scripts/materialize-shots.mjs 登记 2 镜：SC43(scene-43) SC44(scene-44)
+- G8 由 scripts/materialize-shots.mjs 登记 2 镜：SC43(scene-043) SC44(scene-044)

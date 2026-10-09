@@ -25,8 +25,6 @@ export const SHOT_RECIPE = {
   accent_index: 0,
   stage: {
     kind: "beforeafter",
-    before_label: "原始报文",
-    after_label: "摘要 + 校验值",
     caption: "服务器只回一个摘要，密码仍不经过网络",
     focus: [0, 48, 96],
     items: [

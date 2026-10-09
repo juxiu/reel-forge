@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import {releaseFingerprint} from "../src/release/fingerprint.mjs";
 import path from "node:path";
 import {runMediaQc} from "../src/qc/run.mjs";
 import {reportToIssues} from "../src/qc/flags.mjs";
@@ -75,6 +76,11 @@ const reviews=await runNamedAgents(agent,["16x9","9x16"].map(ratio=>({
 
 const result={
   project_id:project.project_id,status:issues.length?"FAIL":"PASS",issues,warnings,
+  // ⚠ 记下这份 QC 对应的是**哪一版输入**（IR / 44 个镜头源 / 解说词 / 字幕 / 字面量白名单）。
+  //   verify:production 会重算指纹比对 —— 少了这一段，那道门只能证明「文件都在」，
+  //   证明不了「产物对应当前输入」：2026-10-08 的 4 镜产物曾一路配着 44 镜的 IR 报 PASS。
+  //   算法在 src/release/fingerprint.mjs，两边共用一份，改一次就一起变。
+  input_fingerprint:{...releaseFingerprint(),at:new Date().toISOString()},
   media:reports.map(report=>({file:report.file,status:report.status,motion_frames:report.motion_frames,black_segments:report.black_segments,duration:report.probe?.format?.duration||0})),
   agent_reviews:reviews,
   plan_audit:planAudit,

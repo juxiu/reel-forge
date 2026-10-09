@@ -17,10 +17,22 @@ export async function nativeTts({engine,text,voice,outDir,rate="+0%",env=process
     const srcAudio=path.join(env.TTS_WAV_DIR,"sentence-"+String(index).padStart(3,"0")+".wav");
     const srcTiming=path.join(env.TTS_WORD_TIMINGS_DIR,"sentence-"+String(index).padStart(3,"0")+".json");
     if(!fs.existsSync(srcAudio)||!fs.existsSync(srcTiming)) throw new Error("missing user wav/timing for sentence "+index);
+    // ⚠ 逐词时间轴必须与这句**文本**对得上。用户 wav 通道没有 TTS 兜底，
+    //   一旦脚本换词而 wav 目录没换，就会拿旧句子的时间轴配新句子 —— 字幕整体错位且没有任何报错。
+    //   所以核对：拼起来的词至少要覆盖本句文本里的汉字（逐字比文本没法保证，TTS 分词与文本不一定对齐）。
     const audio=path.join(outDir,"audio.wav"),timings=path.join(outDir,"word-timestamps.json");
-    fs.copyFileSync(srcAudio,audio);
     const payload=JSON.parse(fs.readFileSync(srcTiming,"utf8")),words=Array.isArray(payload)?payload:(payload.words||[]);
     if(!words.length) throw new Error("user word timing is empty");
+    const spoken=words.map(w=>String(w.text||"")).join("");
+    const cjk=(String(text||"").match(/[一-鿿]/g)||[]);
+    const missing=cjk.filter(ch=>!spoken.includes(ch));
+    if(cjk.length>0&&missing.length>cjk.length*0.34){
+      throw new Error(
+        `user wav timing does not match sentence ${index}: 文本含 ${cjk.length} 个汉字，时间轴只覆盖 ${cjk.length-missing.length} 个`+
+        `（缺 ${missing.slice(0,8).join("")}${missing.length>8?"…":""}）。换过解说词就要换 wav 目录。`,
+      );
+    }
+    fs.copyFileSync(srcAudio,audio);
     fs.writeFileSync(timings,JSON.stringify({words},null,2));
     const duration=Math.max(...words.map(word=>Number(word.end)));
     const manifest={provider:"user-wav",engine:"wav",voice,rate,timing_mode:"tts-word-boundary",timing_source:"user-word-timing",duration_s:duration};

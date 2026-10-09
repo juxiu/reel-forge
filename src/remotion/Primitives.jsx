@@ -591,7 +591,7 @@ export const TitleCard = ({N, f0 = 1, big, rest, tagline, en, lastFrame}) => {
       </GlitchIn>
       {rest ? <SoftIn N={N} f0={f0 + 26}><CText cx={W / 2} cy={cy + 52} size={54} weight={900} family={FONT_HEAVY} scaleX={0.85} opacity={op}>{rest}</CText></SoftIn> : null}
       {tagline ? <SoftIn N={N} f0={f0 + 34}><CText cx={W / 2} cy={cy + (rest ? 118 : 96)} size={30} color={GREY} weight={500} family={FONT_HEAVY} opacity={op} maxW={W - 200}>{tagline}</CText></SoftIn> : null}
-      {en ? <SoftIn N={N} f0={f0 + 42}><TechSub cx={W / 2} cy={cy + (rest ? 160 : 138)} size={26} opacity={op * 0.9}>{en}</TechSub> : null}
+      {en ? <SoftIn N={N} f0={f0 + 42}><TechSub cx={W / 2} cy={cy + (rest ? 160 : 138)} size={26} opacity={op * 0.9}>{en}</TechSub></SoftIn> : null}
     </>
   );
 };

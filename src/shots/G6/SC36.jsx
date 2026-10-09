@@ -22,7 +22,9 @@ export const SHOT_RECIPE = {
   stage: {
       kind: "reshape",
       focus: [0,44,88],
-      caption: "共享密钥变成每跳一把",
+      from_sub: "一处泄露全丢",
+    to_sub: "可单独收回",
+    caption: "共享密钥变成每跳一把",
       from_icon: "key",
       to_icon: "branch",
       items: [

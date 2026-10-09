@@ -93,30 +93,116 @@ if(!supportedEngines.has(engine)) throw new Error("unsupported TTS engine: "+eng
 const root=path.join("artifacts",project.project_id,"audio");
 fs.mkdirSync(root,{recursive:true});
 
-let cursorSeconds=LEAD_FRAMES/FPS,sentenceIndex=0,speechSeconds=0;
-const sentences=[],audioParts=[],allWords=[];
-for(const item of items){
-  if(item.type==="chapter"){if(sentenceIndex>0) cursorSeconds+=CHAPTER_GAP_FRAMES/FPS;continue;}
-  cursorSeconds+=item.gapBefore/FPS;
-  const chunks=item.text.split("|").map(value=>value.trim()).filter(Boolean);
-  const cleanText=chunks.join(language==="en"?" ":"");
-  const chapterDir=path.join(root,"sentence-"+String(sentenceIndex+1).padStart(3,"0"));
-  const result=engine==="edge"
-    ? await edgeTts({text:cleanText,voice,outDir:chapterDir,rate})
-    : await nativeTts({engine,text:cleanText,voice,outDir:chapterDir,rate,index:sentenceIndex+1});
-  const words=JSON.parse(fs.readFileSync(result.timings,"utf8")).words;
-  if(!words.length) throw new Error("no real word timing for sentence "+(sentenceIndex+1));
-  const offset=cursorSeconds;
-  for(const word of words) allWords.push({...word,start:Number(word.start)+offset,end:Number(word.end)+offset});
-  const timings=alignedChunks(cleanText,chunks,words,result.manifest.duration_s);
-  const from=Math.round((offset+Number(words[0].start))*FPS)+1;
-  const to=Math.max(from,Math.round((offset+Number(words.at(-1).end))*FPS));
-  const subs=chunks.map((chunk,index)=>{const timing=timings[index];const sf=Math.round((offset+timing.start)*FPS)+1;return{from:sf,to:Math.max(sf,Math.round((offset+timing.end)*FPS)),text:chunk};});
-  const id="S"+String(sentenceIndex+1).padStart(2,"0");
-  sentences.push({id,chapter:item.chapter,from,to,text:cleanText,para:Boolean(item.paragraphEnd),subs});
-  audioParts.push({file:result.audio,start:offset});
-  cursorSeconds=offset+Number(result.manifest.duration_s);
-  speechSeconds+=Number(result.manifest.duration_s);
+// ---------------------------------------------------------------------------
+// 两段式：先**并发合成**（句与句彼此独立，各写自己的 sentence-NNN 目录），
+// 再**串行装配**（游标、混音、时间轴必须按句号推进）。
+//
+// ⚠ 为什么要拆开：串行时 44 句 ≈ 45 分钟（每句一次 python 进程 + 联网合成 ≈ 60s），
+//   于是一条链上最慢的环节成了「等 TTS」。而合成之间**没有任何依赖** —— 第 7 句不需要
+//   第 6 句的结果，所以并发合成、串行装配能把 44 句压到约 12 分钟。
+//   游标与混音**必须留在串行段**：cursorSeconds 依赖前一句的时长，并发算就会错位。
+//
+// 缓存键（文本+声音+语速的 sha256，见 src/providers/tts/edge.mjs）让这件事幂等：
+// 重跑时已合成的句直接命中，不会重复合成。
+const CONCURRENCY = Math.max(1, Number(process.env.TTS_CONCURRENCY || 4));
+
+const spoken = items
+  .filter((item) => item.type !== "chapter")
+  .map((item, index) => {
+    const chunks = item.text.split("|").map((value) => value.trim()).filter(Boolean);
+    return {
+      index,
+      item,
+      chunks,
+      cleanText: chunks.join(language === "en" ? " " : ","),
+      outDir: path.join(root, "sentence-" + String(index + 1).padStart(3, "0")),
+    };
+  });
+
+// ---- 阶段一：并发合成 ----
+let synthesized = 0;
+async function synthOne(entry) {
+  const result = engine === "edge"
+    ? await edgeTts({text: entry.cleanText, voice, outDir: entry.outDir, rate})
+    : await nativeTts({engine, text: entry.cleanText, voice, outDir: entry.outDir, rate, index: entry.index + 1});
+  synthesized++;
+  process.stderr.write(`\r  TTS 合成 ${synthesized}/${spoken.length}（并发 ${CONCURRENCY}）`);
+  return {...entry, result};
+}
+const synthResults = new Array(spoken.length);
+{
+  let next = 0;
+  const workers = Array.from({length: Math.max(1, Math.min(CONCURRENCY, spoken.length))}, async () => {
+    for (;;) {
+      const i = next++;
+      if (i >= spoken.length) return;
+      synthResults[i] = await synthOne(spoken[i]);
+    }
+  });
+  await Promise.all(workers);
+  process.stderr.write("\n");
+
+  // ---- 串行补齐 ----
+  // ⚠ 并发到 44 句这一档时，edge-tts 会**持续限流**（实测最后两句连续 20 次
+  //   NoAudioReceived，而 edge.mjs 内部只退避到8s就放弃）。更糟的是原写法里
+  //   任何一句失败都会让整个 Promise.all 抛掉，**已经合成好的 42 句全部作废**
+  //   （虽然有缓存，但整轮的时间全白费）。
+  //   所以这里把失败的那几句**单独串行重试**：并发降到 1，等待拉长。
+  //   限流是并发放大的，串行几乎总能过。
+  const failed = [];
+  for (let i = 0; i < spoken.length; i++) if (!synthResults[i]) failed.push(spoken[i]);
+  if (failed.length) {
+    process.stderr.write(`  ${failed.length} 句并发失败，转串行补齐：${failed.map((f) => f.index + 1).join(",")}`);
+    for (const entry of failed) {
+      let done = false;
+      for (let attempt = 1; attempt <= 6 && !done; attempt++) {
+        try {
+          synthResults[entry.index] = await synthOne(entry);
+          done = true;
+        } catch (error) {
+          const wait = Math.min(45000, 4000 * attempt) + Math.floor(Math.random() * 1500);
+          process.stderr.write(`\n  第${entry.index + 1} 句串行第 ${attempt}/6 次失败（${error.message}），${wait}ms 后再试`);
+          await new Promise((r) => setTimeout(r, wait));
+        }
+      }
+      if (!done) throw new Error(`TTS 第 ${entry.index + 1} 句在并发与串行两轮后仍失败 —— 先修网络/限流，或调低 TTS_CONCURRENCY`);
+    }
+    process.stderr.write("\n");
+  }
+}
+
+// ---- 阶段二：串行装配（游标按句号推进，混音顺序即句号）----
+let cursorSeconds = LEAD_FRAMES / FPS;
+let sentenceIndex = 0;
+let speechSeconds = 0;
+let lastChapter = null;
+const sentences = [];
+const audioParts = [];
+const allWords = [];
+for (const entry of synthResults) {
+  const {item, chunks, cleanText, result} = entry;
+  if (item.chapter !== lastChapter) {
+    if (sentenceIndex > 0) cursorSeconds += CHAPTER_GAP_FRAMES / FPS;
+    lastChapter = item.chapter;
+  }
+  cursorSeconds += item.gapBefore / FPS;
+  const words = JSON.parse(fs.readFileSync(result.timings, "utf8")).words;
+  if (!words.length) throw new Error("no real word timing for sentence " + (entry.index + 1));
+  const offset = cursorSeconds;
+  for (const word of words) allWords.push({...word, start: Number(word.start) + offset, end: Number(word.end) + offset});
+  const timings = alignedChunks(cleanText, chunks, words, result.manifest.duration_s);
+  const from = Math.round((offset + Number(words[0].start)) * FPS) + 1;
+  const to = Math.max(from, Math.round((offset + Number(words.at(-1).end)) * FPS));
+  const subs = chunks.map((chunk, index) => {
+    const timing = timings[index];
+    const sf = Math.round((offset + timing.start) * FPS) + 1;
+    return {from: sf, to: Math.max(sf, Math.round((offset + timing.end) * FPS)), text: chunk};
+  });
+  const id = "S" + String(sentenceIndex + 1).padStart(2, "0");
+  sentences.push({id, chapter: item.chapter, from, to, text: cleanText, para: Boolean(item.paragraphEnd), subs});
+  audioParts.push({file: result.audio, start: offset});
+  cursorSeconds = offset + Number(result.manifest.duration_s);
+  speechSeconds += Number(result.manifest.duration_s);
   sentenceIndex++;
 }
 

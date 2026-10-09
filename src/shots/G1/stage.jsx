@@ -5,7 +5,7 @@ import {Icon} from "../../remotion/Icons.jsx";
 import {abs} from "../../remotion/Design.jsx";
 import {GREY, GREY_LIGHT, GREY_LINE, GREY_MID, PURPLE, PURPLE_LIGHT} from "../../visual/style.mjs";
 import {BEAT, clamp01, drawOn, softOp} from "../../visual/easing.mjs";
-import {AREA, Core, Track, entryOf, focusWalk, isPast, marksOf, Node as Satellite} from "../stage-kit.jsx";
+import {AREA, Core, Glyph, Track, entryOf, focusWalk, isPast, marksOf, Node as Satellite} from "../stage-kit.jsx";
 
 /**
  * G1 组（第 1 章）私有舞台。
@@ -52,7 +52,7 @@ function Radial({plan, N, recipe}) {
     <>
       <Svg>
         {items.map((it, i) => {
-          const a = (Math.PI * 2 * i) / Math.max(1, items.length) - Math.PI / 2;
+          const a = (Math.PI * 2 * i) / Math.max(1, items.length);
           const sx = Math.round(hub.cx + Math.cos(a) * st.rx);
           const sy = Math.round(hub.cy + Math.sin(a) * st.ry);
           return <LineArrow key={`sp${it.id}`} x1={hub.cx} y1={hub.cy} x2={sx} y2={sy} progress={spokes} color={k[i] > 0.5 ? PURPLE_LIGHT : GREY_LINE} width={k[i] > 0.5 ? 2.5 : 2} head={0} opacity={0.32 + 0.5 * k[i]} />;
@@ -60,7 +60,7 @@ function Radial({plan, N, recipe}) {
       </Svg>
       <Core cx={hub.cx} cy={hub.cy} size={size} N={N} f0={IN} icon={st.icon} label={st.label} />
       {items.map((it, i) => {
-        const a = (Math.PI * 2 * i) / Math.max(1, items.length) - Math.PI / 2;
+        const a = (Math.PI * 2 * i) / Math.max(1, items.length);
         return (
           <Satellite
             key={it.id}
@@ -94,7 +94,7 @@ function Split2Col({plan, N, recipe}) {
   const arrow = drawOn(N - IN, BEAT.DRAW_ON);
   return (
     <>
-      <Box x={lx - 22} y={AREA.t + 4} w={colW + 44} h={392} border={GREY_LINE} radius={14} opacity={softOp(N - IN, BEAT.FADE_IN)} />
+      <Box x={lx - 22} y={AREA.t + 4} w={colW + 44} h={392} border={GREY} radius={14} opacity={softOp(N - IN, BEAT.FADE_IN)} />
       <Box x={rx - 22} y={AREA.t + 4} w={colW + 44} h={392} border={PURPLE} radius={14} glow opacity={softOp(N - IN, BEAT.FADE_IN) * 0.9} />
       <Svg>
         <LineArrow x1={lx + colW} y1={380} x2={rx - 14} y2={380} progress={arrow} color={PURPLE_LIGHT} width={3} head={12} glow />
@@ -106,7 +106,7 @@ function Split2Col({plan, N, recipe}) {
           <SoftIn N={N} f0={it.f0}>
             <div style={{...abs(lx, 250 + i * 74, colW, 60), display: "flex", alignItems: "center"}}>
               <div style={{width: 46, height: 46, flex: "0 0 46px"}}>
-                <Icon kind={it.icon} cx={23} cy={23} s={44} reveal={1} />
+                <Glyph kind={it.icon} cx={23} cy={23} s={44} reveal={1} />
               </div>
               <MonoText x={62} y={14} size={26} color={GREY_LIGHT}>{it.text}</MonoText>
             </div>
@@ -118,7 +118,7 @@ function Split2Col({plan, N, recipe}) {
           <SoftIn N={N} f0={it.f0}>
             <div style={{...abs(rx, 250 + i * 74, colW, 60), display: "flex", alignItems: "center"}}>
               <div style={{width: 46, height: 46, flex: "0 0 46px"}}>
-                <Icon kind={it.icon} cx={23} cy={23} s={44} active reveal={1} />
+                <Glyph kind={it.icon} cx={23} cy={23} s={44} active reveal={1} />
               </div>
               <MonoText x={62} y={14} size={26} color={WHITE}>{it.text}</MonoText>
             </div>
@@ -151,9 +151,9 @@ function Ranked3({plan, N, recipe}) {
         return (
           <div key={it.id}>
             <SoftIn N={N} f0={it.f0}>
-              <Box x={x} y={y} w={w} h={rowH} border={chosen ? PURPLE : GREY_LINE} radius={12} glow={chosen} bloom={!chosen} opacity={1 - 0.45 * isPast(i, marks, N)} />
+              <Box x={x} y={y} w={w} h={rowH} border={chosen ? PURPLE : GREY} radius={12} glow={chosen} bloom={!chosen} opacity={1 - 0.45 * isPast(i, marks, N)} />
               <div style={{...abs(x + 24, y + (rowH - 72) / 2, 72, 72), display: "flex", alignItems: "center", justifyContent: "center"}}>
-                <Icon kind={it.icon} cx={36} cy={36} s={66} active={chosen} reveal={1} />
+                <Glyph kind={it.icon} cx={36} cy={36} s={66} active={chosen} reveal={1} />
               </div>
               <Label x={x + 120} y={y + rowH / 2 - 17} size={32} color={chosen ? WHITE : GREY_LIGHT} maxW={560}>{it.text}</Label>
               <div style={{...abs(x + w - 76, y + (rowH - 44) / 2, 44, 44)}}>
@@ -201,16 +201,16 @@ function Rail4({plan, N, recipe}) {
             <SoftIn N={N} f0={it.f0}>
               <div style={{...abs(150, y, 800, 92), display: "flex", alignItems: "center", opacity: 1 - 0.45 * isPast(i, marks, N)}}>
                 <div style={{width: 64, height: 64, flex: "0 0 64px"}}>
-                  <Icon kind={it.icon} cx={32} cy={32} s={60} active={k[i] > 0.5} reveal={1} />
+                  <Glyph kind={it.icon} cx={32} cy={32} s={60} active={k[i] > 0.5} reveal={1} />
                 </div>
-                <Box x={86} y={14} w={714} h={64} border={k[i] > 0.5 ? PURPLE : GREY_LINE} radius={8} bloom={k[i] <= 0.5} />
+                <Box x={86} y={14} w={714} h={64} border={k[i] > 0.5 ? PURPLE : GREY} radius={8} bloom={k[i] <= 0.5} />
                 <Label x={112} y={30} size={30} color={k[i] > 0.5 ? WHITE : GREY_LIGHT} maxW={640}>{it.text}</Label>
               </div>
             </SoftIn>
           </div>
         );
       })}
-      <TechSub cx={614} cy={AREA.b - 6}>{st.caption}</TechSub>
+      <TechSub cx={614} cy={AREA.b - 60}>{st.caption}</TechSub>
     </>
   );
 }
@@ -235,7 +235,7 @@ function DualPanel({plan, N, recipe}) {
   const winner = st.winner;
   return (
     <>
-      <Box x={lx} y={py} w={pw} h={ph} border={GREY_LINE} radius={14} opacity={softOp(N - IN, BEAT.FADE_IN)} />
+      <Box x={lx} y={py} w={pw} h={ph} border={GREY} radius={14} opacity={softOp(N - IN, BEAT.FADE_IN)} />
       <Box x={rx} y={py} w={pw} h={ph} border={PURPLE} radius={14} glow opacity={softOp(N - IN, BEAT.FADE_IN) * 0.9} />
       <Svg>
         <line x1={640} y1={py - 18} x2={640} y2={py + ph + 18} stroke={GREY_LINE} strokeWidth={2} opacity={seam} />
@@ -249,7 +249,7 @@ function DualPanel({plan, N, recipe}) {
         return (
           <div key={it.id}>
             <div style={{...abs(bx + pw / 2 - 84, py + 84, 168, 168), display: "flex", alignItems: "center", justifyContent: "center"}}>
-              <Icon kind={st.icons?.[side] || it.icon} cx={84} cy={84} s={160} active={act} reveal={clamp01((N - it.f0) / BEAT.DRAW_ON)} />
+              <Glyph kind={st.icons?.[side] || it.icon} cx={84} cy={84} s={160} active={act} reveal={clamp01((N - it.f0) / BEAT.DRAW_ON)} />
             </div>
             <div style={{...abs(bx + 40, py + 268, pw - 80, 48), display: "flex", alignItems: "center", justifyContent: "center"}}>
               {act ? <Check cx={pw / 2 - 80} cy={24} size={38} color={PURPLE_LIGHT} progress={drawOn(N - it.f0 - 12, 14)} /> : null}
@@ -259,7 +259,7 @@ function DualPanel({plan, N, recipe}) {
         );
       })}
       <TechSub cx={640} cy={py + ph + 44}>{st.caption}</TechSub>
-      <Track x1={lx + 30} x2={rx - 30} y={AREA.b - 4} N={N} f0={IN + 18} color={k[winner] > 0.4 ? PURPLE_LIGHT : GREY_LINE} />
+      <Track x1={lx + 30} x2={rx - 30} y={AREA.b - 60} N={N} f0={IN + 18} color={k[winner] > 0.4 ? PURPLE_LIGHT : GREY_LINE} />
     </>
   );
 }
@@ -275,45 +275,56 @@ function BeforeAfter({plan, N, recipe}) {
   const items = plan.items;
   const marks = marksOf(plan, st);
   const k = focusWalk(marks, N);
-  const py = 300;
-  const p1x = 300;
-  const p2x = 780;
+  const py = 306;
+  const p1x = 348;
+  const p2x = 796;
+  const pw = 376;
   const travel = clamp01((N - IN - 20) / 60);
+  // ⚠ 平面**不再自带标题**。原来 items 是「原文/摘要/通过」、平面标题是「原始报文/摘要 + 校验值」，
+  //   同一件事说了两遍，而且两行只差 23px 叠在一起 —— 真渲染才看得出这种冗余。
+  //   现在只留items 这一组文案，排在斜置平面上方。
   return (
     <>
-      <TiltPlane cx={p1x} cy={py} w={420} h={230} skew={-20} sy={0.46} stroke={GREY_MID} sw={2} fill="rgba(0,0,0,0.82)" opacity={softOp(N - IN, BEAT.FADE_IN)}>
-        <div style={{...abs(0, -34, 420, 60), display: "flex", alignItems: "center", justifyContent: "center"}}>
-          <CText cx={210} cy={30} size={30} weight={800} color={GREY_LIGHT}>{st.before_label}</CText>
-        </div>
+      {/*⚠ 斜置平面**不能放文字**。
+          TiltPlane 对所有子元素施加 scaleY(0.46) skewX(-20°)，文字放进去会被压扁成斜体、
+          几乎不可读（实测「原文」糊成一团）。参照片的斜置平面里放的是矢量形状，不是文字。
+          所以：文案留在平面上方（可读），平面内部放几道横向线条示意「一张躺平的纸」——
+          这既补了密度，又不会被形变破坏。*/}
+      <TiltPlane cx={p1x} cy={py} w={pw} h={210} skew={-20} sy={0.46} stroke={GREY_MID} sw={2} fill="rgba(0,0,0,0.86)" opacity={softOp(N - IN, BEAT.FADE_IN)}>
+        {[0, 1, 2, 3].map((r) => (
+          <div key={r} style={{position: 'absolute', left: 46, top: 60 + r * 34, width: pw - 92 - r * 26, height: 7, background: GREY, opacity: 0.5 - r * 0.07}} />
+        ))}
       </TiltPlane>
-      <TiltPlane cx={p2x} cy={py} w={420} h={230} skew={-20} sy={0.46} stroke={PURPLE} sw={2.5} fill="rgba(0,0,0,0.86)" opacity={softOp(N - IN - 14, BEAT.FADE_IN)}>
-        <div style={{...abs(0, -34, 420, 60), display: "flex", alignItems: "center", justifyContent: "center"}}>
-          <CText cx={210} cy={30} size={30} weight={800} color={WHITE}>{st.after_label}</CText>
-        </div>
+      <TiltPlane cx={p2x} cy={py} w={pw} h={210} skew={-20} sy={0.46} stroke={PURPLE} sw={2.5} fill="rgba(0,0,0,0.9)" opacity={softOp(N - IN - 14, BEAT.FADE_IN)}>
+        {[0, 1, 2].map((r) => (
+          <div key={r} style={{position: 'absolute', left: 46, top: 66 + r * 38, width: pw - 92 - r * 30, height: 8, background: PURPLE_LIGHT, opacity: 0.75 - r * 0.12}} />
+        ))}
       </TiltPlane>
+      {/* 平面上的标签：左右各一个，跟平面一起倾斜也不会糊（字在平面外，保留可读性）*/}
+      <div style={{...abs(p1x - 150, 214, 300, 52), display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+        <Glyph kind={st.from_icon || items[0]?.icon || "doc"} cx={26} cy={26} s={40} reveal={clamp01((N - IN) / BEAT.DRAW_ON)} />
+        <CText cx={168} cy={26} size={36} weight={800} color={GREY_LIGHT} maxW={240}>{items[0]?.text}</CText>
+      </div>
+      <div style={{...abs(p2x - 150, 214, 300, 52), display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+        <Glyph kind={st.to_icon || items[1]?.icon || "lock"} cx={26} cy={26} s={40} active reveal={clamp01((N - IN - 14) / BEAT.DRAW_ON)} />
+        <CText cx={168} cy={26} size={36} weight={800} color={WHITE} maxW={240}>{items[1]?.text}</CText>
+      </div>
       <Svg>
-        <LineArrow x1={p1x + 210} y1={py + 40} x2={p2x - 210} y2={py + 40} progress={drawOn(N - IN - 6, BEAT.DRAW_ON)} color={PURPLE_LIGHT} width={3} head={12} glow />
+        <LineArrow x1={p1x + pw / 2} y1={py + 26} x2={p2x - pw / 2} y2={py + 26} progress={drawOn(N - IN - 6, BEAT.DRAW_ON)} color={PURPLE_LIGHT} width={3} head={12} glow />
       </Svg>
-      <Track x1={p1x + 210} x2={p2x - 210} y={py + 84} N={N} f0={IN + 10} />
-      {items.map((it, i) => {
-        const on = i === 0 ? p1x : i === 1 ? (p1x + p2x) / 2 : p2x;
-        const y = py - 96;
-        const done = i === 2 ? travel : 1;
-        return (
-          <div key={it.id}>
-            <SoftIn N={N} f0={it.f0}>
-              <div style={{position: "absolute", left: 0, top: 0, opacity: done}}>
-                <GlowBlob cx={on} cy={y} r={70} N={N} k={k[i] > 0.4 ? 0.9 : 0.25} />
-                <CText cx={on} cy={y} size={34} weight={800} color={k[i] > 0.4 ? WHITE : GREY_LIGHT} maxW={300}>{it.text}</CText>
-              </div>
-            </SoftIn>
+      <Track x1={p1x + pw / 2} x2={p2x - pw / 2} y={py + 64} N={N} f0={IN + 10} />
+      {items[2] ? (
+        <SoftIn N={N} f0={items[2].f0}>
+          <div style={{...abs(566, 206, 148, 66), opacity: travel}}>
+            <GlowBlob cx={74} cy={33} r={64} N={N} k={k[2] > 0.4 ? 0.95 : 0.3} />
+            <CText cx={74} cy={33} size={36} weight={800} color={k[2] > 0.4 ? WHITE : GREY_LIGHT} maxW={280}>{items[2].text}</CText>
           </div>
-        );
-      })}
-      <div style={{...abs(p2x + 214, py - 24, 60, 60), opacity: softOp(N - IN - 40, 12)}}>
+        </SoftIn>
+      ) : null}
+      <div style={{...abs(p2x + pw / 2 + 10, py - 6, 60, 60), opacity: softOp(N - IN - 40, 12)}}>
         <Check cx={30} cy={30} size={52} color={PURPLE_LIGHT} progress={drawOn(N - IN - 40, 16)} />
       </div>
-      <TechSub cx={640} cy={AREA.b - 4}>{st.caption}</TechSub>
+      <TechSub cx={640} cy={AREA.b - 60}>{st.caption}</TechSub>
     </>
   );
 }

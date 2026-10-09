@@ -1,1 +1,533 @@
-{"project_id":"digest-explainer","segments":[{"id":"seg-001","text":"When an HTTP message crosses more than one connection, transport-layer integrity checks only protect individual connections.","claim_ids":["claim-001"]},{"id":"seg-002","text":"RFC 9530 defines Digest Fields for HTTP integrity, including Content-Digest for message content and Repr-Digest for representation data.","claim_ids":["claim-002"]},{"id":"seg-003","text":"Senders can also use Want-Content-Digest and Want-Repr-Digest to express preferences about receiving those integrity fields.","claim_ids":["claim-003"]},{"id":"seg-004","text":"The standard uses Structured Fields for one consistent encoding format and replaces the older Digest and Want-Digest fields.","claim_ids":["claim-004"]}]}
+{
+  "project_id": "digest-explainer",
+  "segments": [
+    {
+      "id": "seg-001",
+      "chapter": 1,
+      "chapter_title": "摘要握手",
+      "text": "一次摘要认证牵涉到的角色，比想象的多。,客户端、服务端、代理、时钟、缓存，缺一环就校验不过。,先把这张关系网摆出来。",
+      "subtitles": [
+        "一次摘要认证牵涉到的角色，比想象的多。",
+        "客户端、服务端、代理、时钟、缓存，缺一环就校验不过。",
+        "先把这张关系网摆出来。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-002",
+      "chapter": 1,
+      "chapter_title": "摘要握手",
+      "text": "报文本身是明文，头部却带着一串看不懂的字段。,这些字段叫摘要字段，是把口令换成不可逆的凭证。,换句话说，网络上看不到口令。",
+      "subtitles": [
+        "报文本身是明文，头部却带着一串看不懂的字段。",
+        "这些字段叫摘要字段，是把口令换成不可逆的凭证。",
+        "换句话说，网络上看不到口令。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-003",
+      "chapter": 1,
+      "chapter_title": "摘要握手",
+      "text": "并不是每套系统都值得上摘要。,公网链路该上，内网链路可以省。,差别在于链路上有没有不可信的跳。",
+      "subtitles": [
+        "并不是每套系统都值得上摘要。",
+        "公网链路该上，内网链路可以省。",
+        "差别在于链路上有没有不可信的跳。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-004",
+      "chapter": 1,
+      "chapter_title": "摘要握手",
+      "text": "摘要不是凭空来的，它由四个部分拼成。,算法、字段顺序、规范化方式、拼接顺序，缺一不可。,任何一处不同，两侧算出的摘要就不一样。",
+      "subtitles": [
+        "摘要不是凭空来的，它由四个部分拼成。",
+        "算法、字段顺序、规范化方式、拼接顺序，缺一不可。",
+        "任何一处不同，两侧算出的摘要就不一样。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-005",
+      "chapter": 1,
+      "chapter_title": "摘要握手",
+      "text": "覆盖一跳还是覆盖整条链，是两种设计。,单跳校验便宜，但代理能读到原文。,端到端贵一些，整条链路都不可读。",
+      "subtitles": [
+        "覆盖一跳还是覆盖整条链，是两种设计。",
+        "单跳校验便宜，但代理能读到原文。",
+        "端到端贵一些，整条链路都不可读。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-006",
+      "chapter": 1,
+      "chapter_title": "摘要握手",
+      "text": "于是报文被压成一个固定长度的摘要。,服务器只拿摘要比对，口令始终不出网关。,这是摘要机制最核心的一次转换。",
+      "subtitles": [
+        "于是报文被压成一个固定长度的摘要。",
+        "服务器只拿摘要比对，口令始终不出网关。",
+        "这是摘要机制最核心的一次转换。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-007",
+      "chapter": 1,
+      "chapter_title": "摘要握手",
+      "text": "摘要认证要走完三步。,服务端先发挑战，客户端算摘要回应，服务端比对。,少任何一步都算不上一次认证。",
+      "subtitles": [
+        "摘要认证要走完三步。",
+        "服务端先发挑战，客户端算摘要回应，服务端比对。",
+        "少任何一步都算不上一次认证。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-008",
+      "chapter": 1,
+      "chapter_title": "摘要握手",
+      "text": "为什么不用明文口令？,抓包就能读到，代理和日志都会留一份。,同一份凭据还能被反复重放。",
+      "subtitles": [
+        "为什么不用明文口令？",
+        "抓包就能读到，代理和日志都会留一份。",
+        "同一份凭据还能被反复重放。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-009",
+      "chapter": 1,
+      "chapter_title": "摘要握手",
+      "text": "摘要认证不是新发明，它是 HTTP 里的一项可选机制。,规范定义了字段、算法和拼接方式。,我们按规范里的例子来讲。",
+      "subtitles": [
+        "摘要认证不是新发明，它是 HTTP 里的一项可选机制。",
+        "规范定义了字段、算法和拼接方式。",
+        "我们按规范里的例子来讲。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-010",
+      "chapter": 1,
+      "chapter_title": "摘要握手",
+      "text": "客户端真正发出去的，就是这一行头。,用户名、域、路径、还有一串计数器。,这些字段拼起来，才得到最终的摘要。",
+      "subtitles": [
+        "客户端真正发出去的，就是这一行头。",
+        "用户名、域、路径、还有一串计数器。",
+        "这些字段拼起来，才得到最终的摘要。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-011",
+      "chapter": 1,
+      "chapter_title": "摘要握手",
+      "text": "一次请求牵涉的角色可以列成一圈。,客户端负责算，服务端负责比。,代理、缓存、日志各取所需。",
+      "subtitles": [
+        "一次请求牵涉的角色可以列成一圈。",
+        "客户端负责算，服务端负责比。",
+        "代理、缓存、日志各取所需。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-012",
+      "chapter": 1,
+      "chapter_title": "摘要握手",
+      "text": "职责天然落在两侧。,客户端算摘要，服务端生成挑战并比对。,两边共享的只有那把密钥。",
+      "subtitles": [
+        "职责天然落在两侧。",
+        "客户端算摘要，服务端生成挑战并比对。",
+        "两边共享的只有那把密钥。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-013",
+      "chapter": 2,
+      "chapter_title": "算法与字段",
+      "text": "算法分三档，按需选。,弱摘要容易撞，强摘要成本高。,多数新系统直接从第三档起步。",
+      "subtitles": [
+        "算法分三档，按需选。",
+        "弱摘要容易撞，强摘要成本高。",
+        "多数新系统直接从第三档起步。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-014",
+      "chapter": 2,
+      "chapter_title": "算法与字段",
+      "text": "摘要值来自四层东西。,先定算法，再定字段顺序，然后规范化和拼接。,顺序一旦定错，摘要必然不等。",
+      "subtitles": [
+        "摘要值来自四层东西。",
+        "先定算法，再定字段顺序，然后规范化和拼接。",
+        "顺序一旦定错，摘要必然不等。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-015",
+      "chapter": 2,
+      "chapter_title": "算法与字段",
+      "text": "新旧写法逐项对照，差别不小。,旧写法里算法是缺省的，新写法必须写明。,用户名是否进摘要也换了约定。",
+      "subtitles": [
+        "新旧写法逐项对照，差别不小。",
+        "旧写法里算法是缺省的，新写法必须写明。",
+        "用户名是否进摘要也换了约定。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-016",
+      "chapter": 2,
+      "chapter_title": "算法与字段",
+      "text": "口令本身不会离开客户端。,它先被压成摘要，再进网。,服务器只见到摘要这一种形态。",
+      "subtitles": [
+        "口令本身不会离开客户端。",
+        "它先被压成摘要，再进网。",
+        "服务器只见到摘要这一种形态。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-017",
+      "chapter": 2,
+      "chapter_title": "算法与字段",
+      "text": "强度可以分三档看。,不加密、弱摘要、强摘要。,公网场景基本只考虑第三档。",
+      "subtitles": [
+        "强度可以分三档看。",
+        "不加密、弱摘要、强摘要。",
+        "公网场景基本只考虑第三档。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-018",
+      "chapter": 2,
+      "chapter_title": "算法与字段",
+      "text": "弱算法被淘汰是有原因的。,摘要长度有限，可以被穷举。,碰撞也更容易被构造出来。",
+      "subtitles": [
+        "弱算法被淘汰是有原因的。",
+        "摘要长度有限，可以被穷举。",
+        "碰撞也更容易被构造出来。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-019",
+      "chapter": 2,
+      "chapter_title": "算法与字段",
+      "text": "拼接顺序必须是双方约定的。,规范给出了规范串的定义。,顺序错了，摘要就对不上。",
+      "subtitles": [
+        "拼接顺序必须是双方约定的。",
+        "规范给出了规范串的定义。",
+        "顺序错了，摘要就对不上。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-020",
+      "chapter": 2,
+      "chapter_title": "算法与字段",
+      "text": "规范化之后，请求变成四段。,方法、路径、认证参数、摘要前缀。,它们按固定顺序排好，再拼起来。",
+      "subtitles": [
+        "规范化之后，请求变成四段。",
+        "方法、路径、认证参数、摘要前缀。",
+        "它们按固定顺序排好，再拼起来。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-021",
+      "chapter": 2,
+      "chapter_title": "算法与字段",
+      "text": "谁有权定义这个顺序？,规范说了算，客户端和服务端都照它执行。,测试向量用来保证两边一致。",
+      "subtitles": [
+        "谁有权定义这个顺序？",
+        "规范说了算，客户端和服务端都照它执行。",
+        "测试向量用来保证两边一致。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-022",
+      "chapter": 2,
+      "chapter_title": "算法与字段",
+      "text": "请求侧和响应侧的字段不一样。,请求侧关心方法和路径。,响应侧关心摘要本身和随机串。",
+      "subtitles": [
+        "请求侧和响应侧的字段不一样。",
+        "请求侧关心方法和路径。",
+        "响应侧关心摘要本身和随机串。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-023",
+      "chapter": 2,
+      "chapter_title": "算法与字段",
+      "text": "顺序有三种取法。,手写固定序、按字典序、按规范序。,新系统应该走第三种。",
+      "subtitles": [
+        "顺序有三种取法。",
+        "手写固定序、按字典序、按规范序。",
+        "新系统应该走第三种。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-024",
+      "chapter": 2,
+      "chapter_title": "算法与字段",
+      "text": "字段本身也分四层。,原始头字段先规范化，再拼接，最后摘要。,每一层都可能出错。",
+      "subtitles": [
+        "字段本身也分四层。",
+        "原始头字段先规范化，再拼接，最后摘要。",
+        "每一层都可能出错。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-025",
+      "chapter": 3,
+      "chapter_title": "重放与代理",
+      "text": "有没有计数器，差别很大。,没有计数器，原样重放就能通过。,有了计数器，序号必须递增。",
+      "subtitles": [
+        "有没有计数器，差别很大。",
+        "没有计数器，原样重放就能通过。",
+        "有了计数器，序号必须递增。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-026",
+      "chapter": 3,
+      "chapter_title": "重放与代理",
+      "text": "重放被压进一个窗口里。,报文进来，先看序号是否用过。,用过就直接拒绝。",
+      "subtitles": [
+        "重放被压进一个窗口里。",
+        "报文进来，先看序号是否用过。",
+        "用过就直接拒绝。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-027",
+      "chapter": 3,
+      "chapter_title": "重放与代理",
+      "text": "重放防护同样分三档。,只有随机串最弱，加上计数就好些。,再加时间窗口才算稳。",
+      "subtitles": [
+        "重放防护同样分三档。",
+        "只有随机串最弱，加上计数就好些。",
+        "再加时间窗口才算稳。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-028",
+      "chapter": 3,
+      "chapter_title": "重放与代理",
+      "text": "时钟偏了就会失败。,客户端快了一点，服务端就判过期。,请求直接被拒，没有补救机会。",
+      "subtitles": [
+        "时钟偏了就会失败。",
+        "客户端快了一点，服务端就判过期。",
+        "请求直接被拒，没有补救机会。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-029",
+      "chapter": 3,
+      "chapter_title": "重放与代理",
+      "text": "规范对时钟有明确要求。,两侧时间必须足够接近。,偏差过大会被当成异常。",
+      "subtitles": [
+        "规范对时钟有明确要求。",
+        "两侧时间必须足够接近。",
+        "偏差过大会被当成异常。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-030",
+      "chapter": 3,
+      "chapter_title": "重放与代理",
+      "text": "每次请求都要变的东西有三个。,计数器自增，随机串重算，质量参数固定。,这三个字段是防重放的关键。",
+      "subtitles": [
+        "每次请求都要变的东西有三个。",
+        "计数器自增，随机串重算，质量参数固定。",
+        "这三个字段是防重放的关键。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-031",
+      "chapter": 3,
+      "chapter_title": "重放与代理",
+      "text": "有代理的时候，链路会变长。,每一跳都可能看到明文。,缓存和日志还会各自留一份。",
+      "subtitles": [
+        "有代理的时候，链路会变长。",
+        "每一跳都可能看到明文。",
+        "缓存和日志还会各自留一份。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-032",
+      "chapter": 3,
+      "chapter_title": "重放与代理",
+      "text": "于是有了逐跳和端到端两种做法。,逐跳便宜，但只覆盖一段。,端到端贵，覆盖整条链。",
+      "subtitles": [
+        "于是有了逐跳和端到端两种做法。",
+        "逐跳便宜，但只覆盖一段。",
+        "端到端贵，覆盖整条链。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-033",
+      "chapter": 3,
+      "chapter_title": "重放与代理",
+      "text": "部署方式常见三种。,全链摘要最彻底，也最贵。,逐跳摘要是折中，边缘摘要介于两者之间。",
+      "subtitles": [
+        "部署方式常见三种。",
+        "全链摘要最彻底，也最贵。",
+        "逐跳摘要是折中，边缘摘要介于两者之间。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-034",
+      "chapter": 3,
+      "chapter_title": "重放与代理",
+      "text": "每一跳要做四件事。,先认证，再转发，然后重新认证，最后落库。,任何一跳漏掉都会断链。",
+      "subtitles": [
+        "每一跳要做四件事。",
+        "先认证，再转发，然后重新认证，最后落库。",
+        "任何一跳漏掉都会断链。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-035",
+      "chapter": 3,
+      "chapter_title": "重放与代理",
+      "text": "覆盖范围的差别不在算法。,在链路长度。,一跳和整条链是两个量级。",
+      "subtitles": [
+        "覆盖范围的差别不在算法。",
+        "在链路长度。",
+        "一跳和整条链是两个量级。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-036",
+      "chapter": 3,
+      "chapter_title": "重放与代理",
+      "text": "密钥也随 hops 拆开。,共享密钥变成每跳一把。,好处是任何一把都能单独撤回。",
+      "subtitles": [
+        "密钥也随 hops 拆开。",
+        "共享密钥变成每跳一把。",
+        "好处是任何一把都能单独撤回。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-037",
+      "chapter": 4,
+      "chapter_title": "落地与判断",
+      "text": "真正接入要改三处。,选算法、配字段、对齐顺序。,顺序那一步最容易被漏掉。",
+      "subtitles": [
+        "真正接入要改三处。",
+        "选算法、配字段、对齐顺序。",
+        "顺序那一步最容易被漏掉。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-038",
+      "chapter": 4,
+      "chapter_title": "落地与判断",
+      "text": "代价也是从这三处来的。,每跳多算一次，两侧顺序要对齐。,调试成本明显上升。",
+      "subtitles": [
+        "代价也是从这三处来的。",
+        "每跳多算一次，两侧顺序要对齐。",
+        "调试成本明显上升。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-039",
+      "chapter": 4,
+      "chapter_title": "落地与判断",
+      "text": "但要先记住一件事。,摘要是可选机制，不开就没有这些代价。,代价集中在顺序和时钟上。",
+      "subtitles": [
+        "但要先记住一件事。",
+        "摘要是可选机制，不开就没有这些代价。",
+        "代价集中在顺序和时钟上。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-040",
+      "chapter": 4,
+      "chapter_title": "落地与判断",
+      "text": "落到配置上就是这几行。,算法写明，质量参数写明，计数器每次自增。,顺序仍然要对齐。",
+      "subtitles": [
+        "落到配置上就是这几行。",
+        "算法写明，质量参数写明，计数器每次自增。",
+        "顺序仍然要对齐。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-041",
+      "chapter": 4,
+      "chapter_title": "落地与判断",
+      "text": "落地会碰到四个组件。,网关、应用、客户端，还有运维。,每一个都要改。",
+      "subtitles": [
+        "落地会碰到四个组件。",
+        "网关、应用、客户端，还有运维。",
+        "每一个都要改。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-042",
+      "chapter": 4,
+      "chapter_title": "落地与判断",
+      "text": "代价最终落在两侧。,客户端多存一次摘要。,服务端多算一次摘要。",
+      "subtitles": [
+        "代价最终落在两侧。",
+        "客户端多存一次摘要。",
+        "服务端多算一次摘要。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-043",
+      "chapter": 4,
+      "chapter_title": "落地与判断",
+      "text": "该不该上摘要，先看场景。,公网该上，纯内网可以省。,真正的判断依据是链路。",
+      "subtitles": [
+        "该不该上摘要，先看场景。",
+        "公网该上，纯内网可以省。",
+        "真正的判断依据是链路。"
+      ],
+      "paragraph_end": true
+    },
+    {
+      "id": "seg-044",
+      "chapter": 4,
+      "chapter_title": "落地与判断",
+      "text": "判断有先后顺序。,先看场景，再看链路长度，最后看成本。,顺序反了就会为不需要的安全买单。",
+      "subtitles": [
+        "判断有先后顺序。",
+        "先看场景，再看链路长度，最后看成本。",
+        "顺序反了就会为不需要的安全买单。"
+      ],
+      "paragraph_end": true
+    }
+  ]
+}

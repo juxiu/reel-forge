@@ -22,8 +22,8 @@ export const SHOT_RECIPE = {
   stage: {
       kind: "orbit",
       focus: [40,76,112],
-      rx: 396,
-      ry: 176,
+      rx: 356,
+      ry: 140,
       cx: 640,
       cy: 382,
       icon: "grid",

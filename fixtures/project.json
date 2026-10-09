@@ -1,1 +1,13 @@
-{"project_id":"digest-explainer","request":"Explain how HTTP Digest Fields protect message integrity.","language":"en","target_ratios":["16:9","9:16"],"source_urls":["https://www.rfc-editor.org/rfc/rfc9530.html"],"duration_target_s":40}
+{
+  "project_id": "digest-explainer",
+  "request": "Explain how HTTP Digest Fields protect message integrity.",
+  "language": "zh",
+  "target_ratios": [
+    "16:9",
+    "9:16"
+  ],
+  "source_urls": [
+    "https://www.rfc-editor.org/rfc/rfc9530.html"
+  ],
+  "duration_target_s": 40
+}

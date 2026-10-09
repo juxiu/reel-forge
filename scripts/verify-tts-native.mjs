@@ -110,7 +110,10 @@ try {
   fs.mkdirSync(wavDir, {recursive: true});
   fs.mkdirSync(timingDir, {recursive: true});
   fs.writeFileSync(path.join(wavDir, "sentence-001.wav"), SILENT_WAV);
-  fs.writeFileSync(path.join(timingDir, "sentence-001.json"), JSON.stringify([{text: "摘要", start: 0, end: 0.5}]));
+  // 时间轴必须覆盖文本里的汉字：这是「换了解说词却没换 wav」的唯一拦阻
+  fs.writeFileSync(path.join(timingDir, "sentence-001.json"), JSON.stringify([
+    {text: "摘要", start: 0, end: 0.5}, {text: "认证", start: 0.5, end: 1.0},
+  ]));
   const outDir = path.join(SANDBOX, "out-wav");
   fs.rmSync(outDir, {recursive: true, force: true});
   const r = await nativeTts({
@@ -129,6 +132,52 @@ try {
   );
 } catch (error) {
   note(false, "wav 通道", error.message);
+}
+
+// 换过解说词却没换 wav 目录 → 必须拒绝，而不是拿旧时间轴配新句子（字幕会整体错位且不报错）
+try {
+  const wavDir = path.join(SANDBOX, "user-wav-stale");
+  const timingDir = path.join(SANDBOX, "user-timing-stale");
+  fs.mkdirSync(wavDir, {recursive: true});
+  fs.mkdirSync(timingDir, {recursive: true});
+  fs.writeFileSync(path.join(wavDir, "sentence-001.wav"), SILENT_WAV);
+  // 时间轴是另一句话的（英文那句的残留）
+  fs.writeFileSync(path.join(timingDir, "sentence-001.json"), JSON.stringify([{text: "When", start: 0, end: 1}]));
+  const outDir = path.join(SANDBOX, "out-wav-stale");
+  fs.rmSync(outDir, {recursive: true, force: true});
+  await nativeTts({
+    engine: "wav", text: "一次摘要认证牵涉到的角色", voice: "user", outDir, index: 1,
+    env: {...process.env, TTS_WAV_DIR: wavDir, TTS_WORD_TIMINGS_DIR: timingDir},
+  });
+  note(false, "换词不换 wav 必须被拒绝", "居然通过了 —— 会拿旧时间轴配新句子");
+} catch (error) {
+  note(true, "换词不换 wav 必须被拒绝", error.message.slice(0, 96));
+}
+
+// ---- 缓存必须按文本+声音+语速上锁（旧英文配音冒充新中文字幕的孪生兄弟）----
+try {
+  const dir = path.join(SANDBOX, "cache-check");
+  fs.rmSync(dir, {recursive: true, force: true});
+  const {edgeTts, cacheKey} = await import("../src/providers/tts/edge.mjs");
+  const env = {...process.env, RF_STUB_WAV_B64: WAV_B64};
+  // 第一次：provider 存在但返回 ok —— 走真实分支会调 python，这里只验「键」的语义。
+  const k1 = cacheKey({text: "一次摘要认证", voice: "zh-CN-YunxiNeural", rate: "+0%"});
+  const k2 = cacheKey({text: "When an HTTP message", voice: "zh-CN-YunxiNeural", rate: "+0%"});
+  const k3 = cacheKey({text: "一次摘要认证", voice: "zh-CN-YunxiNeural", rate: "+10%"});
+  const k4 = cacheKey({text: "一次摘要认证", voice: "zh-CN-YunxiNeural", rate: "+0%"});
+  note(
+    k1 !== k2 && k1 !== k3 && k1 === k4,
+    "缓存键区分文本/语速，相同输入才同键",
+    `text=${k1!==k2?"区分":"未区分"} rate=${k1!==k3?"区分":"未区分"} stable=${k1===k4}`,
+  );
+  // 旧缓存（无 cache_key.json）必须**不被**当成命中
+  fs.mkdirSync(dir, {recursive: true});
+  fs.writeFileSync(path.join(dir, "audio.mp3"), SILENT_WAV);
+  fs.writeFileSync(path.join(dir, "word-timestamps.json"), JSON.stringify({words: [{text: "旧", start: 0, end: 1}]}));
+  const stale = !fs.existsSync(path.join(dir, "cache_key.json"));
+  note(stale, "旧缓存（无 cache_key.json）不会被当成命中", stale ? "确认无键文件 → 下次必重合成" : "有键文件，需人工确认");
+} catch (error) {
+  note(false, "缓存键自测", error.message);
 }
 
 // ---- 坏输出必须被拒绝，而不是照单全收 ----

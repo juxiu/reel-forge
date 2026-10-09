@@ -4,7 +4,7 @@
 
 ## 总体状态
 
-**状态：基础生产链、双比例质量门禁、语义导演、TTS WordBoundary 主时间轴、镜头评分、画面文字出处门禁与 Skill CLI 已接入；44 镜全部 authored（17 种拓扑），每镜绑定组私有舞台。`verify:fast` 31/31 PASS。当前主要差距是画面审美水准与真实帧基准，尚未引入语义视觉模型。**
+**状态：基础生产链、双比例质量门禁、语义导演、TTS WordBoundary 主时间轴、镜头评分、画面文字出处门禁与 Skill CLI 已接入；44 镜全部 authored（17 种拓扑），每镜绑定组私有舞台。`verify:fast` 34/34 PASS。17 种拓扑已各渲一帧逐张核对并修掉 7 个真实缺陷（此前一帧都没渲过）。当前主要差距：画面审美水准、3 镜密度不达标、真实帧基准缺失、尚未引入语义视觉模型。**
 
 当前主干已经覆盖：
 
@@ -61,6 +61,62 @@ Research → Narration / Timeline → Storyboard → 组私有舞台 → G1 Pilo
 
 新增 `verify:tts-native`：用 stub provider 真调 dispatch（读同样的 stdin JSON、吐同样的返回形状），检查 audio + word-timings + manifest 都写出且 `timing_mode` 仍是 `tts-word-boundary`；再喂四类坏输出（缺时间轴 / 空时间轴 / 缺音频路径 / 非 JSON），确认它**拒绝**而不是照单全收。`requirements.txt` 补上三个可选引擎的装法与模型参数，并写明「无论用哪个引擎，生产时间轴口径只有 `tts-word-boundary`，没有词边界的引擎必须逐块合成并给出真实块边界，禁止伪装成 external ASR」。
 
+### 7. 真渲染验证（补上「没看过画面」这个缺口）
+
+上一轮结束时我写过「44 镜全绿、17 种拓扑」，但**那 44 镜一帧都没渲出来过** —— 当时盘上最新的真实渲染还是 10 月 8 日那次 4 镜 / 37.3s。本轮把 17 种拓扑各渲一帧（`artifacts/stills/k_*.png`，每种拓扑取镜头 62% 处），逐张看，发现并修掉 7 个真实缺陷：
+
+| # | 缺陷 | 画面症状 | 静态门为什么放过 |
+|---|---|---|---|
+| 1 | `Primitives.jsx:594` `<SoftIn>` 开标签未闭合 | esbuild 报 3 个错，**整条渲染路径构建失败** | syntax / imports / jsx-symbols 都不解析 JSX |
+| 2 | `Shot.jsx` / `stage-kit.jsx` 注释里写了 `shots_src/G*` + `/` | `*/` 提前闭合块注释，后半段被当代码 | 同上 |
+| 3 | 图标组件返回 SVG `<g>`，被裸写在 `<div>` 里 | **19 处图标全部隐身**，主角成空框 | 无门检查「SVG 图元是否在 svg 容器内」 |
+| 4 | `comparetable` wrapper 已定位、内部 `Box` 又写同样绝对值 | 左列框被推到中央、右列框出画，表头只剩一个 | 无门检查坐标是否重复定位 |
+| 5 | 同上，`reshape` | 两个形整个消失，只剩一根箭头 | 同上 |
+| 6 | `radial` / `orbit` 卫星起始角在 -90°、`ry` 过大 | 底部标签落进字幕带、主角副标被压 | 无门检查「合成后是否越过 cameraSafe」 |
+| 7 | `beforeafter` 平面自带标题与 items 文案重复 | 「原文」和「原始报文」说同一件事还叠在一起 | 无门检查文案冗余 |
+
+另外把结构框描边从 `GREY_LINE`(#4A4A4A) 提到 `GREY`(#A0A0A1) —— a2e 的规则是「图形 2–3px **白**描边黑填充」，`GREY_LINE` 是网格线层级，用在结构框上黑底几乎看不见（`comparetable` 左列框因此「像没画」）。
+
+### 8. 两道新门（让上面 7 个不再复发）
+
+- **`verify:syntax` 现在真解析 JSX**。它以前把 57 个 `.jsx` 跳过并打印 `jsx_not_parseable_locally: 57`，理由是「本机没有 esbuild」—— **这个前提早已不成立**，esbuild 就在 `node_modules` 里（Remotion 的依赖）。现在 72 个 JSX 全部走 esbuild 解析，解析不到就**判红**，不再降级成 caveat。
+- **`verify:relative-coords`**：wrapper 原点非零时，内部子元素不得重复写同一个原点表达式。判据是「子坐标表达式 == wrapper 原点表达式」，所以对 `cx={s / 2}` 这类**正确**的相对坐标零误报（第一版按「出现绝对坐标」判，误报了 4 处；改成比对表达式后为 0）。
+
+`verify:fast` 现为 **32/32 PASS**。
+
+### 9. 画面密度实测（内容区亮像素占比，17 镜）
+
+```text
+comparetable 4.60%  ranked3 4.29%  dualpanel 3.50%  terminal 3.40%  rail4 3.39%
+splitrows 3.31%     radial 3.24%   layerstack 3.20%  citeside 3.01%  orbit 2.70%
+split2col 2.49%     ballot 2.46%   causechain 2.21%  ladder 1.61%    beforeafter 1.42%
+reshape 1.10%       pipeline3 0.87%
+```
+
+`pipeline3` / `reshape` / `beforeafter` 明显偏空（a2e 硬规则：内容区最大物体 <110px 不得持续 >45 帧）。这三镜**还没达标**，需要加内容密度，不是靠改字号。
+
+### 10. 时序单真源（a2e 对齐）+ TTS 提速
+
+**A4生产门staleness**：`verify:production` 原来只查「文件在不在 / status 是不是 PASS」，**从不检查产物对不对应当前输入** —— 10-08 的 4 镜产物一路配着 44 镜的 IR 报 PASS。新增 `src/release/fingerprint.mjs`（覆盖双比例 IR 画面字段、44 个镜头源字节、解说词、字幕块、字面量白名单），`qc.mjs` 写入、`verify-production` 重算比对，算法两边共用一份。
+
+**A2 TTS 的真正根因不是限流**：`fixtures/project.json` 的 `language` 一直是 `"en"`（旧英文样片遗留），于是 voice 解析成 `en-US-JunxiNeural` —— **英文声音念中文**，edge-tts 每句产不出音频，而报错是 `Please verify that your parameters are correct`，**把矛头指向参数**。先怀疑文本、再怀疑限流、再怀疑退避都不对。新增 `verify:language` 在合成前拦这类不一致。
+
+**TTS 缓存不带文本指纹**（比过期产物更危险）：`edge.mjs` 只判断「文件存在且非空」就当命中。缓存里躺的是旧英文配音，而解说词早已换中文 —— 一旦跑完，**第 1 句是英文音频配中文字幕，而所有门都通过**。现在缓存键 = `sha256(文本+声音+语速)`；`native.mjs` 的用户 wav 通道同类漏洞（换词不换 wav）一并修了。
+
+**TTS 提速约 10 倍**：原来串行 44 句 ≈ 45 分钟（每句一次 python 进程 + 联网合成）。改成**并发合成 + 串行装配**（合成彼此独立；游标与混音必须串行），200 秒完成 42 句。并发到 44 句会触发持续限流（实测连续 20 次 `NoAudioReceived`），所以加了**串行补齐**：失败的那几句单独串行重试 —— 限流是并发放大的，串行几乎总能过；且原写法下一句失败会让整轮作废。
+
+**A1 时序单真源**：事故根源是这份仓库有**三份互不引用**的时序数据（IR 的 `start/duration`、`captions.json`、gitignore 的 `timeline.json`），实测 **IR 7657 帧 vs 真实配音 13235 帧 —— 成片比配音短 186 秒**，而没有任何门发现，因为没有第二个真源跟它 disagreement。
+修法（对齐参照片「一份时间轴 + 按句 id 查表」）：
+- `scripts/sync-script.mjs`：解说词 → `fixtures/script.json`（44 段，一段=一镜），并**用同一份数据**重写 `captions.json`
+- `npm run materialize-ir` 从 `script/timeline.json` 派生双比例 IR
+- 新增 `verify:timeline-source`：镜数==句数、每镜 start==句子 from（容差 1 帧）、字幕块必须落在句区间内、末端漂移
+
+**结果**：`verify:timeline-source` PASS（44 镜 / 44 句 / 132 字幕块 / 13235 帧 / 441.17s），漂移从 **−186 秒 → 0**。
+
+顺带修：IR 的 hero 元素原标`type:"card"`（=画面文案）却装着整段解说词，于是 provenance 判它「无出处」88 条—— **门没骂错，是类型标错了**。改成 `type:"narration"`（参照片规则：整句解说词不进画面），门跳过非画面元素。
+
+**TTS 顺带暴露的事实**：真实 edge 云希在本机是**约 4.0 字/秒**（392s 语音 / 1575 字），不是 a2e 文档声称的 5.5 字/秒。所以同样文本成片是 **7.35 分钟**而非 a2e 样片的 4′35″。脚本规模本身没问题（1575 字 ≈ a2e 的 1490 字那一档），差的是语速。
+
 ## 已完成
 
 ### 生产链
@@ -88,6 +144,8 @@ Research → Narration / Timeline → Storyboard → 组私有舞台 → G1 Pilo
 ## 后续增强
 
 - 用 reel-forge 真实成片帧重建 visual benchmark，替换 64×36 合成图；再考虑 CLIP / SigLIP。
+- **补齐 `pipeline3` / `reshape` / `beforeafter` 三镜的画面密度**（实测内容区亮像素 0.87% / 1.10% / 1.42%，明显偏空）。
+- **用 reel-forge 真实成片帧建 `examples/contrast/` 正反例**（参照片有 6 组，reel-forge 没有）—— 这是目前最缺的一块审美标尺。
 - **真正的 9:16 纵向重排**（当前是同一块 16:9 构图居中）。
 - 更多语义视觉变体与组私有拓扑；继续减少对通用引擎的依赖。
 - 更多真实人工精选 reference / anti-reference 帧。

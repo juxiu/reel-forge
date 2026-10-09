@@ -13,7 +13,7 @@ export const SHOT_RECIPE = {
   shot_id: "SC37",
   variant: "sequence",
   hero_size: 190,
-  camera: "pan",
+  camera: "push",
   settle_frames: 30,
   hero_role: "adopt",
   mirror: false,
@@ -23,6 +23,7 @@ export const SHOT_RECIPE = {
       kind: "pipeline3",
       focus: [0,40,80],
       caption: "接入要改三处",
+    subs: ["两侧都支持", "字段写进配置", "写测试向量对拍"],
       items: [
         {id: "p1", icon: "chip", text: "选算法"},
         {id: "p2", icon: "grid", text: "配字段"},

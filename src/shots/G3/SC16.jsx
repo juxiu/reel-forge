@@ -22,7 +22,9 @@ export const SHOT_RECIPE = {
   stage: {
       kind: "reshape",
       focus: [0,44,88],
-      caption: "口令不经过网络",
+      from_sub: "留在客户端",
+    to_sub: "只有摘要上网",
+    caption: "口令不经过网络",
       from_icon: "key",
       to_icon: "shield",
       items: [

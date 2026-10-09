@@ -109,7 +109,7 @@
       "variant": "sequence",
       "hero_size": 190,
       "settle_frames": 30,
-      "camera": "pan",
+      "camera": "push",
       "still_kinds": [
         "enter+1",
         "enter-mid",
@@ -589,7 +589,7 @@
       "variant": "sequence",
       "hero_size": 190,
       "settle_frames": 30,
-      "camera": "pan",
+      "camera": "push",
       "still_kinds": [
         "enter+1",
         "enter-mid",

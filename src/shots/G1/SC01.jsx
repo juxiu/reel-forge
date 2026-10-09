@@ -26,8 +26,8 @@ export const SHOT_RECIPE = {
   stage: {
     kind: "radial",
     hub: {cx: 640, cy: 372},
-    rx: 448,
-    ry: 196,
+    rx: 356,
+    ry: 140,
     icon: "shield",
     label: "HTTP Digest Fields",
     focus: [46, 84, 122],

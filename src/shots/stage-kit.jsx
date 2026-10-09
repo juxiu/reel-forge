@@ -9,7 +9,7 @@ import {BEAT, clamp01, drawOn, fadeIn, powOutRemain, rnd, softOp} from "../visua
 /**
  * 舞台套件：组私有舞台共用的底层语汇 + 一组拓扑各异的构图。
  *
- * 形态对齐参照片 examples/rag/shots_src/G*/ 的做法（一组镜头共用一个舞台，状态是帧号的纯函数），
+ * 形态对齐参照片 examples/rag/shots_src/Gn/ 的做法（一组镜头共用一个舞台，状态是帧号的纯函数），
  * 但**刻意不复制它按组重复私有模块的写法**：参照片 8 个组各带一份 layout.tsx / g3ui.tsx /
  * vspace.ts，加起来一千多行里大部分是重复的槽位、轨道与焦点爬坡。这里把那些抽成一套 kit，
  * 各组 stage.jsx 只留**本组的拓扑清单与镜头映射**。
@@ -24,8 +24,57 @@ import {BEAT, clamp01, drawOn, fadeIn, powOutRemain, rnd, softOp} from "../visua
  *   scripts/verify-authored-shots.mjs 按 kind 做组内去重与全片占比审计。
  */
 
-/** 内容区（16:9）。所有构图必须落在这一带：y<175 有流程轨，y>620 是字幕带。 */
+/**
+ * 内容区（16:9）。所有构图必须落在这一带：y<175 有流程轨，y>620 是字幕带。
+ *
+ * ⚠⚠ 但**画布上的坐标不等于最终像素**：CameraRig 会做
+ *   `translate(640,360) scale(s) translate(-cam)`，s 最大约 1.083（pan）。
+ *   所以「y ≤ 620」并不够 —— 变换后会被推到 638（正好落进字幕带）。
+ *   反解出真正该守的上界：**变换前 y ≤ 360 + (607-360)/1.083 ≈ 588**。
+ *   这就是底部副标一律放在 `AREA.b - 60`（=580）的原因；
+ *   放在 -4 / -6 / -24 都会被相机推进字幕带 —— verify:shot-sample 实测 17.79% 的空隙带被点亮。
+ *
+ * 换句话说：cameraSafe 是**变换后**的约束，而构图是**变换前**写的，中间隔着一层逆变换。
+ */
 export const AREA = {l: 60, r: 1220, t: 175, b: 620};
+
+/** 底部内容在**变换前**必须≤ 这个值，才保证变换后仍在 cameraSafe.bottom(607) 之内。 */
+export const AREA_BOTTOM_SAFE = 588;
+
+/**
+ * 图标容器：把 Icons.jsx 的图元包进自己的 <svg>。
+ *
+ * ⚠ 为什么必须有它：Icons.jsx 里每个图元返回的是 SVG 的 `<g>`（见 DocIcon）。
+ *   `<g>` 放在 `<svg>` 之外会被浏览器直接丢弃 —— 不报错、不报警，画面上就是**图标整片消失**。
+ *   通用引擎没这个问题是因为它把图标都放进 `SemanticShots` 的 `<Svg>` 描边层里；
+ *   而组私有舞台是直接在 `<div>` 里摆图元的，于是 19 处调用集体隐身。
+ *   这个 bug 只有真渲染才看得见：静态门（syntax / imports / jsx-symbols）全绿。
+ *
+ * 用法：给的是**图元要画的中心点**（cx/cy）与边长 s，容器自动对齐。
+ */
+export const Glyph = ({kind, cx, cy, s, active = false, reveal, opacity = 1, bloom = false, style}) => {
+  if (!kind) return null;
+  const pad = Math.max(8, Math.round(s * 0.12));
+  const box = s + pad * 2;
+  return (
+    <svg
+      width={box}
+      height={box}
+      viewBox={`0 0 ${box} ${box}`}
+      style={{
+        position: 'absolute',
+        left: cx - box / 2,
+        top: cy - box / 2,
+        overflow: 'visible',
+        opacity,
+        filter: bloom ? 'drop-shadow(0 0 3px rgba(255,255,255,.45))' : undefined,
+        ...style,
+      }}
+    >
+      <Icon kind={kind} cx={box / 2} cy={box / 2} s={s} active={active} reveal={reveal} />
+    </svg>
+  );
+};
 
 /**
  * 入场帧的唯一口径。
@@ -78,7 +127,7 @@ export const Core = ({cx, cy, size, N, f0, icon = "shield", label = "", iconScal
       <HeroGlow x={cx - size / 2} y={cy - size / 2} w={size} h={size} N={N} k={k * 0.9} />
       <div style={{position: "absolute", inset: 0, transformOrigin: `${cx}px ${cy}px`, transform: s > 0 ? `scale(${s.toFixed(3)})` : undefined, opacity: k}}>
         <div style={{...abs(cx - half, cy - half, size, size), display: "flex", alignItems: "center", justifyContent: "center"}}>
-          <Icon kind={icon} cx={half} cy={half} s={size - iconScale} active reveal={1} glow={false} />
+          <Glyph kind={icon} cx={half} cy={half} s={size - iconScale} active reveal={1} glow={false} />
         </div>
       </div>
       {[0, 1, 2].map((j) => {
@@ -109,7 +158,7 @@ export const Node = ({cx, cy, s = 92, icon, text, N, f0, active = false, labelSi
   return (
     <div style={{opacity: op}}>
       <div style={{...abs(cx - s / 2, cy - s / 2, s, s), display: "flex", alignItems: "center", justifyContent: "center"}}>
-        <Icon kind={icon} cx={s / 2} cy={s / 2} s={s - 18} active={active} reveal={clamp01(n / BEAT.DRAW_ON)} />
+        <Glyph kind={icon} cx={s / 2} cy={s / 2} s={s - 18} active={active} reveal={clamp01(n / BEAT.DRAW_ON)} />
       </div>
       {text ? (
         <CText cx={cx} cy={labelDy === null ? cy + s / 2 + 24 : labelDy} size={labelSize} weight={700} color={active ? WHITE : GREY} maxW={maxW}>
@@ -145,7 +194,7 @@ export const Slot = ({x, y, w, h, i, N, f0, focus = 0, past = 0, text = "", icon
       />
       {icon ? (
         <div style={{...abs(px + 22, y + (h - iconSize) / 2, iconSize, iconSize)}}>
-          <Icon kind={icon} cx={iconSize / 2} cy={iconSize / 2} s={iconSize - 14} active={focus > 0.5} reveal={clamp01(n / BEAT.DRAW_ON)} />
+          <Glyph kind={icon} cx={iconSize / 2} cy={iconSize / 2} s={iconSize - 14} active={focus > 0.5} reveal={clamp01(n / BEAT.DRAW_ON)} />
         </div>
       ) : null}
       {text ? (
@@ -207,9 +256,11 @@ export function Pipeline3({plan, N, recipe}) {
   const IN = entryOf(plan, st);
   const items = plan.items;
   const k = focusWalk(marksOf(plan, st), N);
-  const bw = 320;
-  const gap = 100;
-  const y = 300;
+  // 3 个框 + 2 个间隙必须落在 cameraSafe.x89–1191 内：3*bw + 2*gap ≤ 1102。
+  // 之前bw=344/gap=96 → 总宽 1224，左框被切出画外，画面密度反而下降。
+  const bw = 298;
+  const gap = 96;
+  const y = 312;
   const x0 = 640 - (bw * items.length + gap * (items.length - 1)) / 2 + bw / 2;
   const arrow = drawOn(N - IN, BEAT.DRAW_ON);
   return (
@@ -225,18 +276,29 @@ export function Pipeline3({plan, N, recipe}) {
           <div key={it.id}>
             <SoftIn N={N} f0={it.f0}>
               <div style={{position: "absolute", inset: 0, opacity: 1 - 0.45 * isPast(i, marksOf(plan, st), N)}}>
-                <Box x={cx - bw / 2} y={y - 78} w={bw} h={156} border={k[i] > 0.5 ? PURPLE : GREY_LINE} radius={14} glow={k[i] > 0.5} bloom={k[i] <= 0.5} />
-                <div style={{...abs(cx - bw / 2 + 26, y - 44, 88, 88), display: "flex", alignItems: "center", justifyContent: "center"}}>
-                  <Icon kind={it.icon} cx={44} cy={44} s={80} active={k[i] > 0.5} reveal={1} />
+                <Box x={cx - bw / 2} y={y - 92} w={bw} h={184} border={k[i] > 0.5 ? PURPLE : GREY} radius={14} glow={k[i] > 0.5} bloom={k[i] <= 0.5} />
+                {/*步骤徽章：序号压在左上角，给这一镜一个可读的「走到第几步」。*/}
+                <div style={{...abs(cx - bw / 2 + 16, y - 76, 32, 32), boxSizing: "border-box", borderRadius: 17, background: "#000", border: `2px solid ${k[i] > 0.5 ? PURPLE : GREY}`, opacity: softOp(N - it.f0 - 6, 8)}}>
+                  <CText cx={16} cy={16} size={19} weight={800} color={k[i] > 0.5 ? WHITE : GREY} dy={-1}>{i + 1}</CText>
                 </div>
-                <Label x={cx - bw / 2 + 132} y={y - 17} size={30} color={k[i] > 0.5 ? WHITE : GREY_LIGHT} maxW={bw - 158}>{it.text}</Label>
+                <div style={{...abs(cx - bw / 2 + 54, y - 56, 72, 72), display: "flex", alignItems: "center", justifyContent: "center"}}>
+                  <Glyph kind={it.icon} cx={36} cy={36} s={68} active={k[i] > 0.5} reveal={1} />
+                </div>
+                <Label x={cx - bw / 2 + 24} y={y + 8} size={30} color={k[i] > 0.5 ? WHITE : GREY_LIGHT} maxW={bw - 48}>{it.text}</Label>
+                {/*副行：这一格到底做什么。recipe 用 stage.subs 提供；缺省就不画，
+                    免得为了凑密度塞占位文字 —— 那是另一种假的丰富。*/}
+                {st.subs?.[i] ? (
+                  <TechSub cx={cx} cy={y + 52} hud={false}>{st.subs[i]}</TechSub>
+                ) : null}
+                {/*格内进度条：随入场推进，给静态版面一件持续动作。*/}
+                <div style={{...abs(cx - bw / 2 + 24, y + 76, (bw - 48) * clamp01((N - it.f0) / 26), 5), background: k[i] > 0.5 ? PURPLE : GREY, opacity: 0.9}} />
               </div>
             </SoftIn>
             {i < items.length - 1 ? <Track x1={cx + bw / 2 + 10} x2={cx + bw + gap - 10} y={y + 52} N={N} f0={it.f0 + 10} color={k[i] > 0.5 ? PURPLE_LIGHT : GREY_LINE} /> : null}
           </div>
         );
       })}
-      <Note cx={640} cy={AREA.b - 4}>{st.caption}</Note>
+      <Note cx={640} cy={AREA.b - 60}>{st.caption}</Note>
     </>
   );
 }
@@ -266,9 +328,9 @@ export function CauseChain({plan, N, recipe}) {
           <div key={it.id}>
             <SoftIn N={N} f0={it.f0}>
               <div style={{position: "absolute", inset: 0, opacity: 1 - 0.45 * isPast(i, marks, N)}}>
-                <Box x={x} y={y} w={w} h={76} border={k[i] > 0.5 ? PURPLE : GREY_LINE} radius={10} bloom={k[i] <= 0.5} />
+                <Box x={x} y={y} w={w} h={76} border={k[i] > 0.5 ? PURPLE : GREY} radius={10} bloom={k[i] <= 0.5} />
                 <div style={{...abs(x + 20, y + 8, 60, 60), display: "flex", alignItems: "center", justifyContent: "center"}}>
-                  <Icon kind={it.icon} cx={30} cy={30} s={56} active={k[i] > 0.5} reveal={1} />
+                  <Glyph kind={it.icon} cx={30} cy={30} s={56} active={k[i] > 0.5} reveal={1} />
                 </div>
                 <Label x={x + 104} y={y + 38 - 16} size={30} color={k[i] > 0.5 ? WHITE : GREY_LIGHT} maxW={w - 140}>{it.text}</Label>
               </div>
@@ -276,7 +338,7 @@ export function CauseChain({plan, N, recipe}) {
           </div>
         );
       })}
-      <Note cx={640} cy={AREA.b - 4}>{st.caption}</Note>
+      <Note cx={640} cy={AREA.b - 60}>{st.caption}</Note>
     </>
   );
 }
@@ -299,7 +361,7 @@ export function CiteSide({plan, N, recipe}) {
           <div style={{position: "absolute", inset: 0}}>
             <Box x={110} y={280} w={430} h={150} border={PURPLE} radius={14} glow />
             <div style={{...abs(134, 300, 92, 92), display: "flex", alignItems: "center", justifyContent: "center"}}>
-              <Icon kind={st.main_icon || "shield"} cx={46} cy={46} s={86} active reveal={1} />
+              <Glyph kind={st.main_icon || "shield"} cx={46} cy={46} s={86} active reveal={1} />
             </div>
             <Label x={246} y={344} size={30} color={WHITE} maxW={270}>{main.text}</Label>
             <Track x1={552} y1={356} x2={686} y2={356} N={N} f0={main.f0 + 12} />
@@ -312,9 +374,9 @@ export function CiteSide({plan, N, recipe}) {
           <div key={it.id}>
             <SoftIn N={N} f0={it.f0}>
               <div style={{position: "absolute", inset: 0, opacity: softOp(N - it.f0, BEAT.SOFT_IN)}}>
-                <Box x={700} y={y} w={cardW} h={cardH} border={GREY_LINE} radius={10} />
+                <Box x={700} y={y} w={cardW} h={cardH} border={GREY} radius={10} />
                 <div style={{...abs(716, y + 15, 48, 48), display: "flex", alignItems: "center", justifyContent: "center"}}>
-                  <Icon kind={st.cite_icons?.[i] || it.icon || "doc"} cx={24} cy={24} s={44} reveal={1} />
+                  <Glyph kind={st.cite_icons?.[i] || it.icon || "doc"} cx={24} cy={24} s={44} reveal={1} />
                 </div>
                 <Label x={782} y={y + 39 - 15} size={27} color={GREY_LIGHT} maxW={cardW - 104}>{it.text}</Label>
               </div>
@@ -323,7 +385,7 @@ export function CiteSide({plan, N, recipe}) {
           </div>
         );
       })}
-      <Note cx={640} cy={AREA.b - 4}>{st.caption}</Note>
+      <Note cx={640} cy={AREA.b - 60}>{st.caption}</Note>
     </>
   );
 }
@@ -345,7 +407,7 @@ export function Terminal({plan, N, recipe}) {
     <>
       <SoftIn N={N} f0={IN}>
         <div style={{position: "absolute", inset: 0}}>
-          <Box x={x} y={y} w={w} h={h} border={GREY_LINE} radius={12} />
+          <Box x={x} y={y} w={w} h={h} border={GREY} radius={12} />
           <div style={{...abs(x + 22, y + 26, 96, 14), display: "flex", gap: 12}}>
             {[0, 1, 2].map((j) => (
               <div key={j} style={{width: 14, height: 14, borderRadius: 7, background: j === 0 ? PURPLE_LIGHT : GREY_MID}} />
@@ -369,7 +431,7 @@ export function Terminal({plan, N, recipe}) {
           </div>
         );
       })}
-      <Note cx={640} cy={Math.min(AREA.b - 4, y + h + 26)}>{st.caption}</Note>
+      <Note cx={640} cy={Math.min(AREA.b - 60, y + h + 26)}>{st.caption}</Note>
     </>
   );
 }
@@ -393,13 +455,13 @@ export function Orbit({plan, N, recipe}) {
         <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="none" stroke={GREY_LINE} strokeWidth={2} strokeDasharray="18 12" opacity={softOp(N - IN, BEAT.FADE_IN)} />
         <LineArrow x1={cx} y1={cy} x2={cx + Math.cos((spin * Math.PI) / 180) * rx} y2={cy + Math.sin((spin * Math.PI) / 180) * ry} progress={1} color={Rgba(PURPLE_LIGHT, 0.5)} width={2} head={0} />
         {items.map((it, i) => {
-          const a = (Math.PI * 2 * i) / Math.max(1, items.length) - Math.PI / 2;
+          const a = (Math.PI * 2 * i) / Math.max(1, items.length);
           return <LineArrow key={`l${it.id}`} x1={cx} y1={cy} x2={cx + Math.cos(a) * rx} y2={cy + Math.sin(a) * ry} progress={drawOn(N - IN, BEAT.DRAW_ON)} color={k[i] > 0.5 ? PURPLE_LIGHT : GREY_LINE} width={k[i] > 0.5 ? 2.5 : 1.8} head={0} opacity={0.3 + 0.5 * k[i]} />;
         })}
       </Svg>
       <Core cx={cx} cy={cy} size={size} N={N} f0={IN} icon={st.icon} label={st.label} />
       {items.map((it, i) => {
-        const a = (Math.PI * 2 * i) / Math.max(1, items.length) - Math.PI / 2;
+        const a = (Math.PI * 2 * i) / Math.max(1, items.length);
         return <Node key={it.id} cx={Math.round(cx + Math.cos(a) * rx)} cy={Math.round(cy + Math.sin(a) * ry)} icon={it.icon} text={it.text} N={N} f0={it.f0} active={k[i] > 0.5} />;
       })}
     </>
@@ -439,9 +501,9 @@ export function SplitRows({plan, N, recipe}) {
             <div key={it.id}>
               <SoftIn N={N} f0={it.f0}>
                 <div style={{position: "absolute", inset: 0, opacity: 1 - 0.4 * isPast(idx, marks, N)}}>
-                  <Box x={x} y={top + i * rowH} w={colW} h={rowH - 14} border={focus ? PURPLE : GREY_LINE} radius={10} glow={focus} bloom={!focus} />
+                  <Box x={x} y={top + i * rowH} w={colW} h={rowH - 14} border={focus ? PURPLE : GREY} radius={10} glow={focus} bloom={!focus} />
                   <div style={{...abs(x + 18, top + i * rowH + 12, 48, 48), display: "flex", alignItems: "center", justifyContent: "center"}}>
-                    <Icon kind={it.icon} cx={24} cy={24} s={44} active={focus} reveal={1} />
+                    <Glyph kind={it.icon} cx={24} cy={24} s={44} active={focus} reveal={1} />
                   </div>
                   <Label x={x + 86} y={top + i * rowH + 35 - 15} size={28} color={focus ? WHITE : GREY_LIGHT} maxW={colW - 110}>{it.text}</Label>
                 </div>
@@ -450,7 +512,7 @@ export function SplitRows({plan, N, recipe}) {
           );
         }),
       )}
-      <Note cx={640} cy={AREA.b - 4}>{st.caption}</Note>
+      <Note cx={640} cy={AREA.b - 60}>{st.caption}</Note>
     </>
   );
 }
@@ -483,9 +545,9 @@ export function Ballot({plan, N, recipe}) {
                     <Check cx={26} cy={26} size={44} color={PURPLE_LIGHT} progress={drawOn(N - it.f0 - 10, 14)} />
                   </div>
                 ) : null}
-                <Box x={cx - cw / 2} y={y - 66} w={cw} h={h} border={chosen ? PURPLE : GREY_LINE} radius={14} glow={chosen} bloom={!chosen} />
+                <Box x={cx - cw / 2} y={y - 66} w={cw} h={h} border={chosen ? PURPLE : GREY} radius={14} glow={chosen} bloom={!chosen} />
                 <div style={{...abs(cx - cw / 2 + 24, y - 44, 76, 76), display: "flex", alignItems: "center", justifyContent: "center"}}>
-                  <Icon kind={it.icon} cx={38} cy={38} s={70} active={chosen} reveal={1} />
+                  <Glyph kind={it.icon} cx={38} cy={38} s={70} active={chosen} reveal={1} />
                 </div>
                 <Label x={cx - cw / 2 + 116} y={y - 4} size={29} color={chosen ? WHITE : GREY_LIGHT} maxW={cw - 142}>{it.text}</Label>
                 <div style={{...abs(cx - cw / 2, y + h - 26, cw * clamp01((N - it.f0) / 24), 6), background: chosen ? PURPLE : GREY_LINE, opacity: 0.85}} />
@@ -525,9 +587,9 @@ export function LayerStack({plan, N, recipe}) {
           <div key={it.id}>
             <SoftIn N={N} f0={it.f0}>
               <div style={{position: "absolute", inset: 0, opacity: 1 - 0.4 * isPast(i, marks, N)}}>
-                <Box x={x} y={y} w={w} h={h} border={k[i] > 0.5 ? PURPLE : GREY_LINE} radius={10} glow={k[i] > 0.5} bloom={k[i] <= 0.5} />
+                <Box x={x} y={y} w={w} h={h} border={k[i] > 0.5 ? PURPLE : GREY} radius={10} glow={k[i] > 0.5} bloom={k[i] <= 0.5} />
                 <div style={{...abs(x + 20, y + 13, 48, 48), display: "flex", alignItems: "center", justifyContent: "center"}}>
-                  <Icon kind={it.icon} cx={24} cy={24} s={44} active={k[i] > 0.5} reveal={1} />
+                  <Glyph kind={it.icon} cx={24} cy={24} s={44} active={k[i] > 0.5} reveal={1} />
                 </div>
                 <Label x={x + 88} y={y + h / 2 - 16} size={29} color={k[i] > 0.5 ? WHITE : GREY_LIGHT} maxW={w - 116}>{it.text}</Label>
               </div>
@@ -535,7 +597,7 @@ export function LayerStack({plan, N, recipe}) {
           </div>
         );
       })}
-      <Note cx={640} cy={AREA.b - 4}>{st.caption}</Note>
+      <Note cx={640} cy={AREA.b - 60}>{st.caption}</Note>
     </>
   );
 }
@@ -561,17 +623,21 @@ export function CompareTable({plan, N, recipe}) {
         return (
           <React.Fragment key={side}>
             <div style={{...abs(cx - cw / 2, top, cw, 56), display: "flex", alignItems: "center", justifyContent: "center", opacity: softOp(N - IN, BEAT.SOFT_IN)}}>
-              <Box x={cx - cw / 2} y={0} w={cw} h={56} border={side === winner ? PURPLE : GREY_LINE} radius={10} glow={side === winner} bloom={side !== winner} />
-              <CText cx={cx} cy={28} size={28} weight={800} color={side === winner ? WHITE : GREY_LIGHT}>{side === 0 ? st.left_label : st.right_label}</CText>
+              {/*⚠ Box/CText 用**相对 wrapper 的坐标**，不是全画布坐标。
+               wrapper 已经在 (cx-cw/2, top)，内部再写一遍同样的绝对值等于偏移两次：
+               左边那列的框被推到 640..940（看着像右列），右边那列的框跑到 1320..1620 直接出画。
+               真渲染才看得出「表头只剩一个、另一列没有框」——静态门完全测不到。*/}
+              <Box x={0} y={0} w={cw} h={56} border={side === winner ? PURPLE : GREY} radius={10} glow={side === winner} bloom={side !== winner} />
+              <CText cx={cw / 2} cy={28} size={28} weight={800} color={side === winner ? WHITE : GREY_LIGHT}>{side === 0 ? st.left_label : st.right_label}</CText>
             </div>
             {Array.from({length: rows}, (_, r) => items[r * 2 + side]).map((it, r) =>
               it ? (
                 <div key={it.id}>
                   <SoftIn N={N} f0={it.f0}>
                     <div style={{...abs(cx - cw / 2, top + 66 + r * rowH, cw, rowH - 12), display: "flex", alignItems: "center", opacity: softOp(N - it.f0, BEAT.SOFT_IN) * (side === winner ? 1 : 0.82)}}>
-                      <Box x={cx - cw / 2} y={0} w={cw} h={rowH - 12} border={side === winner ? PURPLE : GREY_LINE} radius={8} bloom={side !== winner} />
+                      <Box x={0} y={0} w={cw} h={rowH - 12} border={side === winner ? PURPLE : GREY} radius={8} bloom={side !== winner} />
                       <div style={{width: 44, height: 44, flex: "0 0 44px", marginLeft: 16}}>
-                        <Icon kind={it.icon} cx={22} cy={22} s={40} active={side === winner} reveal={1} />
+                        <Glyph kind={it.icon} cx={22} cy={22} s={40} active={side === winner} reveal={1} />
                       </div>
                       <Label x={54} y={16} size={27} color={side === winner ? WHITE : GREY_LIGHT} maxW={cw - 130}>{it.text}</Label>
                     </div>
@@ -582,7 +648,7 @@ export function CompareTable({plan, N, recipe}) {
           </React.Fragment>
         );
       })}
-      <Note cx={640} cy={Math.min(AREA.b - 4, top + 66 + rows * rowH + 26)}>{st.caption}</Note>
+      <Note cx={640} cy={Math.min(AREA.b - 60, top + 66 + rows * rowH + 26)}>{st.caption}</Note>
     </>
   );
 }
@@ -594,42 +660,50 @@ export function Reshape({plan, N, recipe}) {
   const items = plan.items;
   const marks = marksOf(plan, st);
   const k = focusWalk(marks, N);
-  const cy = 350;
-  const lx = 330;
-  const rx = 830;
-  const s = 150;
+  const cy = 342;
+  const lx = 336;
+  const rx = 824;
+  const s = 176;
   const press = clamp01((N - IN - 26) / 30);
-  const shrink = 1 - 0.42 * press;
-  const grow = 0.5 + 0.5 * press;
+  const shrink = 1 - 0.4 * press;
+  const grow = 0.55 + 0.45 * press;
+  // ⚠ 整段只用**相对各自 wrapper 的坐标**。
+  //   这里原来把 wrapper 定位到 (lx-s/2, cy-s/2)，里面的 Box / Glyph 又各写一遍同样的绝对值，
+  //   等于偏移两次：两个形被推到画外、图元与文字散在别处，画面上只剩一根箭头。
+  //   「wrapper 已定位，内部就用相对坐标」这条现在由 scripts/verify-relative-coords.mjs 静态守住。
   return (
     <>
       <div style={{...abs(lx - s / 2, cy - s / 2, s, s), transform: `scale(${shrink.toFixed(3)})`, transformOrigin: `${lx}px ${cy}px`, opacity: 1 - 0.35 * press}}>
-        <Box x={lx - s / 2} y={cy - s / 2} w={s} h={s} border={GREY_LINE} radius={12} />
-        <div style={{...abs(lx - 40, cy - 40, 80, 80), display: "flex", alignItems: "center", justifyContent: "center"}}>
-          <Icon kind={st.from_icon || items[0]?.icon || "doc"} cx={40} cy={40} s={76} reveal={clamp01((N - IN) / BEAT.DRAW_ON)} />
+        <Box x={0} y={0} w={s} h={s} border={GREY} radius={12} />
+        <Glyph kind={st.from_icon || items[0]?.icon || "doc"} cx={s / 2} cy={s / 2 - 16} s={96} reveal={clamp01((N - IN) / BEAT.DRAW_ON)} />
+        {st.from_sub ? <CText cx={s / 2} cy={s / 2 + 54} size={24} weight={600} color={GREY} maxW={s - 28}>{st.from_sub}</CText> : null}
+        <div style={{position: 'absolute', left: 22, top: s - 30, width: s - 44, height: 4, background: GREY, opacity: 0.55}} />
+        <div style={{position: 'absolute', left: 22, top: s + 12, width: s}}>
+          <CText cx={s / 2} cy={20} size={32} weight={800} color={GREY_LIGHT} maxW={s}>{items[0]?.text}</CText>
         </div>
-        <Note cx={lx} cy={cy + s / 2 + 34}>{items[0]?.text}</Note>
       </div>
       <Svg>
-        <LineArrow x1={lx + s / 2 + 26} y1={cy} x2={rx - s / 2 - 26} y2={cy} progress={drawOn(N - IN - 6, BEAT.DRAW_ON)} color={PURPLE_LIGHT} width={3} head={13} glow />
+        <LineArrow x1={lx + s / 2 + 30} y1={cy} x2={rx - s / 2 - 30} y2={cy} progress={drawOn(N - IN - 6, BEAT.DRAW_ON)} color={PURPLE_LIGHT} width={3} head={13} glow />
       </Svg>
-      <Track x1={lx + s / 2 + 26} x2={rx - s / 2 - 26} y={cy + 58} N={N} f0={IN + 10} />
+      <Track x1={lx + s / 2 + 30} x2={rx - s / 2 - 30} y={cy + 62} N={N} f0={IN + 10} />
       <div style={{...abs(rx - s / 2, cy - s / 2, s, s), transform: `scale(${grow.toFixed(3)})`, transformOrigin: `${rx}px ${cy}px`}}>
-        <Box x={rx - s / 2} y={cy - s / 2} w={s} h={s} border={PURPLE} radius={60} glow />
-        <div style={{...abs(rx - 40, cy - 40, 80, 80), display: "flex", alignItems: "center", justifyContent: "center"}}>
-          <Icon kind={st.to_icon || items[1]?.icon || "lock"} cx={40} cy={40} s={76} active reveal={clamp01((N - IN - 20) / BEAT.DRAW_ON)} />
+        <Box x={0} y={0} w={s} h={s} border={PURPLE} radius={s / 2} glow />
+        <Glyph kind={st.to_icon || items[1]?.icon || "lock"} cx={s / 2} cy={s / 2 - 16} s={96} active reveal={clamp01((N - IN - 20) / BEAT.DRAW_ON)} />
+        {st.to_sub ? <CText cx={s / 2} cy={s / 2 + 54} size={24} weight={600} color={GREY_LIGHT} maxW={s - 40}>{st.to_sub}</CText> : null}
+        <div style={{position: 'absolute', left: 30, top: s - 30, width: s - 60, height: 4, background: PURPLE, opacity: 0.9}} />
+        <div style={{position: 'absolute', left: 0, top: s + 12, width: s}}>
+          <CText cx={s / 2} cy={20} size={32} weight={800} color={WHITE} maxW={s}>{items[1]?.text}</CText>
         </div>
       </div>
-      <Note cx={rx} cy={cy + s / 2 + 34}>{items[1]?.text}</Note>
       {items[2] ? (
         <SoftIn N={N} f0={items[2].f0}>
-          <div style={{...abs(560, cy - 172, 160, 60), opacity: softOp(N - items[2].f0, BEAT.SOFT_IN)}}>
-            <GlowBlob cx={640} cy={cy - 142} r={64} N={N} k={k[2] > 0.4 ? 0.9 : 0.3} />
-            <CText cx={640} cy={cy - 142} size={30} weight={800} color={k[2] > 0.4 ? WHITE : GREY_LIGHT} maxW={300}>{items[2].text}</CText>
+          <div style={{...abs(560, cy - 196, 160, 64), opacity: softOp(N - items[2].f0, BEAT.SOFT_IN)}}>
+            <GlowBlob cx={80} cy={32} r={62} N={N} k={k[2] > 0.4 ? 0.9 : 0.3} />
+            <CText cx={80} cy={32} size={30} weight={800} color={k[2] > 0.4 ? WHITE : GREY_LIGHT} maxW={300}>{items[2].text}</CText>
           </div>
         </SoftIn>
       ) : null}
-      <Note cx={640} cy={AREA.b - 4}>{st.caption}</Note>
+      <Note cx={640} cy={AREA.b - 60}>{st.caption}</Note>
     </>
   );
 }
@@ -660,14 +734,14 @@ export function Ladder({plan, N, recipe}) {
           <SoftIn N={N} f0={it.f0}>
             <div style={{...abs(lx + 26, top + i * gap - 28, rx - lx - 52, 56), display: "flex", alignItems: "center", opacity: 1 - 0.4 * isPast(i, marks, N)}}>
               <div style={{width: 46, height: 46, flex: "0 0 46px"}}>
-                <Icon kind={it.icon} cx={23} cy={23} s={42} active={k[i] > 0.5} reveal={1} />
+                <Glyph kind={it.icon} cx={23} cy={23} s={42} active={k[i] > 0.5} reveal={1} />
               </div>
               <Label x={68} y={14} size={29} color={k[i] > 0.5 ? WHITE : GREY_LIGHT} maxW={rx - lx - 160}>{it.text}</Label>
             </div>
           </SoftIn>
         </div>
       ))}
-      <Note cx={640} cy={AREA.b - 4}>{st.caption}</Note>
+      <Note cx={640} cy={AREA.b - 60}>{st.caption}</Note>
     </>
   );
 }

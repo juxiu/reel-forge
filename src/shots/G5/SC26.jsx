@@ -22,7 +22,9 @@ export const SHOT_RECIPE = {
   stage: {
       kind: "reshape",
       focus: [0,44,88],
-      caption: "重放被压进窗口里",
+      from_sub: "原样重放",
+    to_sub: "窗口内才有效",
+    caption: "重放被压进窗口里",
       from_icon: "doc",
       to_icon: "clock",
       items: [
