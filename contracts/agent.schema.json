@@ -1,1 +1,28 @@
-{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","required":["id","provider","input","output"],"properties":{"id":{"type":"string"},"provider":{"type":"string"},"input":{"type":"object"},"output":{"type":"object"},"status":{"enum":["running","paused","failed","completed"]}},"additionalProperties":false}
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "一次 agent 调用的信封（src/agents/orchestrator.mjs 写）。skipped = 根本没配 agent，评审一步都没发生；这种信封只许带 reason，不许带任何结论 —— 否则「没看过的画面」就能被写成一条看起来像看过的评审。",
+  "type": "object",
+  "required": ["role", "status", "output"],
+  "properties": {
+    "role": {"type": "string"},
+    "status": {"enum": ["completed", "failed", "skipped"]},
+    "output": {"type": ["object", "array", "string", "number", "boolean", "null"]},
+    "completed_at": {"type": "string"}
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "skipped"}}, "required": ["status"]},
+      "then": {
+        "properties": {
+          "output": {
+            "type": "object",
+            "required": ["reason"],
+            "properties": {"reason": {"type": "string"}},
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  ]
+}

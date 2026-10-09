@@ -37,7 +37,7 @@ Research → Narration / Timeline → Storyboard → Overlay / Primitives → G1
 - Delivery checksum manifest；verify:delivery 会重新计算交付目录中的实际 SHA-256 与 size。
 - Pilot preview manifest。
 - Visual Benchmark：正向 / anti-reference PPM 资产、benchmark manifest、结构化阈值。
-- Visual Regression：按 scene/ratio 采样 3 帧，计算 visual-pixel-v1 embedding similarity 与 anti-reference similarity。
+- Visual Regression：按 scene/ratio 采样 3 帧，计算 visual-pixel embedding similarity 与 anti-reference similarity（当前 v2，纯 stdlib 实现，无 numpy / Pillow）。
 - Shot Score 已扩展 reference_similarity、visual_complexity、text_density、hero_consistency、layout_stability。
 - npm run skill -- "TOPIC" --source URL --auto-approve 一键执行入口已接入，Pilot 默认仍可停住等待人工批准。
 
@@ -45,7 +45,7 @@ Research → Narration / Timeline → Storyboard → Overlay / Primitives → G1
 
 **当前没有 P0 阻塞。**
 
-视觉 embedding 采用仓库内置的确定性 visual-pixel-v1，不是 CLIP/SigLIP 语义模型。经真实 production run 实测确认：其参考资产（<code>fixtures/visual-references/</code>，64×36 合成图）与画面质量**反向相关**——画面更密更实则分数更低。因此它已降级为**非阻断回归信号**（<code>gate: "advisory"</code>），不再参与交付判定；后续若要恢复阻断能力，需要先用 reel-forge 自己的真实成片帧重建正例/反例基准。
+视觉 embedding 采用仓库内置的确定性 visual-pixel 描述符（当前 v2），不是 CLIP/SigLIP 语义模型；v1→v2 换了缩放核与量化方式，跨版本的 cosine 读数不可比，清单里 embedding 名与脚本 DESCRIPTOR 不一致时 visual_regression.py 直接拒绝运行。经真实 production run 实测确认：其参考资产（<code>fixtures/visual-references/</code>，64×36 合成图）与画面质量**反向相关**——画面更密更实则分数更低。因此它已降级为**非阻断回归信号**（<code>gate: "advisory"</code>），不再参与交付判定；后续若要恢复阻断能力，需要先用 reel-forge 自己的真实成片帧重建正例/反例基准。
 
 ### 首次真实 production run（2026-10-08）
 
@@ -72,7 +72,7 @@ verify:production      PASS
 
 ## 后续增强
 
-- 用 CLIP / SigLIP 类模型替换或增强 visual-pixel-v1。
+- 用 CLIP / SigLIP 类模型替换或增强 visual-pixel 描述符。
 - 更多真实人工精选 reference / anti-reference 帧。
 - 更多语义视觉变体，并继续减少 generic fallback。
 - Repair patch 与 BeatGraph / 源节点的真实回写。

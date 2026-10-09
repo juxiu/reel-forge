@@ -13,7 +13,7 @@
 | Parallel Build | build-groups + materialize-shots + scheduler/pool | 完成 |
 | Render | Remotion 16:9 / 9:16 + audio | 完成 |
 | Quantitative QC | media probe + frame metrics + motion check | 完成 |
-| Visual Regression | scene/ratio frame sampling + visual-pixel-v1 cosine + anti-reference | 完成，但降级为非阻断回归信号（参考资产为 64×36 合成图，与画面质量反向相关） |
+| Visual Regression | scene/ratio frame sampling + visual-pixel cosine + anti-reference | 完成，但降级为非阻断回归信号（参考资产为 64×36 合成图，与画面质量反向相关）；测量层已改纯 stdlib 并有合成帧自测覆盖 |
 | Text Provenance | elements[].text 溯源到解说词/调研 + 硬编码字面量白名单 + 双比例一致 | 完成（阻断门，对应 a2e 硬性原则 2） |
 | Shot Score | semantic/hero/motion/composition/light/safety + five visual dimensions | 完成（reference_similarity 仅为维度，不作硬门） |
 | Repair / Recheck | repair engine + repair plan + rerender hook | 完成 |
@@ -36,7 +36,7 @@
 
 reel-forge 保留了更偏工程化的 Typed Artifact Contract、项目锁、外部 Agent provider 和 HyperFrames contract。这些属于扩展能力，不会改变 anything2explainer 的基础生产顺序。
 
-当前差异主要在视觉 embedding：仓库内置的 visual-pixel-v1 是确定性的视觉特征 embedding，不冒充 CLIP/SigLIP；provider contract 后续可替换为真正的语义视觉模型。
+当前差异主要在视觉 embedding：仓库内置的 visual-pixel 描述符是确定性的视觉特征 embedding，不冒充 CLIP/SigLIP；provider contract 后续可替换为真正的语义视觉模型。
 
 ## 当前验收说明
 

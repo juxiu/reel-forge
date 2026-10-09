@@ -1,215 +1,383 @@
-import React from "react";
-import {useCurrentFrame, useVideoConfig} from "remotion";
-import {PALETTE, safeArea, clamp01, easeOut} from "../visual/style.mjs";
+import React from 'react';
+import {useCurrentFrame} from 'remotion';
+import {buildPlan} from './plan.mjs';
+import {ReelContext} from './context.mjs';
+import {useDesign} from '../remotion/Design.jsx';
+import {Box, CText, ChainArrows, Check, Cross, FocusIn, GREY, GREY_LINE, GREY_MID, Label, LineArrow, PURPLE, PURPLE_LIGHT, SoftIn, Svg, TechText, WHITE} from '../remotion/Primitives.jsx';
+import {BigNumber, CameraRig, GhostText, GlowBlob, HaloRing, HeroGlow, LightSweep, SET_PIECE, StageLine, TiltPlane, countTo, ghostOpacity, setPiece} from '../remotion/Fx.jsx';
+import {Icon} from '../remotion/Icons.jsx';
+import {BEAT, clamp01, drawOn, emphasisPulse, exitDrop, slideIn, softOp} from '../visual/easing.mjs';
 
-const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
-// 项目未内置字体资产，若不指定字族，headless Chromium 会回退到衬线体，
-// 导致主角大字与 a2e 的超粗黑体语言完全不符。
-const SANS='"Helvetica Neue","Arial Black",Helvetica,Arial,sans-serif';
+/**
+ * 语义镜头引擎 —— 分镜数据（RenderIR + 镜头文件里的 SHOT_RECIPE）到画面的那一段。
+ *
+ * 构图固定成两条横向带，纵向尺寸由当前画幅推导（同一份代码服务 16:9 与 9:16）：
+ *   主角带  内容区上 42%   一个够大的字 / 大数字 / 图形，独占视觉重心
+ *   机理带  其余部分      按变体安排的配角图元：白描边图标 + 26px 标签 + 连线
+ * composition.focus = 'single-hero' 时主角带吃满内容区，配角缩到主角脚下的窄轨。
+ *
+ * 三条纪律写死在这里，不给镜头文件留口子：
+ *   1) 紫色只给当前重点：同镜头 ≤1 个 active 图元（多余的由 plan 降级并记 issue）；
+ *   2) 光只跟主角：配角不带 glow / box-shadow，柔光呼吸只给主角；
+ *   3) 三轮紫光横扫（LightSweep）由**全片白名单**放行 —— 只有 ReelContext.fx.sweepScenes 列到的镜头才画。
+ *      引擎自己不按「这镜看起来精彩」加戏，全片 ≤2 处是片级预算。
+ *
+ * ⚠ 入场帧一律来自 plan（相对本镜头首块字幕 −6…+3、逐件 2 帧错峰），镜头文件不要另算。
+ * ⚠ 这里不做文案兜底：分镜没给合法主角文案时 plan 报 hero-overlong，画面退化成关键词，
+ *    交给 selfcheck/QC 拦下 ——「按字号预算截断加省略号」是上一版最伤画面的写法。
+ *
+ * ⚠ 9:16 说明：参照项目本身只支持 1280×720 横屏，reel-forge 的竖屏是按宽度归一到 1280 逻辑宽
+ *    （s=720/1280）实现的，内容区按 0.35×logicalH 纵向放宽，构图仍是横屏那套。
+ *    真竖屏构图（纵向堆叠、字号按设备像素下限重算）是后续独立一步，现在不要当已达标。
+ */
 
-// ---------- IR 载荷解析 ----------
-// 分镜（RenderIR）已经带导演决策与真实文案，渲染器必须消费它们，
-// 否则镜头会退化成与内容无关的通用卡片。
-function heroSource(scene){
-  const els=Array.isArray(scene?.elements)?scene.elements:[];
-  const hero=els.find(e=>e&&e.id==="hero"&&e.text)||els.find(e=>e&&e.text);
-  return String(hero?.text||scene?.narration?.text||"").replace(/\s+/g," ").trim();
-}
-// 画面主体不写整句解说词：取首个从句并按主角字号预算截断（a2e：主角是大字/大数字，不是段落）。
-function heroHeadline(scene,heroSize){
-  const src=heroSource(scene);
-  if(!src) return String(scene?.narrative_job||"explain");
-  const clause=src.split(/(?<=[.!?;:,])\s/)[0]||src;
-  const budget=clamp(Math.round(heroSize*0.16),16,54);
-  if(clause.length<=budget) return clause;
-  const cut=clause.slice(0,budget);
-  const sp=cut.lastIndexOf(" ");
-  return (sp>8?cut.slice(0,sp):cut)+"…";
-}
-// a2e 硬规则 7：主角高度 ≥170px。hero_scale 由 Repair 写入 IR，因此这里必须读。
-function heroSizeOf(scene,recipe){
-  const base=Number(recipe?.hero_size||190);
-  const scale=Number(scene?.hero_scale||1);
-  return Math.round(clamp(base*scale,170,420));
-}
-function cameraOf(scene){
-  const motion=Array.isArray(scene?.motion)?scene.motion:[];
-  const cam=motion.find(m=>m&&m.type==="camera"&&m.target==="stage");
-  if(!cam) return null;
-  return {preset:cam.preset||"push",amount:clamp(Number(cam.amount||0.05),0.02,0.12)};
-}
-function keyIntensity(scene){
-  return clamp(Number(scene?.light?.key_intensity ?? 0.82),0,1);
-}
-// 分镜声明的持续动词：flow/travel。没有它，镜头在入场后就是静止的。
-function travels(scene){
-  const motion=Array.isArray(scene?.motion)?scene.motion:[];
-  return motion.some(m=>m&&m.type==="transform"&&m.target==="flow"&&m.preset==="travel");
+/** 内容区纵向划分：主角带 / 机理带（随 logicalH 伸缩，16:9 时与样片逐像素一致）。 */
+export function layoutBands(bands, logicalH = 720) {
+  const top = bands.contentTop ?? 175;
+  const bottom = bands.contentBottom ?? logicalH - 100;
+  const avail = bottom - top;
+  const designH = Math.round(Math.min(avail, Math.max(445, logicalH * 0.35)));
+  const offset = Math.round((avail - designH) / 2);
+  const ct = top + offset;
+  const cb = ct + designH;
+  return {
+    full: {top: ct, bottom: cb},
+    hero: {top: ct, bottom: Math.round(ct + designH * 0.42)},
+    support: {top: Math.round(ct + designH * 0.42 + 12), bottom: cb},
+    designH,
+  };
 }
 
-function Fade({children,frame,duration,style={}}){
-  const enter=easeOut(clamp01((frame+1)/20));
-  const exitWindow=18;
-  const exit=easeOut(clamp01((frame-(duration-exitWindow))/exitWindow));
-  const opacity=enter*(1-exit);
-  const transform="translateY("+(-40*exit).toFixed(2)+"px) scale("+(1-0.04*exit).toFixed(4)+")";
-  return <div style={{position:"absolute",inset:0,opacity,transform,fontFamily:SANS,...style}}>{children}</div>;
+const isCJK = (s) => /[㐀-䶿一-鿿]/.test(String(s || ''));
+
+export function SemanticShot({scene, recipe = {}, variant, captions: captionsProp}) {
+  const frame = useCurrentFrame();
+  const d = useDesign();
+  const ctx = React.useContext(ReelContext) || {};
+  const fps = Number(ctx.fps) || 30;
+  const captions = captionsProp || ctx.captions || [];
+  const N = frame + 1; // 镜头内 1-based：Remotion 的 useCurrentFrame() 是 0-based
+
+  const plan = buildPlan({scene, recipe: {...recipe, variant: variant || recipe.variant}, captions, fps, bands: d.bands, logicalH: d.height});
+  const lb = layoutBands(d.bands, d.height);
+  const pos = heroPos(plan, lb);
+  const sp = setPiece(1, plan.subFrom);
+  const ex = N >= plan.exit.exitAt ? exitDrop(N - plan.exit.exitAt, 12) : {opacity: 1, dy: 0};
+  const sceneId = String(scene?.id || scene?.scene_id || '');
+  const sweepAllowed = plan.fx.sweep && (ctx.fx?.sweepScenes || []).includes(sceneId);
+
+  return (
+    <div style={{position: 'absolute', inset: 0, opacity: ex.opacity, transform: `translateY(${ex.dy.toFixed(1)}px)`}}>
+      <CameraRig N={N} keys={plan.camera.keys}>
+        {sweepAllowed ? <LightSweep N={N} rounds={sp.sweeps} dy={pos.cy - 335} /> : null}
+        {plan.fx.setPiece ? <StageLine N={N} f0={sp.line} flashAt={sp.flash} cy={pos.cy} w={760} /> : null}
+        {plan.fx.setPiece ? <GhostHero plan={plan} N={N} pos={pos} until={sp.pulse} /> : null}
+        <SceneContent plan={plan} N={N} pos={pos} lb={lb} sp={sp} />
+      </CameraRig>
+    </div>
+  );
 }
-// 运镜层：只包裹内容层，HUD / 字幕在 Root 层不动（a2e：运镜只动内容层）。
-// 1.0→1.05 慢推贯穿是 a2e 明确允许的例外；仍然避开末拍（结束帧 ≤ 离场起点 −30）。
-function Stage({scene,frame,duration,children}){
-  const cam=cameraOf(scene);
-  if(!cam) return children;
-  const start=20,end=Math.max(start+1,duration-30);
-  const t=easeOut(clamp01((frame-start)/Math.max(1,end-start)));
-  const scale=1+cam.amount*t;
-  const dx=cam.preset==="pan"?cam.amount*260*(t-0.5)*2:0;
-  const dy=cam.preset==="pan"?0:cam.amount*130*(t-0.5);
-  return <div style={{position:"absolute",inset:0,transformOrigin:"50% 50%",transform:"translate("+dx.toFixed(2)+"px,"+dy.toFixed(2)+"px) scale("+scale.toFixed(4)+")"}}>{children}</div>;
+
+/** 主角位置：单主角模式吃满内容区宽，双带模式左置（mirror 时右置）。 */
+function heroPos(plan, lb) {
+  const single = plan.focus === 'single-hero';
+  const cy = Math.round(single ? (lb.full.top + lb.full.bottom) / 2 : (lb.hero.top + lb.hero.bottom) / 2);
+  const usable = 1160;
+  const cx = single ? 640 : Math.round(plan.mirror ? 1220 - usable * 0.6 / 2 : 60 + usable * 0.6 / 2);
+  return {cx, cy, single, squeeze: isCJK(plan.hero.text) ? 0.85 : 1};
 }
-// 持续动作：沿内容区底部的数据流轨道反复行进的信号点，撑住整个镜头（a2e：动词要持续到下一拍）。
-function TravelSignal({scene,frame,width,height}){
-  if(!travels(scene)) return null;
-  const y=height*.79,period=54,t=(frame%period)/period;
-  const x=width*(0.14+0.72*t);
-  const fade=t<.08?t/.08:t>.9?(1-t)/.1:1;
-  return <>
-    <div style={{position:"absolute",left:width*.14,top:y-2,width:width*.72,height:3,background:"linear-gradient(90deg,rgba(125,104,255,0),rgba(125,104,255,.5),rgba(125,104,255,0))"}}/>
-    <div style={{position:"absolute",left:x-9,top:y-9,width:18,height:18,borderRadius:999,background:PALETTE.purpleLight,boxShadow:"0 0 20px rgba(125,104,255,.85)",opacity:0.25+0.75*fade}}/>
-  </>;
+
+/** 登场型高光的幽灵轮廓：主角白描边 10% 隐现，脉冲起撤掉。 */
+const GhostHero = ({plan, N, pos, until}) => {
+  if (plan.hero.kind === 'number') return null;
+  const op = ghostOpacity(N, SET_PIECE.ghost + 1, until);
+  if (op <= 0) return null;
+  return (
+    <GhostText cx={pos.cx} cy={pos.cy} size={plan.hero.size} letterSpacing={0} opacity={op}>
+      {plan.hero.text}
+    </GhostText>
+  );
+};
+
+// ---------------- 配角排布 ----------------
+/**
+ * 给每个配角算槽位（设计像素）。authored stage 显式给了 x/y 就直接用，
+ * 其余按变体选一种几何：环状 / 双栏 / 清单 / 链条 / 汇聚。
+ */
+export function itemSlots(plan, lb) {
+  const out = new Map();
+  const rails = plan.items.filter((it) => it.kind === 'flow');
+  const solid = plan.items.filter((it) => it.kind !== 'flow');
+
+  const band = plan.focus === 'single-hero' ? {l: 90, r: 1190, t: lb.support.top, b: lb.support.bottom} : {l: 720, r: 1200, t: lb.support.top, b: lb.support.bottom};
+  const w = band.r - band.l;
+  const h = band.b - band.t;
+
+  solid.forEach((it) => {
+    if (Number.isFinite(Number(it.x)) && Number.isFinite(Number(it.y))) {
+      out.set(it.id, {cx: Math.round(Number(it.x) + (Number(it.w) || 0) / 2), cy: Math.round(Number(it.y) + (Number(it.h) || 0) / 2), w: Number(it.w) || undefined, h: Number(it.h) || undefined, authored: true});
+    }
+  });
+  const auto = solid.filter((it) => !out.get(it.id));
+  const n = auto.length;
+
+  const rowLayout = (rowLike) => {
+    const rowH = Math.floor(h / Math.max(1, n));
+    auto.forEach((it, i) => out.set(it.id, {cx: Math.round(band.l + w / 2), cy: Math.round(band.t + rowH * (i + 0.5)), w: Math.round(w), h: rowLike ? Math.min(56, rowH - 10) : Math.max(40, rowH - 12), ...rowLike}));
+  };
+  const gridLayout = (cols) => {
+    const cw = Math.floor(w / cols) - 14;
+    const ch = Math.floor(h / Math.max(1, Math.ceil(n / cols))) - 10;
+    auto.forEach((it, i) => out.set(it.id, {cx: Math.round(band.l + cw / 2 + (i % cols) * (cw + 14)), cy: Math.round(band.t + ch / 2 + Math.floor(i / cols) * (ch + 10)), w: cw, h: ch}));
+  };
+
+  switch (plan.variant) {
+    case 'network': {
+      const cx = Math.round(band.l + w / 2);
+      const cy = Math.round(band.t + h / 2);
+      const rx = Math.max(60, Math.min(215, Math.round(w / 2) - 30));
+      const ry = Math.max(40, Math.min(112, Math.round(h / 2) - 26));
+      auto.forEach((it, i) => {
+        const a = (Math.PI * 2 * i) / Math.max(1, n) - Math.PI / 2;
+        out.set(it.id, {cx: Math.round(cx + Math.cos(a) * rx), cy: Math.round(cy + Math.sin(a) * ry), hub: {cx, cy}});
+      });
+      break;
+    }
+    case 'comparison':
+      gridLayout(Math.max(1, Math.min(2, n)));
+      break;
+    case 'structured':
+      rowLayout();
+      auto.forEach((it) => out.set(it.id, {...out.get(it.id), list: true}));
+      break;
+    case 'code':
+      rowLayout();
+      auto.forEach((it) => out.set(it.id, {...out.get(it.id), code: true}));
+      break;
+    case 'preference':
+      rowLayout({row: true});
+      break;
+    case 'evidence': {
+      const cw = Math.floor(w / Math.max(1, n)) - 14;
+      auto.forEach((it, i) => out.set(it.id, {cx: Math.round(band.l + cw / 2 + i * (cw + 14)), cy: Math.round(band.t + (i === 0 ? h * 0.16 : h * 0.74)), w: cw, h: Math.round(h * 0.42), fan: i > 0}));
+      break;
+    }
+    case 'sequence':
+    case 'causal':
+    case 'split':
+    case 'transformation': {
+      const cols = Math.min(3, Math.max(1, n));
+      gridLayout(cols);
+      if (Math.ceil(n / cols) === 1) auto.forEach((it, i) => out.set(it.id, {...out.get(it.id), chain: i < n - 1}));
+      break;
+    }
+    default:
+      rowLayout();
+  }
+
+  rails.forEach((it, i) => out.set(it.id, {rail: true, y: Math.round(lb.support.bottom - 24 - i * 30), l: 90, r: plan.focus === 'single-hero' ? 1190 : 690}));
+  return out;
 }
-function Label({children,x,y,color=PALETTE.white,size=24,align="left",mono=false}){
-  return <div style={{position:"absolute",left:x,top:y,color,fontSize:size,fontWeight:800,fontFamily:mono?"monospace":SANS,textAlign:align,whiteSpace:"nowrap"}}>{children}</div>;
-}
-function Box({x,y,w,h,border=PALETTE.line,fill="rgba(10,10,16,.78)",radius=18,children,style={}}){
-  return <div style={{position:"absolute",left:x,top:y,width:w,height:h,border:"2px solid "+border,borderRadius:radius,background:fill,boxSizing:"border-box",display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden",...style}}>{children}</div>;
-}
-function Arrow({x1,y1,x2,y2,color=PALETTE.purpleLight,progress=1,width=4}){
-  const dx=x2-x1,dy=y2-y1,len=Math.hypot(dx,dy)||1,angle=Math.atan2(dy,dx)*180/Math.PI,p=clamp(progress,0,1);
-  return <div style={{position:"absolute",left:x1,top:y1,width:len*p,height:width,background:color,transformOrigin:"0 50%",transform:"rotate("+angle+"deg)",boxShadow:"0 0 14px rgba(125,104,255,.24)"}}/>;
-}
-function Hero({text,x,y,size,maxW,safeTop=0,color=PALETTE.white,accent=PALETTE.purpleLight,key=0.82}){
-  const fontSize=clamp(size*.22,34,72),boxW=Math.min(size*2.2,maxW||size*2.2);
-  return <div style={{position:"absolute",left:x,top:Math.max(y,safeTop),width:boxW,minHeight:size*0.72,display:"flex",alignItems:"center",color,fontWeight:900,fontSize,lineHeight:1.08,letterSpacing:-0.4,whiteSpace:"normal",textShadow:"0 0 "+Math.round(16+26*key)+"px rgba(125,104,255,"+(0.14+0.24*key).toFixed(3)+")",borderLeft:"6px solid "+accent,paddingLeft:22,boxSizing:"border-box"}}>{text}</div>;
-}
-function NetworkShot({scene,recipe,frame,width,height,heroSize,headline,heroW,safeTop}){
-  const cx=width*(recipe.mirror?.34:.66),cy=height*.58,r=Math.min(width,height)*.17,p=easeOut(clamp01((frame-10)/28));
-  const count=recipe.support_count||6,nodes=Array.from({length:count},(_,i)=>{const a=Math.PI*2*i/count+frame*.008;return{x:cx+Math.cos(a)*r,y:cy+Math.sin(a)*r*.78};});
-  return <><Hero text={headline} x={width*.07} y={height*.15} size={heroSize} maxW={heroW} safeTop={safeTop} key={keyIntensity(scene)}/>
-    {nodes.map((n,i)=><Arrow key={"a"+i} x1={cx} y1={cy} x2={n.x} y2={n.y} progress={p} color={i%2?PALETTE.line:PALETTE.purple}/>)}
-    {nodes.map((n,i)=><div key={"n"+i} style={{position:"absolute",left:n.x-18,top:n.y-18,width:36,height:36,borderRadius:999,background:i===0?PALETTE.purpleLight:"rgba(255,255,255,.92)",boxShadow:i===0?"0 0 22px rgba(125,104,255,.65)":"0 0 8px rgba(255,255,255,.15)",opacity:p}}/>)}
-    <div style={{position:"absolute",left:cx-42,top:cy-42,width:84,height:84,borderRadius:999,border:"3px solid "+PALETTE.purpleLight,boxShadow:"0 0 28px rgba(125,104,255,.45)",transform:"scale("+(0.88+0.12*p)+")"}}/>
-    <Label x={cx-62} y={cy+r*.78+16} size={22} color={PALETTE.grey}>dominant flow</Label>
-  </>;
-}
-function SplitShot({scene,recipe,frame,width,height,heroSize,headline,heroW,safeTop}){
-  const p=easeOut(clamp01((frame-8)/26)),input=heroSource(scene)||"input",labels=recipe.labels||["signal","structure"];
-  return <><Box x={width*.08} y={height*.40} w={width*.24} h={120} border={PALETTE.line} style={{transform:"translateX("+((1-p)*-45)+"px)"}}><span style={{fontSize:30,fontWeight:900,color:PALETTE.grey,padding:14,lineHeight:1.2}}>{input.slice(0,26)}</span></Box>
-    <Arrow x1={width*.34} y1={height*.47} x2={width*.50} y2={height*.47} progress={p}/>
-    {labels.map((label,i)=><Box key={label} x={width*.54} y={height*(i?.56:.36)} w={width*.31} h={102} border={i===recipe.accent_index?PALETTE.purple:PALETTE.line} style={{transform:"translateY("+((1-p)*(i?28:-28))+"px)",color:i===recipe.accent_index?PALETTE.purpleLight:PALETTE.white}}><span style={{fontSize:30,fontWeight:900}}>{label}</span></Box>)}
-    <Hero text={headline} x={width*.10} y={height*.16} size={heroSize} maxW={heroW} safeTop={safeTop} key={keyIntensity(scene)}/>
-  </>;
-}
-function PreferenceShot({scene,recipe,frame,width,height,heroSize,headline,heroW,safeTop}){
-  const p=easeOut(clamp01((frame-6)/24)),options=recipe.labels||["option A","option B","preferred"];
-  return <><Hero text={headline} x={width*.08} y={height*.13} size={heroSize} maxW={heroW} safeTop={safeTop} key={keyIntensity(scene)}/>
-    <div style={{position:"absolute",left:width*.14,right:width*.14,top:height*.43}}>{options.map((label,i)=>{const active=i===recipe.accent_index;return <div key={label} style={{position:"relative",height:62,marginBottom:16,border:"2px solid "+(active?PALETTE.purple:PALETTE.line),borderRadius:16,background:"rgba(12,12,18,.82)",transform:"translateX("+((1-p)*70*(recipe.mirror?-1:1))+"px)",opacity:p,display:"flex",alignItems:"center",padding:"0 22px",color:active?PALETTE.purpleLight:PALETTE.white,fontSize:26,fontWeight:800}}><div style={{width:16,height:16,borderRadius:999,background:active?PALETTE.purpleLight:PALETTE.grey,marginRight:14}}/>{label}{active?<div style={{marginLeft:"auto",fontSize:18,color:PALETTE.purpleLight}}>SELECTED</div>:null}</div>})}</div>
-  </>;
-}
-function StructuredShot({scene,recipe,frame,width,height,heroSize,headline,heroW,safeTop}){
-  const p=easeOut(clamp01((frame-10)/30)),fields=recipe.labels||["header","payload","metadata","policy"];
-  return <><Hero text={headline} x={width*.08} y={height*.12} size={heroSize} maxW={heroW} safeTop={safeTop} key={keyIntensity(scene)}/>
-    <Box x={width*.50} y={height*.28} w={width*.38} h={height*.47} border={PALETTE.purple} style={{transform:"translateY("+((1-p)*34)+"px) scale("+(0.95+0.05*p)+")"}}>
-      <div style={{position:"absolute",inset:22}}>{fields.map((label,i)=><div key={label} style={{height:40,marginBottom:12,borderBottom:"1px solid "+(i===recipe.accent_index?PALETTE.purple:PALETTE.line),display:"flex",alignItems:"center",justifyContent:"space-between",color:i===recipe.accent_index?PALETTE.purpleLight:PALETTE.white,fontSize:22,fontWeight:800,opacity:clamp01(p+i*.05)}}><span>{label}</span><span style={{color:PALETTE.grey}}>{"{...}"}</span></div>)}</div>
-    </Box><Label x={width*.10} y={height*.64} size={24} color={PALETTE.grey}>schema → inspectable state</Label>
-  </>;
-}
-function ComparisonShot({scene,recipe,frame,width,height,heroSize,headline,heroW,safeTop}){
-  const p=easeOut(clamp01((frame-8)/26)),rows=recipe.rows||["speed","quality","cost"];
-  return <><Hero text={headline} x={width*.08} y={height*.12} size={heroSize} maxW={heroW} safeTop={safeTop} key={keyIntensity(scene)}/>
-    {[0,1].map(i=><Box key={i} x={width*(i?.56:.10)} y={height*.38} w={width*.28} h={height*.34} border={i===1?PALETTE.purple:PALETTE.line} style={{transform:"translateY("+((1-p)*(i?18:-18))+"px)"}}>
-      <div style={{position:"absolute",left:20,right:20,top:18,fontSize:34,fontWeight:900,color:i===1?PALETTE.purpleLight:PALETTE.white}}>{i===1?"B":"A"}</div>
-      <div style={{position:"absolute",left:20,right:20,top:70}}>{rows.map((row,j)=><div key={row} style={{display:"flex",justifyContent:"space-between",padding:"10px 0",borderBottom:"1px solid "+PALETTE.line,color:PALETTE.white,fontSize:20}}><span>{row}</span><span style={{color:(j+i)%2===0?PALETTE.purpleLight:PALETTE.grey}}>{(j+1)*(i+1)}</span></div>)}</div>
-    </Box>)}<div style={{position:"absolute",left:width*.49,top:height*.52,fontSize:42,fontWeight:900,color:PALETTE.white}}>VS</div>
-  </>;
-}
-function TransformationShot({scene,recipe,frame,width,height,heroSize,headline,heroW,safeTop}){
-  const p=easeOut(clamp01((frame-8)/30));
-  return <><Hero text={headline} x={width*.08} y={height*.14} size={heroSize} maxW={heroW} safeTop={safeTop} key={keyIntensity(scene)}/>
-    <Box x={width*.10} y={height*.43} w={width*.25} h={120} border={PALETTE.line} style={{opacity:1-p*.7,transform:"scale("+(1-.03*p)+")"}}><span style={{fontSize:32,fontWeight:900}}>BEFORE</span></Box>
-    <Arrow x1={width*.39} y1={height*.50} x2={width*.61} y2={height*.50} progress={p} width={5}/>
-    <Box x={width*.66} y={height*.39} w={width*.25} h={154} border={PALETTE.purple} style={{transform:"translateY("+((1-p)*30)+"px) scale("+(0.9+0.1*p)+")",boxShadow:"0 0 30px rgba(125,104,255,.28)"}}><span style={{fontSize:36,fontWeight:900,color:PALETTE.purpleLight}}>AFTER</span></Box>
-    <Label x={width*.42} y={height*.59} size={22} color={PALETTE.grey}>state change</Label>
-  </>;
-}
-function SequenceShot({scene,recipe,frame,width,height,heroSize,headline,heroW,safeTop}){
-  const p=easeOut(clamp01((frame-8)/30)),labels=recipe.labels||["first","next","result"];
-  return <><Hero text={headline} x={width*.08} y={height*.14} size={heroSize} maxW={heroW} safeTop={safeTop} key={keyIntensity(scene)}/>
-    {labels.map((label,i)=>{const x=width*(.12+i*.29),q=easeOut(clamp01((frame-i*8)/18));return <React.Fragment key={label}><Box x={x} y={height*.44} w={width*.20} h={110} border={i===2?PALETTE.purple:PALETTE.line} style={{opacity:q,transform:"translateY("+(1-q)*24+"px)"}}><span style={{fontSize:28,fontWeight:900,color:i===2?PALETTE.purpleLight:PALETTE.white}}>{i+1}. {label}</span></Box>{i<2?<Arrow x1={x+width*.20+8} y1={height*.50} x2={x+width*.29-8} y2={height*.50} progress={p}/>:null}</React.Fragment>})}
-  </>;
-}
-function CausalShot({scene,recipe,frame,width,height,heroSize,headline,heroW,safeTop}){
-  const p=easeOut(clamp01((frame-8)/30)),labels=recipe.labels||["cause","mechanism","result"];
-  return <><Hero text={headline} x={width*.08} y={height*.14} size={heroSize} maxW={heroW} safeTop={safeTop} key={keyIntensity(scene)}/>
-    {labels.map((label,i)=>{const x=width*(.10+i*.30);return <React.Fragment key={label}><Box x={x} y={height*.44} w={width*.22} h={112} border={i===1?PALETTE.purple:PALETTE.line} style={{opacity:easeOut(clamp01((frame-i*7)/18))}}><span style={{fontSize:28,fontWeight:900,color:i===1?PALETTE.purpleLight:PALETTE.white}}>{label}</span></Box>{i<2?<Arrow x1={x+width*.22+8} y1={height*.50} x2={x+width*.30-8} y2={height*.50} progress={p}/>:null}</React.Fragment>})}
-  </>;
-}
-function EvidenceShot({scene,recipe,frame,width,height,heroSize,headline,heroW,safeTop}){
-  const p=easeOut(clamp01((frame-8)/26));
-  return <><Hero text={headline} x={width*.08} y={height*.13} size={heroSize} maxW={heroW} safeTop={safeTop} key={keyIntensity(scene)}/>
-    <Box x={width*.38} y={height*.38} w={width*.25} h={130} border={PALETTE.purple} style={{boxShadow:"0 0 26px rgba(125,104,255,.28)",transform:"scale("+(0.94+0.06*p)+")"}}><span style={{fontSize:32,fontWeight:900,color:PALETTE.purpleLight}}>CLAIM</span></Box>
-    <Box x={width*.09} y={height*.59} w={width*.25} h={92} border={PALETTE.line}><span style={{fontSize:22,fontWeight:800}}>SOURCE A</span></Box>
-    <Box x={width*.66} y={height*.59} w={width*.25} h={92} border={PALETTE.line}><span style={{fontSize:22,fontWeight:800}}>EVIDENCE B</span></Box>
-    <Arrow x1={width*.33} y1={height*.63} x2={width*.40} y2={height*.50} progress={p}/>
-    <Arrow x1={width*.67} y1={height*.63} x2={width*.61} y2={height*.50} progress={p}/>
-  </>;
-}
-function CodeShot({scene,recipe,frame,width,height,heroSize,headline,heroW,safeTop}){
-  const p=easeOut(clamp01((frame-6)/24));
-  return <><Hero text={headline} x={width*.08} y={height*.12} size={heroSize} maxW={heroW} safeTop={safeTop} key={keyIntensity(scene)}/>
-    <Box x={width*.08} y={height*.38} w={width*.52} h={height*.37} border={PALETTE.line} style={{alignItems:"flex-start",justifyContent:"flex-start",padding:24}}>
-      <div style={{fontFamily:"monospace",fontSize:24,lineHeight:1.8,color:PALETTE.white,opacity:p}}>
-        <div><span style={{color:PALETTE.purpleLight}}>const</span> input = request;</div>
-        <div><span style={{color:PALETTE.purpleLight}}>const</span> result = transform(input);</div>
-        <div><span style={{color:PALETTE.purpleLight}}>return</span> verify(result);</div>
+
+// ---------------- 渲染 ----------------
+const SceneContent = ({plan, N, pos, lb, sp}) => {
+  const slots = itemSlots(plan, lb);
+  const pulse = plan.fx.pulse && N >= sp.pulse ? emphasisPulse(N - sp.pulse) : 1;
+  // 光环：登场型高光按舞台线帧起，单独声明 fx.halo 的镜头也要能亮（否则 halo 是个假开关，
+  // 分镜里写了却什么都不会发生——这类「声明了但渲染层不认」的键最容易被当成已经生效）。
+  const haloOn = plan.fx.halo || plan.fx.setPiece;
+  const haloAt = plan.fx.setPiece ? SET_PIECE.line + 1 : 8;
+  const haloP = haloOn ? drawOn(N - haloAt, 26) : 0;
+  const haloCy = Math.round((lb.hero.bottom + lb.support.top) / 2);
+  const haloPhase = (N - SET_PIECE.line) * 2.2;
+  // 分层视差只在分镜声明 parallax 时启用：主角（前景）位移比相机大，描边/连线（背景）几乎不动。
+  // 深度来自**同一份相机 keys**，不是各层自己加动画 —— 否则运镜 QC 判的位移和画面看到的位移不是一回事。
+  const dp = plan.camera.depths;
+  const haloBack = haloP > 0 ? <HaloRing cx={pos.cx} cy={haloCy} p={haloP} half="back" fillOp={0.5 * haloP} phase={haloPhase} /> : null;
+  const haloFront = haloP > 0 ? <HaloRing cx={pos.cx} cy={haloCy} p={haloP} half="front" fillOp={0.5 * haloP} phase={haloPhase} /> : null;
+  const faces = plan.items.map((it) => {
+    const s = slots.get(it.id);
+    if (!s || s.rail) return null;
+    return <ItemFace key={it.id} it={it} slot={s} N={N} />;
+  });
+  if (!dp) {
+    return (
+      <>
+        {haloBack}
+        <HeroLayer plan={plan} N={N} pos={pos} pulse={pulse} />
+        {haloFront}
+        <Svg>
+          <ItemStrokes plan={plan} N={N} slots={slots} lb={lb} />
+        </Svg>
+        {faces}
+      </>
+    );
+  }
+  return (
+    <>
+      <ParallaxLayer N={N} keys={plan.camera.keys} depth={dp.back}>
+        <Svg>
+          <ItemStrokes plan={plan} N={N} slots={slots} lb={lb} />
+        </Svg>
+      </ParallaxLayer>
+      {haloBack}
+      {faces}
+      <ParallaxLayer N={N} keys={plan.camera.keys} depth={dp.front}>
+        <HeroLayer plan={plan} N={N} pos={pos} pulse={pulse} />
+      </ParallaxLayer>
+      {haloFront}
+    </>
+  );
+};
+
+/** 主角层：文字 / 大数字两种主角，矩形柔光 vs 圆形光斑；光只打这里。 */
+const HeroLayer = ({plan, N, pos, pulse}) => {
+  const hero = plan.hero;
+  // 主角入场帧由 plan 给（= 首句字幕 −4，钳到镜头首帧）；写死 1 会让主角比解说早登场，
+  // 镜头比字幕块早开几帧时尤其明显（观众看到画面已经摆好了，耳朵里还在说上一句）。
+  const heroF0 = Number(hero.f0) || 1;
+  const k = clamp01(plan.key) * softOp(N - heroF0, BEAT.SOFT_IN);
+  const node =
+    hero.kind === 'number' ? (
+      <BigNumber cx={pos.cx} cy={pos.cy} value={countTo(N - heroF0, 0, hero.value ?? 0, BEAT.COUNTER)} size={Math.max(110, Math.round(hero.size * 0.66))} unit={hero.unit} />
+    ) : (
+      <CText cx={pos.cx} cy={pos.cy} size={hero.size} weight={900} color={WHITE} scaleX={pos.squeeze} maxW={hero.maxW} shadow={k > 0.5 ? '0 0 34px rgba(102,45,248,.45)' : undefined}>
+        {hero.text}
+      </CText>
+    );
+  const boxW = Math.min(hero.maxW || 696, 700);
+  return (
+    <>
+      {hero.kind === 'number' ? <GlowBlob cx={pos.cx} cy={pos.cy} r={Math.round(hero.size * 1.2)} N={N} k={k} /> : <HeroGlow x={pos.cx - boxW / 2} y={pos.cy - hero.size / 2 - 14} w={boxW} h={hero.size + 28} N={N} k={k * 0.9} />}
+      <div style={{position: 'absolute', inset: 0, transform: `scale(${pulse.toFixed(4)})`, transformOrigin: `${pos.cx}px ${pos.cy}px`}}>
+        {plan.fx.glitch ? <FocusIn N={N} f0={heroF0} seed={7}>{node}</FocusIn> : <SoftIn N={N} f0={heroF0} len={BEAT.SOFT_IN}>{node}</SoftIn>}
       </div>
-    </Box>
-    <Arrow x1={width*.62} y1={height*.56} x2={width*.76} y2={height*.56} progress={p} width={5}/>
-    <Box x={width*.78} y={height*.43} w={width*.16} h={96} border={PALETTE.purple} style={{transform:"scale("+(0.9+0.1*p)+")"}}><span style={{fontSize:24,fontWeight:900,color:PALETTE.purpleLight}}>VERIFIED</span></Box>
-  </>;
-}
-function HookShot({scene,recipe,frame,width,height,heroSize,headline,heroW,safeTop}){
-  const p=easeOut(clamp01((frame-4)/18));
-  return <><div style={{position:"absolute",left:width*.08,top:height*.20,width:width*.78,fontSize:clamp(width*.06,44,86),lineHeight:1.06,fontWeight:900,color:PALETTE.white,textShadow:"0 0 26px rgba(125,104,255,.26)",transform:"translateY("+(1-p)*36+"px)"}}>{headline}</div>
-    <div style={{position:"absolute",left:width*.08,top:height*.56,width:width*.55,height:6,background:"linear-gradient(90deg,"+PALETTE.purple+",transparent)",transform:"scaleX("+p+")",transformOrigin:"0 50%"}}/>
-    <Label x={width*.08} y={height*.61} size={24} color={PALETTE.grey}>one dominant idea · one visual action</Label>
-  </>;
-}
-export function SemanticShot({scene,recipe={variant:"generic",hero_size:190}}){
-  const frame=useCurrentFrame(),{width,height}=useVideoConfig(),area=safeArea(width,height);
-  const duration=Math.max(1,Math.round((scene.duration||4)*30)),variant=recipe.variant||scene.variant||"generic";
-  const heroSize=heroSizeOf(scene,recipe);
-  const headline=heroHeadline(scene,heroSize);
-  const heroW=Math.round(width*0.46);
-  // HUD 位于 safeArea.top-28、高约 36px；主角统一下移到安全区之下，避免与 HUD 碰撞。
-  const safeTop=area.top+14;
-  const props={scene,recipe,frame,width,height,area,heroSize,headline,heroW,safeTop};
-  let content;
-  if(variant==="network") content=<NetworkShot {...props}/>;
-  else if(variant==="split") content=<SplitShot {...props}/>;
-  else if(variant==="preference") content=<PreferenceShot {...props}/>;
-  else if(variant==="structured") content=<StructuredShot {...props}/>;
-  else if(variant==="comparison") content=<ComparisonShot {...props}/>;
-  else if(variant==="transformation") content=<TransformationShot {...props}/>;
-  else if(variant==="sequence") content=<SequenceShot {...props}/>;
-  else if(variant==="causal") content=<CausalShot {...props}/>;
-  else if(variant==="evidence") content=<EvidenceShot {...props}/>;
-  else if(variant==="code") content=<CodeShot {...props}/>;
-  else content=<HookShot {...props}/>;
-  return <Fade frame={frame} duration={duration}>
-    <Stage scene={scene} frame={frame} duration={duration}>
-      {content}
-      <TravelSignal scene={scene} frame={frame} width={width} height={height}/>
-    </Stage>
-  </Fade>;
-}
+      {hero.sub ? (
+        <SoftIn N={N} f0={plan.subFrom + 16}>
+          <TechText x={pos.single ? 490 : pos.cx - boxW / 2} y={pos.cy + hero.size * 0.72} size={30}>
+            {hero.sub}
+          </TechText>
+        </SoftIn>
+      ) : null}
+    </>
+  );
+};
+
+/** 描边层：连线 / 卡片框 / 轨道 / 图标 / 分镜显式连线 —— 一张 SVG 画完。 */
+const ItemStrokes = ({plan, N, slots, lb}) => {
+  const nodes = [];
+  for (const it of plan.items) {
+    const s = slots.get(it.id);
+    if (!s) continue;
+    if (s.rail) {
+      nodes.push(<Rail key={it.id} N={N} f0={it.f0} s={s} />);
+      continue;
+    }
+    const op = softOp(N - it.f0, BEAT.SOFT_IN);
+    if (op <= 0) continue;
+    const draw = drawOn(N - it.f0, BEAT.DRAW_ON);
+
+    if (it.icon) {
+      nodes.push(
+        <g key={`i${it.id}`} opacity={op}>
+          <Icon
+            kind={it.icon}
+            cx={s.cx}
+            cy={s.cy - (it.text ? 24 : 0)}
+            s={iconSize(s)}
+            active={it.active}
+            reveal={draw}
+            check={draw}
+            value={clamp01((N - it.f0) / 26)}
+            flow={clamp01((N - it.f0) / 60)}
+            lit={Math.floor(((N - it.f0) / 12) % 4)}
+            N={N}
+            {...(it.props || {})}
+          />
+        </g>,
+      );
+    }
+    if (s.w && (s.row || s.code || plan.variant === 'comparison' || plan.variant === 'evidence' || it.kind === 'box')) {
+      const bw = s.w * draw;
+      nodes.push(<rect key={`r${it.id}`} x={s.cx - bw / 2} y={s.cy - s.h / 2} width={bw} height={s.h} rx={10} fill="none" stroke={it.active ? PURPLE : GREY_LINE} strokeWidth={it.active ? 2.5 : 2} opacity={op} />);
+    }
+    if (s.list) {
+      nodes.push(<line key={`l${it.id}`} x1={s.cx - s.w / 2} y1={s.cy + s.h / 2} x2={s.cx - s.w / 2 + s.w * draw} y2={s.cy + s.h / 2} stroke={it.active ? PURPLE : GREY_LINE} strokeWidth={2} opacity={op} />);
+    }
+    if (s.hub) nodes.push(<LineArrow key={`a${it.id}`} x1={s.hub.cx} y1={s.hub.cy} x2={s.cx} y2={s.cy} progress={draw} color={it.active ? PURPLE_LIGHT : GREY_MID} width={it.active ? 2.5 : 2} head={0} />);
+    if (s.chain) {
+      const nxt = plan.items[plan.items.indexOf(it) + 1];
+      const ns = nxt ? slots.get(nxt.id) : null;
+      if (ns) nodes.push(<LineArrow key={`c${it.id}`} x1={s.cx + s.w / 2 + 6} y1={s.cy} x2={ns.cx - ns.w / 2 - 8} y2={ns.cy} progress={draw} color={it.active ? PURPLE_LIGHT : WHITE} width={2.5} head={9} glow={it.active} />);
+    }
+    if (s.fan) {
+      const first = plan.items.find((x) => !slots.get(x.id)?.fan && !slots.get(x.id)?.rail);
+      const fs = first ? slots.get(first.id) : null;
+      if (fs) nodes.push(<LineArrow key={`f${it.id}`} x1={s.cx} y1={s.cy - s.h / 2} x2={fs.cx} y2={fs.cy + fs.h / 2} progress={draw} color={it.active ? PURPLE_LIGHT : GREY_MID} width={2} head={8} />);
+    }
+    if (it.mark === 'check') nodes.push(<Check key={`ck${it.id}`} cx={s.cx + (s.w || 120) / 2 - 22} cy={s.cy} size={30} progress={draw} color={it.active ? PURPLE_LIGHT : WHITE} />);
+    if (it.mark === 'cross') nodes.push(<Cross key={`cx${it.id}`} cx={s.cx + (s.w || 120) / 2 - 22} cy={s.cy} size={26} progress={draw} color={GREY} />);
+  }
+
+  const net = plan.items.find((it) => slots.get(it.id)?.hub);
+  if (net) {
+    const {hub} = slots.get(net.id);
+    const r = slideIn(N - net.f0, 20, 2.5);
+    nodes.push(<circle key="hub" cx={hub.cx} cy={hub.cy} r={16 + 8 * r} fill="none" stroke={PURPLE_LIGHT} strokeWidth={2.5} opacity={r} />);
+    nodes.push(<circle key="hub2" cx={hub.cx} cy={hub.cy} r={30 + 6 * Math.sin((N - net.f0) * 0.12)} fill="none" stroke={GREY_LINE} strokeWidth={1.6} opacity={r * 0.7} />);
+  }
+  if (plan.variant === 'transformation') {
+    nodes.push(<TiltPlane key="tilt" cx={640} cy={Math.round((lb.support.top + lb.support.bottom) / 2)} w={520} h={200} skew={-22} sy={0.42} opacity={softOp(N - 2, 12) * 0.5} sw={1.6} stroke={GREY_LINE} />);
+  }
+  // 分镜显式声明的连线（authored stage 用图元 id 引用）
+  plan.links.forEach((l, i) => {
+    const a = slots.get(l.from);
+    const b = slots.get(l.to);
+    if (!a || !b || a.rail || b.rail) return;
+    nodes.push(<ChainArrows key={`lk${i}`} points={[[a.cx, a.cy], [b.cx, b.cy]]} N={N} f0={l.f0} per={6} color={a.active || b.active ? PURPLE_LIGHT : WHITE} />);
+  });
+  return <>{nodes}</>;
+};
+
+const iconSize = (s) => Math.round(Math.min(132, Math.max(86, s.w ? s.w * 0.5 : 110)));
+
+/** 数据流轨道：内容区横轨 + 匀速行进小球（持续到下一拍的动词）。 */
+const Rail = ({N, f0, s}) => {
+  const op = softOp(N - f0, BEAT.SOFT_IN);
+  if (op <= 0) return null;
+  return (
+    <g opacity={op}>
+      <line x1={s.l} y1={s.y} x2={s.r} y2={s.y} stroke={GREY_LINE} strokeWidth={2} strokeDasharray="14 10" />
+      {[0, 0.34, 0.68].map((o, i) => {
+        const t = ((N - f0) / 54 + o) % 1;
+        return <circle key={i} cx={s.l + (s.r - s.l) * t} cy={s.y} r={i === 1 ? 6 : 4.5} fill={i === 1 ? PURPLE_LIGHT : WHITE} opacity={0.35 + 0.65 * Math.sin(Math.PI * t)} />;
+      })}
+    </g>
+  );
+};
+
+/** 配角的文字面：大数字 / 代码块 / 标签；active 才转紫。 */
+const ItemFace = ({it, slot, N}) => {
+  const op = softOp(N - it.f0, 8);
+  if (op <= 0) return null;
+  const color = it.active ? PURPLE_LIGHT : WHITE;
+  if (it.kind === 'number' && it.value !== null) {
+    return <BigNumber cx={slot.cx} cy={slot.cy} value={countTo(N - it.f0, 0, it.value, BEAT.COUNTER)} size={Math.min(96, Math.max(54, Math.round((slot.h || 90) * 0.72)))} unit={it.unit} opacity={op} />;
+  }
+  if (it.kind === 'code') {
+    const w = slot.w || 320;
+    const h = slot.h || 44;
+    return (
+      <>
+        <Box x={slot.cx - w / 2} y={slot.cy - h / 2} w={w} h={h} border={it.active ? PURPLE : GREY_LINE} radius={8} bloom={false} style={{opacity: op}} />
+        <Label x={slot.cx - w / 2 + 14} y={slot.cy - 16} size={24} color={color} opacity={op} family="'SF Mono', Menlo, Consolas, monospace">
+          {it.text}
+        </Label>
+      </>
+    );
+  }
+  if (!it.text) return null;
+  return <CText cx={slot.cx} cy={slot.cy + (it.icon ? 32 : 0)} size={it.icon ? 26 : 30} weight={800} color={color} opacity={op} maxW={Math.max(120, (slot.w || 240) - 18)}>{it.text}</CText>;
+};
+
+export default SemanticShot;

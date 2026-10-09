@@ -3,10 +3,11 @@ import path from "node:path";
 import {buildScenes} from "../src/build/parallel-scenes.mjs";
 import {createAgentProvider} from "../src/providers/agent/index.mjs";
 import {runNamedAgent} from "../src/agents/orchestrator.mjs";
+import {maxShotsPerGroup} from "../src/build/limits.mjs";
 
 const ir=JSON.parse(fs.readFileSync("fixtures/render-ir-16x9.json","utf8"));
 const project=JSON.parse(fs.readFileSync(process.env.PROJECT_FILE||"fixtures/project.json","utf8"));
-const maxPerGroup=Number(process.env.MAX_SHOTS_PER_GROUP||6);
+const maxPerGroup=maxShotsPerGroup();
 const concurrency=Number(process.env.BUILD_CONCURRENCY||4);
 const agent=createAgentProvider();
 const strict=process.env.AGENT_STRICT==="1";

@@ -4,9 +4,11 @@ artifacts/
 *.log
 
 # 运行产物：由 npm run tts / render_storyboard 生成，不入库。
-# 原因：src/remotion/index.jsx 会 import script/timeline.json，<Audio> 依赖 public/audio.mp3，
-# 全新的 clone 必须先跑一次 TTS 才能渲染或执行 verify:e2e。
+# 打包不依赖这里任何一项：时间轴经 src/remotion/timeline.gen.mjs（占位已提交）装载，
+# <Audio> 由 includeAudio 控制，没配音时主合成直接不放音频层。
+# 所以 fresh clone 可以在一次 TTS 都没跑的情况下打开 Remotion Studio 看画面。
 public/audio.mp3
+
 script/timeline.json
 script/timeline-source.json
 script/timeline.md

@@ -1,12 +1,16 @@
 {
-  "version": "1.0",
+  "version": "1.1",
   "name": "reel-forge-visual-benchmark",
-  "embedding": "visual-pixel-v1",
+  "embedding": "visual-pixel-v2",
   "thresholds": {
     "pass": 0.62,
     "reference": 0.78,
     "excellent": 0.88,
     "anti_fail": 0.9
+  },
+  "scoring": {
+    "positive_weight": 0.78,
+    "anti_weight": 0.22
   },
   "sampling": {
     "positions": [

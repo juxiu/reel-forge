@@ -63,10 +63,9 @@ pip install -r requirements.txt
 
 ~~~bash
 npm run verify:fast
-npm run verify:authored-shots
 ~~~
 
-这两项不需要任何运行产物。
+`verify:fast` 不需要任何运行产物，检查清单里已含 `verify:authored-shots`（authored 镜头合规）与 `verify:limits`（分组与 still 数量真源）；想单跑某一道用 `npm run verify:<name>`。
 
 **要渲染或跑 <code>verify:e2e</code>，必须先生成 TTS 产物**：<code>public/audio.mp3</code>、<code>script/timeline.json</code>、<code>fixtures/captions.json</code>。它们由 <code>npm run tts</code> 生成、不入库（<code>src/remotion/index.jsx</code> 会 import时间轴，<code>&lt;Audio&gt;</code> 依赖配音文件），所以全新 clone 的第一步是：
 
@@ -145,7 +144,7 @@ npm run verify:authored-shots
 
 - positive references：network-flow、structured-mechanism、transformation；
 - anti references：static-card、clutter、decorative-motion；
-- <code>visual-pixel-v1</code> embedding；
+- <code>visual-pixel-v2</code> embedding（这个名字必须与 <code>scripts/visual_regression.py</code> 里的 <code>DESCRIPTOR</code> 一致，<code>verify:visual-benchmark</code> 会把两边读出来对撞）；
 - pass / reference / excellent / anti-fail 阈值。
 
 Shot Score 当前统一汇总：
@@ -212,4 +211,14 @@ Production PASS
 - [docs/USAGE.md](docs/USAGE.md) — 完整使用说明
 - [docs/REFERENCE_PROCESS.md](docs/REFERENCE_PROCESS.md) — 生产过程与完成定义
 - [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md) — 当前项目状态
-- [docs/VISUAL_GRAMMAR.md](docs/VISUAL_GRAMMAR.md) — 视觉语法与质量基线
+- [docs/VISUAL_GRAMMAR.md](docs/VISUAL_GRAMMAR.md) — 规则 ↔ 执行者索引页（不是真源，先从这里找入口）
+- [docs/knowledge/composition-and-light.md](docs/knowledge/composition-and-light.md) — **空间与光**的真源：设计空间与 band、内容区划分、构图模式、变体几何、主角/配角尺寸、发光模型、QC 测量判据与换算
+- [docs/knowledge/motion-vocabulary.md](docs/knowledge/motion-vocabulary.md) — **时间与动效**的真源：帧号口径、帧数预算、缓动、节拍窗口、运镜词表、效果开关与配额、修复路由、死表清单
+- [docs/knowledge/style-guide.md](docs/knowledge/style-guide.md) — **画风常量**的真源：调色板与每个色值的读取状态、字号阶梯、字体角色、画面文案准入与禁令
+- [docs/knowledge/narration-and-storyboard.md](docs/knowledge/narration-and-storyboard.md) — **解说词与分镜表**的真源：句法与停顿帧数、写作预算的执行状态、分镜令牌与表格格式、`selfcheck` 判据、句:镜 1:1 冲突
+- [docs/knowledge/agent-protocol.md](docs/knowledge/agent-protocol.md) — **agent 层**的真源：provider 形态与四个 `AGENT_*` 开关、三态信封、四个角色的输入输出、`only_paths` 的实际效力、a2e QC 维度对照
+- [docs/knowledge/research-brief.md](docs/knowledge/research-brief.md) — **事实层**的真源：本仓库的"调研"实际是什么、claims 的自证性质、画面文字出处门 A1/A2/B/C 判到哪、判不到哪
+- [docs/knowledge/lessons.md](docs/knowledge/lessons.md) — **上游教训对照**的真源：a2e 五部片 125 条返工逐条归属（六态口径）、本仓库独有的三类破口（死掉的修法 / 注释即执行者 / 半个修法）、结构上不可能犯的那一类
+- [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) — 实现计划与 Scoped Repair（与代码同源，由 `npm run verify:plan` 双向校验）
+
+> 一条规则只有一个真源文档，其余位置只放链接。新增规则前先查上面六篇（空间与光 / 时间与动效 / 画风常量 / 解说词与分镜 / agent 协议 / 事实层）有没有写过，再看 `lessons.md` 里上游是否已为这条踩过坑；写重了 `verify:plan` 与文档评审都会把它抓出来。

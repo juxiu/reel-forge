@@ -2,7 +2,7 @@ import fs from "node:fs";
 import {runMediaQc} from "../src/qc/run.mjs";
 
 // 阻断项：媒体探测、frame/motion 指标、画面文字出处。
-// 非阻断项：visual-pixel-v1 回归记录（参考资产为 64x36 合成图，embedding 非语义模型）。
+// 非阻断项：visual-pixel 回归记录（参考资产为 64x36 合成图，embedding 非语义模型）。
 const project = JSON.parse(fs.readFileSync(process.env.PROJECT_FILE || "fixtures/project.json", "utf8"));
 const qcDir = "artifacts/" + project.project_id + "/qc";
 const results = [];
@@ -43,4 +43,4 @@ for (const item of results) {
   if (!(item.duration > 0)) throw new Error("invalid duration: " + item.ratio);
   if (!(item.motion_frames >= 2)) throw new Error("insufficient motion: " + item.ratio);
 }
-console.log("qc PASS", JSON.stringify({ media: results, text_provenance: provenance.status, traced_elements: provenance.traced_elements }));
+console.log("qc PASS", JSON.stringify({ media: results, text_provenance: provenance.status, ir_text_elements: provenance.ir_text_elements, rendered_texts: provenance.rendered_texts, unsourced: (provenance.unsourced_rendered_text || []).length }));

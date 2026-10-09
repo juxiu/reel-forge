@@ -56,22 +56,50 @@ Research -> Narration/Timeline -> Storyboard -> Overlay/Primitives -> G1 Pilot -
 - 16:9 / 9:16 双比例。
 - H.264 输出。
 - 渲染前强制检查 Pilot checkpoint。
+- 渲染前强制跑 `npm run plan-audit`：buildPlan 在渲染前就知道的分镜违规必须在这儿停下，而不是渲完再看截图反推。
 
 ## P9 Quantitative QC
 
+- 判据单一真源：src/visual/field.mjs 同时给渲染层（Primitives.jsx 的幕底、Fx.jsx 的高光时序都从它 re-export）
+  和测量层使用；`npm run export-visual-contracts` 把它连同 src/visual/style.mjs 的尺寸档、
+  src/visual/camera.mjs 的运镜上限一起导出成 fixtures/visual_contracts.json，
+  并按画幅给出设计单位 / 设备像素 / 320 宽采样坐标三套换算后的数。
+  QC 脚本只允许从这份 JSON 取数，不在 Python 里另抄一份阈值。
+- `npm run verify:visual-contracts` 守住三件事：contracts 与代码不漂移、迁走的常量没有第二处定义、
+  光晕改成数据驱动后 CSS 字符串逐字符不变。
 - media probe：duration / video / audio / dimensions / motion / black frame。
-- frame metrics：亮度占比、黑场占比、帧差、最长低变化区间。
-- motion check：连续低变化区间和均值。
-- visual regression：每个 scene/ratio 采样 20% / 50% / 80% 位置帧，与 positive / anti-reference benchmark 做 visual-pixel-v1 cosine similarity。
+- frame metrics：主角尺度（最大物体高度，宽物体按宽折算）、空场最长连续帧、柔光面积（主角区 / 全区）、
+  紫色碎片数、背景碎屑数、亮度占比、黑场占比、帧差、最长低变化区间。
+- motion check：连续低变化区间和均值，外加末拍稳定期 hold（离场前最后一段「无大面积变化」的连续帧数）。
+- visual regression：每个 scene/ratio 采样 20% / 50% / 80% 位置帧，与 positive / anti-reference benchmark 做 visual-pixel cosine similarity（当前 v2：纯 stdlib 双线性 + 面积平均，与 v1 的 PIL 读数不可比）。
 - 视觉回归输出 reference_similarity、anti_similarity、visual_complexity、text_density、hero_consistency、layout_stability。
 - Shot Score 将以上五个视觉维度与 semantic / hero / motion / composition / light / safety 统一加权。
 - QC 结果 JSON + Markdown 落盘。
 
 ## Scoped Repair
 
-- src/repair/engine.mjs 按 node 局部修改 RenderIR。
-- 支持 hero_too_small / motion_too_low / freeze / caption_overlap / visual_regression_fail 的确定性修复。
-- visual_regression_fail 首轮提升 Hero 权重/尺度与 camera motion，并写入 BeatGraph source-repair。
+- src/repair/engine.mjs 按 node 局部修改 RenderIR，并用 `repair_trace` 区分「画面真变了」和「只留了痕」。
+- 确定性修复（IR 上真改）：hero_too_small / camera-unknown-preset / accent-overflow
+- 像素层的自动修只有一条：`hero_too_small` → 抬 `hero_scale`。
+  `motion_too_low` 以前按 Python 分类放行「小面积动作」，把该镜头元素条目的 `motion[].amount`
+  从 0.04 抬到 0.075 并记成一次画面改动 —— 但渲染层只读 `motion[type==='camera']` 的
+  `preset`/`amount`（见 src/shots/plan.mjs 里 cameraKeysFromMotion 的取用），元素条目上的
+  `amount` 没有读者，重渲染后画面逐像素相同，报告却写着「修过了」。这就是假的确定性修复，
+  所以它现在不进自动修名单。
+- `motion_too_low` / `freeze` / `hold_too_short` / `glow_missing` / `purple_debris` / `background_debris` /
+  `motion_sample_too_sparse` / `frame_metrics_missing` 在 RenderIR 里没有对应开关（在素材、幕底掩膜、
+  镜头时长、抽帧配置和分镜的动作编排上），一律只写 trace 并 escalated，绝不冒充「已修」。
+  `motion_too_low` 的三档分类（真静 / 有动作 / 小面积动作）与 Python 给的 `repair_hint`
+  会原样出现在 escalations 和 `repair_trace` 里：升级到分镜层时要知道是「没动作」还是「动作太小」，
+  这两件事在分镜里改的是不同的东西。
+- `visual_regression_fail` 是 advisory（reference_similarity 与画面质量反向相关）：不进修复循环、
+  不写 trace、不升级。
+- 分镜层问题由 src/shots/plan.mjs 的 REPAIR_ACTIONS 单独分类，和上面那几类**不能混在一路处理**：
+  - `camera-unknown-preset`、`accent-overflow`：真值就在 RenderIR 里（`camera`、`elements[].active`），可以自修；
+  - `hero-overlong`：缺的是另写的画面文案，改 RenderIR 只会把长句放得更大更挤，必须回分镜；
+  - `beat-window-overflow`、`beat-after-exit`：入场帧 `f0` 写在镜头源文件 `src/shots/Gn/SCnn.jsx` 的 recipe 里，IR 表达不了；
+  - `icon-unregistered`、`text-below-min`：要先注册图元或改字号/文案。
+- 后五类只写 repair_trace 并把 status 记为 escalated：本轮没有影响画面的 IR 改动时 repair-cycle 直接停，不再重渲染去「观察」一个已经知道的结果。
 - Repair 后禁止重新 materialize 覆盖修复后的 RenderIR；直接重新渲染，并重新跑 frame metrics / motion / visual regression。
 - 修复计划与状态归档。
 - 修复后重新 render + 全质量层 QC，限制重试次数。

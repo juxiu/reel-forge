@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import {spawnSync} from "node:child_process";
+import {run as spawn} from "../src/runtime/spawn.mjs";
 import crypto from "node:crypto";
 import {edgeTts} from "../src/providers/tts/edge.mjs";
 import {nativeTts} from "../src/providers/tts/native.mjs";
@@ -67,7 +67,8 @@ function alignedChunks(text,chunks,words,duration){
 }
 
 function runFfmpeg(args){
-  const result=spawnSync("ffmpeg",args,{encoding:"utf8"});
+  const result=spawn("ffmpeg",args,{encoding:"utf8"});
+  if(result.error) throw new Error("ffmpeg 无法启动: "+result.error+"（不在 PATH？装 ffmpeg 或设置 FFMPEG_PATH）");
   if(result.status!==0) throw new Error("ffmpeg failed: "+(result.stderr||"").slice(-1000));
 }
 function mixAudio(parts,totalSeconds,outFile){
@@ -129,6 +130,18 @@ const captionSource=captionsFromWords(allWords,{language});
 const timeline={fps:FPS,total_frames:Math.max(1,Math.ceil(totalSeconds*FPS)),engine,voice,rate,language,timing_mode:"tts-word-boundary",chapters,sentences,speech_seconds:Number(speechSeconds.toFixed(3))};
 fs.mkdirSync("script",{recursive:true});
 fs.writeFileSync("script/timeline.json",JSON.stringify(timeline,null,2));
+// 打包用的装载点：script/timeline.json 是 gitignore 的运行产物，直接 import 它会让 fresh clone 在跑配音前连 bundle 都过不了。
+// 这里把同一份数据写成必定存在的源码模块（仓库里有占位版本，参照 anything2explainer 的 src/common/timeline.ts）。
+fs.mkdirSync(path.join("src","remotion"),{recursive:true});
+fs.writeFileSync(path.join("src","remotion","timeline.gen.mjs"),[
+  "// 由 scripts/tts_build.mjs 生成，请勿手改；仓库里的占位版本在配音后会被这里覆盖。",
+  "// 时间轴真源仍是 script/timeline.json，本文件只是给 webpack 一个必定能解析的模块。",
+  "export const timeline = "+JSON.stringify(timeline,null,2)+";",
+  "",
+  "export default timeline;",
+  ""
+].join("\n"));
+
 fs.writeFileSync("script/timeline.md",[
   "# 时间轴","",
   "| 句 | 章 | 帧 from–to | 时长 | 段末 | 文本 |","|---|---|---:|---:|---|---|",

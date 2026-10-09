@@ -1,3 +1,7 @@
+# QC / 测量层（frame_metrics、motion_check、visual_regression、vision、pngio、test_measurement）
+# 故意只用标准库：这台机器和 CI 都可能没有 Pillow/numpy，而「依赖没装 → 门禁静默不跑」
+# 是本项目最贵的一类假绿。装了下面两个也请不要在 scripts/*.py 的测量层里 import 它们。
+#
+# 只有 TTS provider 需要 numpy（float32 音频拼接与归一化）。
 edge-tts>=7.2,<8
 numpy>=1.26,<3
-Pillow>=10,<13

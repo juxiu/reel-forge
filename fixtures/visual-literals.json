@@ -1,142 +1,409 @@
 {
-  "version": "1.0",
-  "note": "Rendered on-screen literals must be registered here. Structural labels are allowed; factual claims must trace to script/research instead.",
+  "version": "2.0",
+  "note": "Rendered on-screen literals must be registered here. Structural labels are allowed; any digit is still checked against script/research and cannot be waived by this file.",
+  "channels": [
+    "attrLiteral",
+    "stringArray",
+    "legacyFallback",
+    "jsxChildren",
+    "quotedChildren"
+  ],
   "literals": [
     {
+      "literal": "1 && textEm(v)",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "= perBlock && bi",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "= start1 && c.from",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
       "literal": "AFTER",
-      "file": "src/shots/SemanticShots.jsx"
+      "file": "src\\shots\\plan.mjs"
     },
     {
       "literal": "BEFORE",
-      "file": "src/shots/SemanticShots.jsx"
+      "file": "src\\shots\\plan.mjs"
     },
     {
-      "literal": "CLAIM",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "Content-Digest",
+      "file": "src\\shots\\G5\\SC29.jsx"
     },
     {
-      "literal": "EVIDENCE B",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "RFC 9530",
+      "file": "src\\shots\\G5\\SC29.jsx"
     },
     {
-      "literal": "SELECTED",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "Repr-Digest",
+      "file": "src\\shots\\G5\\SC29.jsx"
     },
     {
-      "literal": "SOURCE A",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "accept",
+      "file": "src\\shots\\G3\\SC13.jsx"
     },
     {
-      "literal": "VERIFIED",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "algorithm",
+      "file": "src\\shots\\G8\\SC44.jsx"
     },
     {
-      "literal": "VS",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "bytes",
+      "file": "src\\shots\\G6\\SC36.jsx"
     },
     {
-      "literal": "cause",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "candidate",
+      "file": "src\\shots\\G1\\SC03.jsx"
     },
     {
-      "literal": "const",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "check",
+      "file": "src\\shots\\G5\\SC27.jsx"
     },
     {
-      "literal": "cost",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "claim",
+      "file": "src\\shots\\G4\\SC19.jsx"
     },
     {
-      "literal": "dominant flow",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "compare",
+      "file": "src\\shots\\G2\\SC10.jsx"
     },
     {
-      "literal": "first",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "constraint",
+      "file": "src\\shots\\G1\\SC03.jsx"
+    },
+    {
+      "literal": "content",
+      "file": "src\\shots\\G5\\SC28.jsx"
+    },
+    {
+      "literal": "content-digest",
+      "file": "src\\shots\\G7\\SC42.jsx"
+    },
+    {
+      "literal": "coverage",
+      "file": "src\\shots\\G6\\SC35.jsx"
+    },
+    {
+      "literal": "current",
+      "file": "src\\shots\\G3\\SC16.jsx"
+    },
+    {
+      "literal": "data",
+      "file": "src\\shots\\G7\\SC38.jsx"
+    },
+    {
+      "literal": "destination",
+      "file": "src\\shots\\G6\\SC31.jsx"
+    },
+    {
+      "literal": "digest",
+      "file": "src\\shots\\G8\\SC44.jsx"
+    },
+    {
+      "literal": "digest-fields",
+      "file": "src\\shots\\G3\\SC15.jsx"
+    },
+    {
+      "literal": "encode",
+      "file": "src\\shots\\G7\\SC40.jsx"
+    },
+    {
+      "literal": "encoding",
+      "file": "src\\shots\\G3\\SC14.jsx"
+    },
+    {
+      "literal": "end-to-end",
+      "file": "src\\shots\\G1\\SC05.jsx"
+    },
+    {
+      "literal": "evidence",
+      "file": "src\\shots\\G7\\SC39.jsx"
+    },
+    {
+      "literal": "field",
+      "file": "src\\shots\\G7\\SC39.jsx"
+    },
+    {
+      "literal": "hash",
+      "file": "src\\shots\\G5\\SC28.jsx"
     },
     {
       "literal": "header",
-      "file": "src/shots/SemanticShots.jsx"
+      "file": "src\\shots\\G1\\SC04.jsx"
     },
     {
-      "literal": "input = request;",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "hop",
+      "file": "src\\shots\\G4\\SC21.jsx"
     },
     {
-      "literal": "mechanism",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "input",
+      "file": "src\\shots\\G3\\SC18.jsx"
+    },
+    {
+      "literal": "integrity",
+      "file": "src\\shots\\G8\\SC44.jsx"
+    },
+    {
+      "literal": "intermediary",
+      "file": "src\\shots\\G6\\SC31.jsx"
+    },
+    {
+      "literal": "item",
+      "file": "src\\shots\\G6\\SC34.jsx"
+    },
+    {
+      "literal": "legacy",
+      "file": "src\\shots\\G6\\SC35.jsx"
+    },
+    {
+      "literal": "match",
+      "file": "src\\shots\\G6\\SC36.jsx"
+    },
+    {
+      "literal": "message",
+      "file": "src\\shots\\G6\\SC32.jsx"
+    },
+    {
+      "literal": "meta",
+      "file": "src\\shots\\plan.mjs"
     },
     {
       "literal": "metadata",
-      "file": "src/shots/SemanticShots.jsx"
+      "file": "src\\shots\\G1\\SC04.jsx"
     },
     {
-      "literal": "next",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "migration",
+      "file": "src\\shots\\G3\\SC15.jsx"
     },
     {
-      "literal": "one dominant idea · one visual action",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "new-field",
+      "file": "src\\shots\\G6\\SC35.jsx"
     },
     {
-      "literal": "option A",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "old-digest",
+      "file": "src\\shots\\G3\\SC15.jsx"
     },
     {
-      "literal": "option B",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "origin",
+      "file": "src\\shots\\G6\\SC31.jsx"
+    },
+    {
+      "literal": "parameter",
+      "file": "src\\shots\\G6\\SC34.jsx"
+    },
+    {
+      "literal": "parse",
+      "file": "src\\shots\\G5\\SC27.jsx"
     },
     {
       "literal": "payload",
-      "file": "src/shots/SemanticShots.jsx"
+      "file": "src\\shots\\G5\\SC26.jsx"
     },
     {
       "literal": "policy",
-      "file": "src/shots/SemanticShots.jsx"
+      "file": "src\\shots\\G1\\SC04.jsx"
     },
     {
-      "literal": "preferred",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "prefer",
+      "file": "src\\shots\\G3\\SC13.jsx"
     },
     {
-      "literal": "quality",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "preference",
+      "file": "src\\shots\\G8\\SC43.jsx"
     },
     {
-      "literal": "result = transform(input);",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "receive",
+      "file": "src\\shots\\G5\\SC27.jsx"
     },
     {
-      "literal": "result",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "receiver",
+      "file": "src\\shots\\G7\\SC41.jsx"
     },
     {
-      "literal": "return",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "repr-digest",
+      "file": "src\\shots\\G7\\SC42.jsx"
     },
     {
-      "literal": "schema → inspectable state",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "representation",
+      "file": "src\\shots\\G7\\SC38.jsx"
     },
     {
-      "literal": "signal",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "request",
+      "file": "src\\shots\\G7\\SC37.jsx"
     },
     {
-      "literal": "speed",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "scope",
+      "file": "src\\shots\\G1\\SC05.jsx"
     },
     {
-      "literal": "state change",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "selected",
+      "file": "src\\shots\\G1\\SC03.jsx"
     },
     {
-      "literal": "structure",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "sender",
+      "file": "src\\shots\\G7\\SC41.jsx"
     },
     {
-      "literal": "verify(result);",
-      "file": "src/shots/SemanticShots.jsx"
+      "literal": "sf-dictionary",
+      "file": "src\\shots\\G4\\SC24.jsx"
+    },
+    {
+      "literal": "sf-item",
+      "file": "src\\shots\\G4\\SC24.jsx"
+    },
+    {
+      "literal": "sf-list",
+      "file": "src\\shots\\G4\\SC24.jsx"
+    },
+    {
+      "literal": "standard",
+      "file": "src\\shots\\G7\\SC39.jsx"
+    },
+    {
+      "literal": "structured",
+      "file": "src\\shots\\G8\\SC44.jsx"
+    },
+    {
+      "literal": "structured-field",
+      "file": "src\\shots\\G6\\SC34.jsx"
+    },
+    {
+      "literal": "transform",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "transport",
+      "file": "src\\shots\\G6\\SC32.jsx"
+    },
+    {
+      "literal": "validate",
+      "file": "src\\shots\\G3\\SC17.jsx"
+    },
+    {
+      "literal": "value",
+      "file": "src\\shots\\G6\\SC34.jsx"
+    },
+    {
+      "literal": "verified",
+      "file": "src\\shots\\G7\\SC37.jsx"
+    },
+    {
+      "literal": "verify",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "want",
+      "file": "src\\shots\\G3\\SC13.jsx"
+    },
+    {
+      "literal": "want-content",
+      "file": "src\\shots\\G8\\SC43.jsx"
+    },
+    {
+      "literal": "want-repr",
+      "file": "src\\shots\\G8\\SC43.jsx"
+    },
+    {
+      "literal": "主张",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "优选",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "原文",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "可检验",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "实测 B",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "改造前",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "改造后",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "方案 A",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "方案 B",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "机制",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "来源 A",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "校验",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "现象",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "第一步",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "第三步",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "第二步",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "结构化",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "结果",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "结论",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "落库",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "观测",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "诱因",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "转发",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "输入",
+      "file": "src\\shots\\plan.mjs"
+    },
+    {
+      "literal": "重试",
+      "file": "src\\shots\\plan.mjs"
     }
   ]
 }

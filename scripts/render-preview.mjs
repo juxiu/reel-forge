@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
-import {spawnSync} from "node:child_process";
+import {run as spawn} from "../src/runtime/spawn.mjs";
 
 const ir = JSON.parse(fs.readFileSync("fixtures/render-ir-16x9.json", "utf8"));
 const fps = Number(ir.fps || 30);
@@ -12,7 +12,7 @@ const outDir = "artifacts/preview";
 const output = outDir + "/preview.mp4";
 fs.mkdirSync(outDir, {recursive: true});
 
-const r = spawnSync(
+const r = spawn(
   "npx",
   [
     "remotion",
@@ -27,6 +27,10 @@ const r = spawnSync(
   {stdio: "inherit"},
 );
 
+if (r.error) {
+  console.error("渲染命令起不来: " + r.error + "（依赖没装？先 npm install）");
+  process.exit(127);
+}
 if (r.status !== 0) process.exit(r.status ?? 1);
 if (!fs.existsSync(output) || !fs.statSync(output).size) {
   throw new Error("preview empty");

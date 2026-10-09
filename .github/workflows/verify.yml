@@ -18,8 +18,25 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - run: pip install -r requirements.txt
       - run: npm install
+      # 先说清楚「这台机器缺什么」，再让门禁跑。缺 python3/ffmpeg 时必须当场炸并指名，
+      # 而不是让 QC 脚本安静地什么都不做（那是本项目最贵的一类假绿）。
+      - run: npm run verify:env
+      # 测量层的判据数字只有一份真源。先在跑任何东西之前确认「仓库里提交的 contracts
+      # 就是由 src/visual/field.mjs 导出的那一份」，否则后面所有 PASS 都是在测一份过期几何。
+      - run: npm run verify:visual-contracts
+      - run: node scripts/export-visual-contracts.mjs --check
+      # 测量层自己也要被测：这台机器/CI 都可能没有 ffmpeg，真实帧进不来，
+      # 于是用纯 stdlib 合成 PNG 把 frame_metrics / motion_check / visual_regression 全跑一遍。
+      - run: npm run verify:measure
+      # 分镜表链在 CI 后半段靠真产物跑（npm run storyboard / selfcheck）。这里再叠一层
+      # 合成时间轴的变异测试：那条链的判据哪天不执行了，前半段就会变红，而不是等到
+      # 跑完整条生产链才发现 selfcheck 静默通过了。
+      - run: npm run verify:storyboard
       - run: npm run verify:plan
       - run: npm run verify:contracts
+      # 画面全黑而门禁全绿是本项目最贵的一类假绿：`{halo}` 这种 JSX 裸名引用在
+      # node --check / verify:imports / 纯函数门禁下都是绿的，渲染时才是 ReferenceError。
+      - run: npm run verify:jsx-symbols
       - run: npm run verify:runtime
       - run: npm run verify:approval
       - run: npm run verify:build
@@ -56,11 +73,15 @@ jobs:
       - run: npm run render
       - run: npm run frame-metrics -- --frames artifacts/frames/16x9 --render-ir fixtures/render-ir-16x9.json --out artifacts/digest-explainer/qc/frame_metrics_16x9.json
       - run: npm run frame-metrics -- --frames artifacts/frames/9x16 --render-ir fixtures/render-ir-9x16.json --out artifacts/digest-explainer/qc/frame_metrics_9x16.json
-      - run: npm run motion-check -- artifacts/frames/16x9 --render-ir fixtures/render-ir-16x9.json --report artifacts/digest-explainer/qc/motion_16x9.json
-      - run: npm run motion-check -- artifacts/frames/9x16 --render-ir fixtures/render-ir-9x16.json --report artifacts/digest-explainer/qc/motion_9x16.json
+      - run: npm run motion-check -- --frames artifacts/frames/16x9 --render-ir fixtures/render-ir-16x9.json --report artifacts/digest-explainer/qc/motion_16x9.json
+      - run: npm run motion-check -- --frames artifacts/frames/9x16 --render-ir fixtures/render-ir-9x16.json --report artifacts/digest-explainer/qc/motion_9x16.json
       - run: npm run visual-regression -- --frames artifacts/frames/16x9 --render-ir fixtures/render-ir-16x9.json --out artifacts/digest-explainer/qc/visual_regression_16x9.json
       - run: npm run visual-regression -- --frames artifacts/frames/9x16 --render-ir fixtures/render-ir-9x16.json --out artifacts/digest-explainer/qc/visual_regression_9x16.json
       - run: npm run verify-shot-score
+      # 画面文字出处门必须在这里跑：scripts/qc.mjs:37 见 artifacts/<pid>/qc/text_provenance.json
+      # 不存在就记一条阻断 issue，而这条链原先没有任何一步写过它 —— 不联网的 CI 跑到
+      # verify:qc / deliver 时必然撞上「text_provenance_missing」。顺序与一键链 scripts/skill.mjs:119 对齐。
+      - run: npm run verify:text-provenance
       - run: npm run verify:visual-regression
       - run: AUTO_APPROVE=1 npm run repair-cycle
       - run: npm run verify:qc

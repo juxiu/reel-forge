@@ -1,9 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
+import {maxShotsPerGroup} from "../src/build/limits.mjs";
 
 const ir = JSON.parse(fs.readFileSync("fixtures/render-ir-16x9.json", "utf8"));
-const maxPerGroup = Number(process.env.MAX_SHOTS_PER_GROUP || 6);
-if (!Number.isInteger(maxPerGroup) || maxPerGroup < 1) throw new Error("MAX_SHOTS_PER_GROUP must be a positive integer");
+const maxPerGroup = maxShotsPerGroup();
+// 正整数校验原来在 :6（本地写的一份），现在由 limits.mjs 的 maxShotsPerGroup() 统一抛。
 
 const root = "src/shots";
 const groups = [];
@@ -46,21 +47,21 @@ for (let i = 0; i < ir.scenes.length; i += maxPerGroup) {
       "export const SHOTS_" + id + " = {\n" + entries.join("\n") + "\n};\n",
   );
 
-  fs.writeFileSync(
-    path.join(dir, "BUILD_NOTES.md"),
-    [
-      "# " + id + " 构建记录",
-      "",
-      "镜头数：" + scenes.length,
-      "",
-      ...scenes.map((scene, n) =>
-        "- " + ("SC" + String(i + n + 1).padStart(2, "0")) + " / " + scene.id + " / " +
-        Math.round(scene.start * ir.fps) + "–" + Math.round((scene.start + scene.duration) * ir.fps) + "f"
-      ),
-      "",
-      "每个镜头独立组件，共用 ExplainerShot 图元；已有 authored scene 不会被覆盖。",
-    ].join("\n") + "\n",
-  );
+  // BUILD_NOTES 是人 / build-agent 的构建记录：任务书要求往里写 motion_check 数字、主角尺寸、是否高光、
+  // 运镜次数（src/agents/task-brief.mjs 的 build-agent 规则）。旧写法每次 materialize 都**整篇重写**，
+  // 把那些记录抹掉；而它在全仓零读者（grep 确认），抹掉也没有任何东西变红 —— 见 agent-protocol §3.2 与 §8 第 5 条。
+  // 现在的口径：不存在才建，已存在只**追加**机器这一段。追加不毁内容，也不假装它是人写的。
+  // ⚠ 这一段仍然没有门守（BUILD_NOTES 零读者本身就是记录过的事实）；改这里请同步那两节。
+  const notesFile = path.join(dir, "BUILD_NOTES.md");
+  const machine = "- " + id + " 由 scripts/materialize-shots.mjs 登记 " + scenes.length + " 镜："
+    + scenes.map((scene, n) => "SC" + String(i + n + 1).padStart(2, "0") + "(" + scene.id + ")").join(" ");
+  if (!fs.existsSync(notesFile)) fs.writeFileSync(notesFile, [
+    "# " + id + " 构建记录", "",
+    "镜头数：" + scenes.length, "",
+    "每个镜头独立组件，共用 ExplainerShot 图元；已有 authored scene 不会被覆盖（BUILD_NOTES 自身除外：它只追加）。", "",
+    "## 机器登记", machine,
+  ].join("\n") + "\n");
+  else fs.appendFileSync(notesFile, machine + "\n");
 
   groups.push({id, scene_ids: scenes.map((scene) => scene.id), status: "generated"});
 }

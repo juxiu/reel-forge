@@ -7,8 +7,6 @@ export const SHOT_RECIPE = {
   hero_size:210,
   camera:"pan",
   settle_frames:30,
-  layout:"network",
-  seed:1031,
   mirror:false,
   accent_index:1,
   hero_role:"flow",

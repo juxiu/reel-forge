@@ -542,9 +542,14 @@ decorative-motion
 
 当前视觉 embedding：
 
-<code>visual-pixel-v1</code>
+<code>visual-pixel-v2</code>
 
 它主要用于确定性的视觉回归，不应描述成真正的语义视觉模型。
+
+> 版本号不是装饰：v1 用 PIL 缩放并把像素量化成 uint8，v2 是纯标准库的双线性 + 面积平均、全程浮点。
+> 两者的 cosine 读数不可比，所以 <code>fixtures/visual-benchmark.json</code> 的 <code>embedding</code> 必须等于
+> <code>scripts/visual_regression.py</code> 的 <code>DESCRIPTOR</code>——不等时脚本直接拒绝运行，
+> <code>npm run verify:visual-benchmark</code> 也会把这两处读出来对撞。
 
 > **口径说明（重要）**：<code>fixtures/visual-references/</code> 里的正例/反例是 <strong>64×36 的 P3 PPM 合成图</strong>（3–30 种纯色），不是真实样片帧。实测显示：把画面做得更密、更实、更有真实文案后，<code>reference_similarity</code> 会<strong>下降</strong>（0.597 → 0.50），即该指标与画面质量反向相关。因此自 v2.0 起它标记为 <code>gate: "advisory"</code> / <code>blocking: false</code>，<strong>不再阻断交付</strong>，只作为 run-to-run 回归记录（报告含 <code>reference_similarity_delta</code>）。它的 PASS 不代表质量达标，只代表没有异常漂移。
 
@@ -664,6 +669,18 @@ source-repair.json
 ~~~
 
 Repair 的目标是局部修复，而不是无条件重新生成整个项目。
+
+真改动只写 `fixtures/render-ir-16x9.json` / `fixtures/render-ir-9x16.json`（渲染层确实读这两个文件），
+所以 `status.json` 的 `changed_nodes` 等于「下一帧真的会不一样」的镜头。
+
+`source-repair.json` 是**源层待办清单**，不是写回记录，`writeback_count` 恒为 0：
+`artifacts/<project_id>/beats.json` 每轮由 `buildBeatGraph(script, timeline)` 重新生成，
+而且 `beatToScene` 不读 `beat.camera` / `beat.hero` —— 改那个文件不会改变画面。
+分镜层改不动 IR 的问题（`hero-overlong`、`text-below-min`、`beat-window-overflow` 等）
+记在 `entries` 里，由人或 agent 落到手写的 `script/storyboard_src.md` 与 `fixtures/script.json` 上。
+
+沙盒跑法（不改仓库里的 fixtures，供 `npm run verify:repair` 用）：
+`PROJECT_FILE=<项目文件> IR_DIR=<render-IR 目录> node scripts/repair.mjs`。
 
 ## 25. Lessons 闭环
 
@@ -939,9 +956,9 @@ G8/SC43–SC44
 - hero_size；
 - camera；
 - settle_frames；
-- 6 个 still sample kind。
+- 6 个 still sample kind（这是**参考片的实录**：那 44 镜没有一镜声明 `highlight`。渲染层的判据是「每镜 ≥6 张、`SHOT_RECIPE.highlight === true` 的镜头 ≥10 张」，真源 `src/build/limits.mjs:27,38`，论述见 `docs/knowledge/agent-protocol.md` §4）。
 
-当前验证器会检查 44 镜头、8 groups、源码存在、recipe 对齐、30-frame settle 和越权旧 renderer 引用。
+当前验证器**不写影片规模**：它判蓝图自洽（`shot_count === shots.length`）、每条 `group` 与 `MAX_SHOTS_PER_GROUP` 的分组公式一致、每组条数等于公式期望、镜头源文件存在且字段不与蓝图漂移、`settle_frames` 不低于相机最短让位帧、以及越权旧 renderer 引用。44 镜 / 8 组是这份蓝图自身的属性，不是门禁脚本里的常量（论述见 `docs/knowledge/agent-protocol.md` §7，真源在 `src/build/limits.mjs`）。
 
 ## 34. 当前工程状态应如何表述
 

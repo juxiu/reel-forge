@@ -1,7 +1,8 @@
 import fs from "node:fs";
+import {groupIdOf, maxShotsPerGroup} from "../src/build/limits.mjs";
 
 const ir = JSON.parse(fs.readFileSync("fixtures/render-ir-16x9.json", "utf8"));
-const maxPerGroup = Number(process.env.MAX_SHOTS_PER_GROUP || 6);
+const maxPerGroup = maxShotsPerGroup();
 if (!fs.existsSync("src/shots/registry.jsx")) throw new Error("shot registry missing");
 const registry = fs.readFileSync("src/shots/registry.jsx", "utf8");
 
@@ -12,7 +13,7 @@ if (missing.length) throw new Error("shot registry missing: " + missing.join(","
 
 for (const scene of ir.scenes) {
   const number = Number(scene.id.split("-").at(-1));
-  const group = "G" + String(Math.floor((number - 1) / maxPerGroup) + 1);
+  const group = groupIdOf(number, maxPerGroup);
   const shot = "SC" + String(number).padStart(2, "0");
   const file = "src/shots/" + group + "/" + shot + ".jsx";
   if (!fs.existsSync(file)) throw new Error("shot source missing: " + file);

@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import {buildPlan} from "../src/shots/plan.mjs";
 
 // 画面文字出处门（阻断）
 // 依据 anything2explainer 的两条硬判据：
@@ -7,10 +8,25 @@ import path from "node:path";
 //   examples/rag 的 QC 判据「画面英文/数字逐个核对调研文档」。
 // reel-forge 此前声称"事实可回溯"，但没有任何代码检查画面文字；这里补上闭环。
 //
-// 三部分：
-//   A. 事实溯源    —— 每个 scene 的 elements[*].text 必须能在解说词里找到，其中的数字必须能在脚本或调研文档里找到。
-//   B. 字面量白名单 —— 渲染源码里所有会上画面的硬编码文案必须显式登记，新增未登记文案即失败。
-//   C. 双比例一致  —— 同一 scene 在 16:9 / 9:16 的时长、顺序、变体必须一致。
+// 四部分：
+//   A1 IR 文案      —— fixtures/render-ir-* 的 elements[*].text 必须能在解说词里找到，其中的数字必须有出处。
+//   A2 真上画面的文案 —— 经 src/shots/plan.mjs 归一后**确实会被渲染**的 hero / support 文案：
+//                        数字一律要出处（白名单豁免不了数字）；没出处的非数字文案出声、暂不阻断（理由见 §A2）。
+//   B  字面量白名单  —— 渲染源码里所有会上画面的硬编码文案必须显式登记，新增未登记文案即失败。
+//   C  双比例一致    —— 同一 scene 在 16:9 / 9:16 的时长、顺序、变体必须一致。
+//
+// ⚠ 为什么 A2 必须存在（2026-10 实测，别把这段当解释）：
+//   A1 查的是 IR 里的整句解说词，而 plan 层**故意不把整句画上画面**——
+//     heroTextOf 拒收 >12 宽度单位的句子（src/shots/plan.mjs:153），
+//     pickSupport 把 textEm>12 的 box 元素直接跳过（src/shots/plan.mjs:190）。
+//   于是 A1 查到的那 4 条恰好是**唯一不会上画面**的文字；真正画上屏幕的是
+//   recipe.labels（src/shots/Gn/SCnn.jsx 的对象数组）、变体骨架标签（src/shots/plan.mjs:246-256）、
+//   以及 hero-overlong 兜底时的 scene.narrative_job 枚举 token（src/shots/plan.mjs:145）。
+//   实测 digest 样片：A1 看 4 条，画面真上 20 条，两者交集 1 条 —— 只有 A1 的门
+//   在「满屏无出处英文 token」的片子上会全绿。同理 B 段以前的三条正则
+//   只认 `text={"…"}` / `labels||[…]` / `>文案<` 三种形状，本仓库一条都没有，
+//   于是 discovered_literals 恒为 0、unregistered 恒为空、门恒绿；登记的 34 条里 30 条
+//   早就从源码里消失了。所以现在加了「扫描器自检」和「零发现即失败」两条反脱节断言。
 
 const project = JSON.parse(fs.readFileSync(process.env.PROJECT_FILE || "fixtures/project.json", "utf8"));
 const artifacts = path.join("artifacts", project.project_id);
@@ -35,8 +51,10 @@ const wide = readJson("fixtures/render-ir-16x9.json", { scenes: [] });
 const tall = readJson("fixtures/render-ir-9x16.json", { scenes: [] });
 const issues = [];
 const facts = [];
+const rendered = [];
+const unsourced = [];
 
-// ---- A. 事实溯源 ----
+// ---- A1. IR 文案 ----
 for (const [ratio, ir] of [["16x9", wide], ["9x16", tall]]) {
   for (const scene of ir.scenes || []) {
     for (const element of scene.elements || []) {
@@ -56,9 +74,116 @@ for (const [ratio, ir] of [["16x9", wide], ["9x16", tall]]) {
   }
 }
 
+// ---- A2. 真上画面的文案 ----
+// registry.jsx → scene id → 镜头源文件；recipe 取法与 scripts/plan-audit.mjs:39-56 同一形状
+// （括号配对 + new Function 求值），不是字符串包含判断 —— 字符串判断会把
+// `labels:["a","b"]` 看成"没有文案"，而它每个元素都要上画面。
+function shotIndexByScene() {
+  const index = new Map();
+  for (const m of readText("src/shots/registry.jsx").matchAll(/["']([^"']+)["']\s*:\s*(G\d+)\.([A-Za-z0-9_]+)/g)) {
+    index.set(m[1], path.join("src", "shots", m[2], m[3] + ".jsx"));
+  }
+  return index;
+}
+function recipeFrom(shotFile) {
+  const source = readText(shotFile);
+  const start = source.indexOf("SHOT_RECIPE");
+  const brace = source.indexOf("{", start);
+  if (start < 0 || brace < 0) return null;
+  let depth = 0;
+  for (let i = brace; i < source.length; i++) {
+    if (source[i] === "{") depth += 1;
+    else if (source[i] === "}" && --depth === 0) {
+      try {
+        return new Function("return (" + source.slice(brace, i + 1) + ");")();
+      } catch {
+        return null;
+      }
+    }
+  }
+  return null;
+}
+const sceneShotFiles = shotIndexByScene();
+
+function renderedTexts(ir) {
+  const rows = [];
+  let withoutShot = 0;
+  for (const scene of ir.scenes || []) {
+    const file = sceneShotFiles.get(String(scene.id)) || null;
+    const available = file && fs.existsSync(file);
+    if (!available) withoutShot += 1;
+    const plan = buildPlan({scene, recipe: available ? (recipeFrom(file) || {}) : {}, captions: [], fps: 30});
+    const push = (role, value) => {
+      const text = String(value ?? "").trim();
+      if (text) rows.push({scene: String(scene.id), role, text, shot_file: available ? file : null});
+    };
+    push("hero", plan.hero?.text);
+    push("hero.sub", plan.hero?.sub);
+    push("hero.unit", plan.hero?.unit);
+    for (const item of plan.items || []) {
+      push("support:" + item.kind, item.text);
+      push("support.unit", item.unit);
+    }
+  }
+  return {rows, withoutShot};
+}
+
+const allowlistFile = "fixtures/visual-literals.json";
+function registeredSet() {
+  return new Set((readJson(allowlistFile, { literals: [] }).literals || []).map((x) => (typeof x === "string" ? x : x.literal)));
+}
+const allow = registeredSet();
+let scenesWithoutShot = 0;
+
+for (const [ratio, ir] of [["16x9", wide], ["9x16", tall]]) {
+  const {rows, withoutShot} = renderedTexts(ir);
+  scenesWithoutShot = Math.max(scenesWithoutShot, withoutShot);
+  for (const row of rows) {
+    rendered.push({ratio, ...row});
+    // 数字：注册进白名单也不能豁免。白名单管的是「结构标签可以不念」，
+    // 不是「登记过的字就可以没有出处」—— a2e 事实规则第 1 条要的是数字/年份/机构/人名逐个有出处。
+    for (const number of row.text.match(/\d+(?:\.\d+)?/g) || []) {
+      if (!narrationNorm.includes(number) && !researchNorm.includes(number)) {
+        issues.push(ratio + "/" + row.scene + ": rendered " + row.role + " number has no source: " + number + "（文案：" + row.text.slice(0, 40) + "）");
+      }
+    }
+    const probe = norm(row.text).slice(0, 80);
+    const traced = probe && (narrationNorm.includes(probe) || researchNorm.includes(probe));
+    if (!traced && !allow.has(row.text)) unsourced.push({ratio, scene: row.scene, role: row.role, text: row.text, shot_file: row.shot_file});
+  }
+}
+
 // ---- B. 字面量白名单 ----
+// ⚠ 通道清单必须与「画面文字的出身」对齐（src/shots/plan.mjs 的 DISPLAY_KEYS 与 pickHero/pickSupport）：
+//   少一条通道，B 就退化成"扫不到东西所以永远绿"，而那正是它上一版失效的原因。
+const attrLiteral = /\b(?:text|title|label|alt|caption|placeholder|display|headline|sub|unit|fallback_hero)\s*[:=]\s*\{?\s*["']([^"'\n]{2,})["']/g;
+const stringArray = /\b(?:labels|rows|key_terms|chips|steps)\s*:\s*\[([^\]]*)\]/g;
+const legacyFallback = /\b(?:labels|rows)\|\|\[([^\]]*)\]/g;
+const jsxChildren = />([^<>{}"\n][^<>{}"\n]{1,})</g;
+const quotedChildren = />\s*["']([^"'<>{}\n]{2,})["']\s*</g;
+const ignore = /^[\s\d.,:;!?/\\|()[\]{}+\-*=<>]*$/;
+
+function pushLiteral(found, raw) {
+  const value = String(raw || "").replace(/\s+/g, " ").trim().replace(/^["'`]|["'`]$/g, "").trim();
+  if (!value || value.length < 2) return;
+  if (ignore.test(value)) return;
+  if (!/[a-zA-Z一-鿿]/.test(value)) return;
+  if (/^(rgba?|calc|var|px|rem|em|flex|none|solid|absolute|relative|center|left|right|top|bottom|hidden)$/i.test(value)) return;
+  found.add(value);
+}
+
+function literalsInSource(source) {
+  const found = new Set();
+  for (const m of source.matchAll(attrLiteral)) pushLiteral(found, m[1]);
+  for (const m of source.matchAll(stringArray)) for (const part of m[1].split(",")) pushLiteral(found, part);
+  for (const m of source.matchAll(legacyFallback)) for (const part of m[1].split(",")) pushLiteral(found, part);
+  for (const m of source.matchAll(jsxChildren)) pushLiteral(found, m[1]);
+  for (const m of source.matchAll(quotedChildren)) pushLiteral(found, m[1]);
+  return found;
+}
+
 function shotSources() {
-  const files = [path.join("src", "shots", "SemanticShots.jsx")];
+  const files = [path.join("src", "shots", "SemanticShots.jsx"), path.join("src", "shots", "plan.mjs")];
   for (const group of fs.readdirSync(path.join("src", "shots"), { withFileTypes: true })) {
     if (!group.isDirectory()) continue;
     const dir = path.join("src", "shots", group.name);
@@ -66,53 +191,55 @@ function shotSources() {
       if (entry.endsWith(".jsx")) files.push(path.join(dir, entry));
     }
   }
-  return files;
+  return files.filter((file) => fs.existsSync(file));
 }
-const visibleAttributes = /(?:text|title|label|alt|caption|placeholder)=\{?"([^"{}]{2,})"?\}/g;
-const jsxText = />([^<>{}"\n][^<>{}"\n]{1,})</g;
-const fallbackArray = /(?:labels|rows)\|\|\[([^\]]*)\]/g;
-const ignore = /^[\s\d.,:;!?/\\|()[\]{}+\-*=<>]*$/;
 
 function literalsIn(file) {
-  const source = fs.readFileSync(file, "utf8");
-  const found = new Set();
-  const push = (raw) => {
-    const value = String(raw || "").replace(/\s+/g, " ").trim().replace(/^["'`]|["'`]$/g, "").trim();
-    if (!value || value.length < 2) return;
-    if (ignore.test(value)) return;
-    if (!/[a-zA-Z一-鿿]/.test(value)) return;
-    if (/^(rgba?|calc|var|px|rem|em|flex|none|solid|absolute|relative|center|left|right|top|bottom|hidden)$/i.test(value)) return;
-    found.add(value);
-  };
-  for (const match of source.matchAll(visibleAttributes)) push(match[1]);
-  for (const match of source.matchAll(fallbackArray)) for (const part of match[1].split(",")) push(part);
-  for (const match of source.matchAll(jsxText)) push(match[1]);
-  return [...found].sort();
+  return [...literalsInSource(fs.readFileSync(file, "utf8"))].sort();
 }
 
-const allowlistFile = "fixtures/visual-literals.json";
-const discovered = [];
-for (const file of shotSources()) for (const literal of literalsIn(file)) discovered.push({ file, literal });
-const unregistered = discovered.filter((entry) => !registered(entry.literal));
-function registered(literal) {
-  const data = readJson(allowlistFile, { literals: [] });
-  return new Set((data.literals || []).map((x) => (typeof x === "string" ? x : x.literal))).has(literal);
-}
-if (write) {
-  const merged = new Map();
-  for (const entry of discovered) merged.set(entry.literal, entry.file);
-  for (const entry of readJson(allowlistFile, { literals: [] }).literals || []) {
-    const literal = typeof entry === "string" ? entry : entry.literal;
-    if (!merged.has(literal)) merged.set(literal, "retired");
+// 扫描器自检：源码形状会变（JSX 属性改成对象字段、引号换成单引号…），
+// 变了就要在这里红，而不是悄悄退回成"零发现所以全绿"。
+function scannerSelfTest() {
+  const probes = [
+    ["recipe labels 数组", 'export const SHOT_RECIPE = {labels:["mutA","mutB"]};', ["mutA", "mutB"]],
+    ["recipe 字符串字段", 'export const SHOT_RECIPE = {hero:{display:"mutC",unit:"mutD"}};', ["mutC", "mutD"]],
+    ["JSX 属性（表达式容器）", '<CText text={"mutE"} />', ["mutE"]],
+    ["JSX 属性（裸字符串）", '<CText text="mutF" />', ["mutF"]],
+    ["JSX 子元素", '<CText>mutG</CText>', ["mutG"]],
+    ["骨架 labels（冒号后带空格、单引号）", "labels: ['mutH', 'mutI']", ["mutH", "mutI"]],
+    ["带引号的子元素", '<CText> "mutJ" </CText>', ["mutJ"]],
+  ];
+  const dead = [];
+  for (const [name, source, expect] of probes) {
+    const found = literalsInSource(source);
+    for (const want of expect) if (!found.has(want)) dead.push(name + "（不再扫到 " + want + "）");
   }
+  return dead;
+}
+for (const dead of scannerSelfTest()) issues.push("B 段扫描器自检失败：" + dead + " —— 白名单正在变成装饰");
+
+const discovered = [];
+for (const file of shotSources()) for (const literal of literalsIn(file)) discovered.push({file, literal});
+const unregistered = discovered.filter((entry) => !allow.has(entry.literal));
+
+if (write) {
+  // 只写「现在真在源码里扫到的」。老实现把扫不到的条目留成 "retired" 永久保留，
+  // 结果 34 条登记里 30 条对应的源码文案早就不存在了 —— 只增不减的白名单等于把门越开越宽。
   const payload = {
-    version: "1.0",
-    note: "Rendered on-screen literals must be registered here. Structural labels are allowed; factual claims must trace to script/research instead.",
-    literals: [...merged.entries()].sort().map(([literal, file]) => ({ literal, file })),
+    version: "2.0",
+    note: "Rendered on-screen literals must be registered here. Structural labels are allowed; any digit is still checked against script/research and cannot be waived by this file.",
+    channels: ["attrLiteral", "stringArray", "legacyFallback", "jsxChildren", "quotedChildren"],
+    literals: [...new Map(discovered.map((entry) => [entry.literal, entry.file])).entries()]
+      .sort(([a], [b]) => (a < b ? -1 : 1))
+      .map(([literal, file]) => ({literal, file})),
   };
   fs.writeFileSync(allowlistFile, JSON.stringify(payload, null, 2) + "\n");
-  console.log("visual literals allowlist written", payload.literals.length, "entries");
+  console.log("visual literals allowlist written", payload.literals.length, "entries; dropped previously-registered:", [...allow].filter((x) => !payload.literals.some((e) => e.literal === x)).length);
   process.exit(0);
+}
+if (!discovered.length) {
+  issues.push("B 段在渲染源码里一条硬编码文案都没扫到 —— 扫描形状与源码已脱节，白名单不再拦任何东西");
 }
 for (const entry of unregistered) {
   issues.push("unregistered on-screen literal in " + entry.file + ": " + JSON.stringify(entry.literal));
@@ -131,26 +258,37 @@ if (wide.scenes.length !== tall.scenes.length) {
 }
 
 const report = {
-  version: "1.0",
+  version: "2.0",
   project_id: project.project_id,
   status: issues.length ? "FAIL" : "PASS",
   script_segments: script.segments.length,
-  traced_elements: facts.length,
-  registered_literals: new Set((readJson(allowlistFile, { literals: [] }).literals || []).map((x) => (typeof x === "string" ? x : x.literal))).size,
+  ir_text_elements: facts.length,
+  rendered_texts: rendered.length,
+  scenes_without_shot_file: scenesWithoutShot,
+  unsourced_rendered_text: unsourced,
+  registered_literals: allow.size,
   discovered_literals: discovered.length,
+  research_bytes: research.trim().length,
   blocking: true,
-  rationale: "a2e SKILL.md 硬性原则 2「事实有出处」+ 样片 QC「画面英文/数字逐个核对调研文档」的可执行版本",
+  blocking_scope: "A1 IR 文案溯源 + A2 画面数字 + B 未登记字面量 + C 双比例一致；A2 的非数字无出处文案暂只出声",
+  rationale: "a2e SKILL.md 硬性原则 2「事实有出处」+ 样片 QC「画面英文/数字逐个核对调研文档」+ narration-guidance.md §11「画面与解说分工」的可执行版本",
   issues,
 };
 fs.mkdirSync(path.join(artifacts, "qc"), { recursive: true });
 fs.writeFileSync(path.join(artifacts, "qc", "text_provenance.json"), JSON.stringify(report, null, 2));
+if (unsourced.length) {
+  console.warn("⚠ 画面有 " + unsourced.length + " 条文案既不在解说词/调研里、也没登记成结构标签（不阻断，理由见脚本 §A2 注释）：");
+  for (const row of unsourced.slice(0, 8)) console.warn("  - " + row.ratio + "/" + row.scene + " " + row.role + ": " + row.text + (row.shot_file ? "  ← " + row.shot_file : "  ← scene 数据"));
+}
 if (issues.length) {
-  console.error("text provenance FAIL " + JSON.stringify({ unregistered: unregistered.length, issues: issues.length }));
+  console.error("text provenance FAIL " + JSON.stringify({unregistered: unregistered.length, issues: issues.length, rendered: rendered.length}));
   issues.slice(0, 12).forEach((issue) => console.error("- " + issue));
   process.exit(1);
 }
 console.log("text provenance PASS", JSON.stringify({
-  traced_elements: report.traced_elements,
+  ir_text_elements: report.ir_text_elements,
+  rendered_texts: report.rendered_texts,
   registered_literals: report.registered_literals,
   discovered_literals: report.discovered_literals,
+  unsourced_rendered_text: unsourced.length,
 }));

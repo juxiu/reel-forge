@@ -1,0 +1,276 @@
+
+>>> verify:skill
+skill contract PASS {"name":"reel-forge","sections":11,"cli":"npm run skill","commands":8,"checkpoints":4,"env_flags":1,"pipeline_order":"plan-audit → qc（容忍型）"}
+<<< verify:skill PASS 327ms
+
+>>> verify:plan
+plan PASS {"doc_path_tokens":15,"mjs_imported":8,"cited_commands":4,"repair_types_promised":3,"repair_types_auto_in_code":3,"repair_tokens_documented":17}
+<<< verify:plan PASS 153ms
+
+>>> verify:contracts
+ok   校验器：缺必填字段要报出来
+ok   校验器：additionalProperties:false 拒多余字段
+ok   校验器：additionalProperties:false 不收已登记字段
+ok   校验器：integer 不收小数
+ok   校验器：number 收整数
+ok   校验器：const 要精确匹配
+ok   校验器：enum 成员外要报
+ok   校验器：pattern 生效
+ok   校验器：minItems / maxItems 生效
+ok   校验器：items 递归到每个元素
+ok   校验器：exclusiveMinimum 是严格大于
+ok   校验器：if/then 只在命中时施加约束
+ok   校验器：类型不符时不再刷子字段错误
+ok   校验器：description 是注记：不校验也不顶替约束
+ok   校验器：if/then 里的子约束真的生效
+ok   校验器：不认识的关键字必须抛错，不能静默通过
+ok   校验器：取键：只取第一层，嵌套对象的键不外泄
+ok   校验器：取键：字符串里的花括号与逗号不切段
+ok   校验器：取键：shorthand 也算字段
+ok   校验器：取键：认出展开写法并如实说「测不全」
+ok   校验器：取键：锚点找不到时返回 null 而不是空键表
+ok   project ← fixtures/project.json（1 项）
+ok   script ← fixtures/script.json（1 项）
+ok   render-ir ← fixtures/render-ir.json（1 项）
+ok   render-ir ← fixtures/render-ir-16x9.json（1 项）
+ok   render-ir ← fixtures/render-ir-9x16.json（1 项）
+ok   captions ← fixtures/captions.json（1 项）
+ok   visual-benchmark ← fixtures/visual-benchmark.json（1 项）
+ok   motion ← fixtures/render-ir-16x9.json / scenes（12 项）
+ok   beat ← artifacts/demo-production/beats.json / beats（4 项）
+ok   scene ← artifacts/demo-production/scene.json / scenes（4 项）
+ok   qc ← artifacts/digest-explainer/qc/report.json（1 项）
+ok   agent ← artifacts/digest-explainer/qc/report.json / agent_reviews（2 项）
+ok   hyperframes ← src/backends/hyperframes-project.mjs(现场生成)
+ok   静态对撞（不等产物）：timeline ← scripts/tts_build.mjs 的字段表（10 个键）
+ok   静态对撞（不等产物）：voice-manifest ← scripts/tts_build.mjs 的字段表（10 个键）
+skip footage ← fixtures/render-ir-16x9.json / footage：该产物当前为空，没有可校验的元素
+skip timeline ← script/timeline.json 还没生成（由 npm run tts 写出；一存在本门就真校验它）
+skip word-timing ← script/timeline-source.json 还没生成（由 npm run tts 写出；一存在本门就真校验它）
+skip voice-manifest ← artifacts/digest-explainer/audio/voice-manifest.json 还没生成（由 npm run tts 写出；一存在本门就真校验它）
+skip delivery ← artifacts/delivery/digest-explainer/delivery-manifest.json 还没生成（由 npm run deliver 写出；一存在本门就真校验它）
+skip research ← artifacts/digest-explainer/research.json 还没生成（由 npm run run-production 写出；一存在本门就真校验它）
+contracts PASS 13 个契约真校验了产物，2 个与生产者的字段表静态对撞，6 个等产物生成，0 个装饰性契约
+<<< verify:contracts PASS 214ms
+
+>>> verify:imports
+IMPORT GATE PASS {"files":103,"checkedExports":39,"fonts":4}
+<<< verify:imports PASS 323ms
+
+>>> verify:syntax
+SYNTAX GATE PASS {"checked":115,"jsx_not_parseable_locally":56,"caveat":"jsx layers are structurally checked by verify:imports, not parsed"}
+<<< verify:syntax PASS 18181ms
+
+>>> verify:timeline
+TIMELINE GATE PASS {"chapters":3,"hud":3,"card_frames":70}
+<<< verify:timeline PASS 192ms
+
+>>> verify:storyboard
+     用 python3 → C:\Users\guolintao\AppData\Local\Python\bin\python3.exe：Python 3.14.6
+ok   合规分镜通过自检 — selfcheck PASS 4 shots
+ok   镜头不足 120 帧要失败 — shot too short (<120f): SC03
+ok   没有持续动作要失败 — missing continuous action: SC02
+ok   末拍稳定期 <30 帧要失败 — insufficient settle hold (<30f): SC02
+ok   白名单外的镜头用 Glitch 要失败 — glitch over whitelist: SC02
+ok   白名单外的镜头用扫光图元要失败 — light-sweep over whitelist: SC02
+ok   分镜引用了时间轴没有的句子要出声（不是 KeyError 回溯） — 渲染阶段就失败：分镜里有 {S99.from}，但时间轴没有句子 S99（共 4 句）
+ok   渲染后仍有未解析的花括号要失败 — 渲染阶段就失败：unresolved storyboard tokens: ['{NOT_A_TOKEN}']
+ok   分镜表与时间轴帧号不一致要失败 — timeline mismatch: SC02
+ok   镜头数和时间轴句数对不上要失败 — storyboard/timeline coverage mismatch: 4 != 3
+ok   表格式对不上时说出真原因 — 分镜表里没有解析到任何 | SCnn | 起–止 | … | 表格行：格式变了还是这一版根本没用表格？（artifacts\storyboard-selftest\storyboard-table-format.md）
+ok   缺时间轴时给安装提示而不是回溯 — missing artifact: artifacts\storyboard-selftest\timeline-no-timeline.json（先跑 npm run tts：它写出 script/timeline.json）
+ok   缺分镜表时指向 storyboard 而不是 tts — missing artifact: artifacts\storyboard-selftest\storyboard-no-storyboard.md（先跑 npm run storyboard：它把 script/storyboard_src.md 渲染成分镜表）
+ok   时间轴是半截 JSON 时说清是哪个文件 — 时间轴不是合法 JSON：artifacts\storyboard-selftest\timeline-bad-json.json（Expecting value 第 1 行第 27 列）——重跑 npm run tts
+verify-storyboard PASS 14 个用例（1 基准 + 13 条判据变异）
+<<< verify:storyboard PASS 6560ms
+
+>>> verify:render-layer
+RENDER LAYER GATE PASS {"scenes":8,"icons":17,"beats":20}
+<<< verify:render-layer PASS 246ms
+
+>>> verify:jsx-symbols
+JSX symbols PASS {"dir":"src","files":56,"bare_containers":30}
+<<< verify:jsx-symbols PASS 569ms
+
+>>> verify:spawn
+ok    node resolves to this process's own binary D:\nvm4w\nodejs\node.exe
+ok    unknown command resolves to null 
+ok    missing command reports status null 
+ok    missing command reports a spawn error, not a silent exit 1 reel-forge-definitely-not-installed not found on PATH — 安装它，或设置 REEL_FORGE_DEFINITELY_NOT_INSTALLED_PATH 指向可执行文件
+ok    arguments with spaces survive round-trip ["--frame=123","plain","with space","dir with space/x.png"]
+ok    exit codes propagate as numbers (null 会把失败伪装成退出码 1) 3
+ok    success reads as 0 
+ok    piped run returns text, not a Buffer string "line1\nline2\n"
+ok    only src/runtime/spawn.mjs touches child_process 
+ok    npm.cmd resolves to an executable, not the extensionless sh script D:\nvm4w\nodejs\npm.cmd
+ok    npm actually runs on Windows (the historical ENOENT case) 0 11.11.1 
+ok    runNpmScript executes the package.json entry 0
+ok    runAsync pipes stdin and captures stdout 0 hello-spawn 
+ok    runAsync reports missing binary instead of hanging or throwing raw reel-forge-definitely-not-installed not found on PATH — 安装它，或设置 REEL_FORGE_DEFINITELY_NOT_INSTALLED_PATH 指向可执行文件
+ok    runAsync returns non-zero status and stderr 4 boom
+ok    a normal async run reports timed_out false false / false
+ok    runAsync timeout kills the child instead of waiting it out timed_out=true 428ms status=null signal=SIGTERM
+ok    timeout is reported as a timeout, not as a failed launch node 超时被终止（400ms，killSignal=SIGTERM）
+ok    FOO_PATH env override wins over PATH lookup C:\Users\guolintao\Desktop\github\reel-forge\artifacts\spawn-selftest\fake-tool.mjs
+SPAWN GATE PASS {"platform":"win32","node":"D:\\nvm4w\\nodejs\\node.exe","npm":"D:\\nvm4w\\nodejs\\npm.cmd"}
+<<< verify:spawn PASS 2540ms
+
+>>> verify:agent
+ok    AGENT_COMMAND 未设置时 provider 为 null（降级而不是报错） 
+ok    AGENT_COMMAND 设置后 provider 存在 
+ok    AGENT_ARGS 必须是 JSON 数组（写错立刻抛，不静默当无参） Unexpected token 'o', "not-json" is not valid JSON
+ok    无 provider → status=skipped {"role":"qc-agent","status":"skipped","output":{"reason":"agent-unconfigured"},"completed_at":"2026-10-09T11:19:24.362Z"}
+ok    skipped 信封合契约 
+ok    AGENT_STRICT=1 时无 provider 直接抛并指名角色 agent provider required for build-agent
+ok    provider 返回 undefined → status=failed + empty-output {"role":"director-agent","status":"failed","output":{"reason":"empty-output"},"completed_at":"2026-10-09T11:19:24.364Z"}
+ok    failed 信封合契约 
+ok    AGENT_STRICT=1 时空输出直接抛 agent returned empty output: research-agent
+ok    skipped 却带结论的信封被契约拒绝 $.output：契约里没有的字段 "verdict"（additionalProperties:false）
+ok    completed 信封带任意 output 形状（数组）合契约 
+ok    命令 provider：stdin 收 input、stdout 收 JSON → completed {"role":"build-agent","status":"completed","output":{"verdict":"reviewed","role_seen":"build-agent","scenes":2},"completed_at":"2026-10-09T11:19:24.600Z"}
+ok    completed 信封带 completed_at 2026-10-09T11:19:24.600Z
+ok    provider 真的把 role 与 input 原样喂进去了（stdin JSON 里能看到 role 与 shots 数） {"verdict":"reviewed","role_seen":"build-agent","scenes":2}
+ok    completed 信封合契约 
+ok    退出码非 0 → agent failed: exit N（不是超时也不是起不来） agent failed: exit 7
+ok    stdout 不是 JSON → 指名「output is not JSON」 agent output is not JSON
+ok    命令名写错 → 报「无法启动」并指名是哪个命令，而不是裸 ENOENT agent command 无法启动: reel-forge-definitely-not-installed not found on PATH — 安装它，或设置 REEL_FORGE_DEFINITELY_NOT_INSTALLED_PATH 指向可执行文件
+ok    stdout 恰好是 null 时算「空输出」（failed）而不是 completed {"role":"research-agent","status":"failed","output":{"reason":"empty-output"},"completed_at":"2026-10-09T11:19:25.242Z"}
+ok    AGENT_TIMEOUT_MS/timeoutMs 到点杀子进程并指名超时 agent command 超时被终止: D:\nvm4w\nodejs\node.exe（500ms；用 AGENT_TIMEOUT_MS 调整）
+ok    超时是真的中断等待，不是等它跑完（<5s 返回，脚本本身要 15s） 531ms
+ok    AGENT_TIMEOUT_MS 环境变量生效（不必改代码就有保险） agent command 超时被终止: D:\nvm4w\nodejs\node.exe（400ms；用 AGENT_TIMEOUT_MS 调整）
+ok    默认不设超时（不改变既有行为） 
+ok    批量里一条 provider 抛异常 → runNamedAgents 抛（同批已成功的信封一起丢） [{"index":1,"error":"agent failed: exit 9"}]
+ok    报错里带失败的 index，能看出是哪一条 [{"index":1,"error":"agent failed: exit 9"}]
+ok    成功那条没有因为抛错而被当成失败上报（errors 里只有 index 1） [{"index":1,"error":"agent failed: exit 9"}]
+ok    批量在「没配 provider」时是两份 skipped 而不是异常 [{"role":"qc-agent","status":"skipped","output":{"reason":"agent-unconfigured"},"completed_at":"2026-10-09T11:19:26.674Z"},{"role":"build-agent","status":"skipped","output":{"reason":"agent-unconfigured"},"completed_at":"2026-10-09T11:19:26.674Z"}]
+ok    批量在 strict 下逐条抛（错误信息保留角色名） [{"index":0,"error":"agent provider required for qc-agent"}]
+ok    verify-contracts 只是按契约校验 agent 信封的形状（each:agent_reviews） 
+ok    agent 输出没有任何下游消费者（本文 §2 的一句话结论） 
+ok    qc 的 PASS/FAIL 只由 issues.length 决定，不含 agent 结果 
+ok    约束键 only_paths 只有写入点（1 处） scripts/build-groups.mjs
+ok    约束键 six_stills_per_shot 只有写入点（1 处） scripts/build-groups.mjs
+ok    约束键 test_render_frames 只有写入点（1 处） scripts/build-groups.mjs
+ok    约束键 semantic_renderer_required 只有写入点（1 处） scripts/build-groups.mjs
+ok    约束键 settle_frames_min 只有写入点（1 处） scripts/build-groups.mjs
+ok    角色 research-agent 仍在 scripts/run-production.mjs 里被调用 
+ok    角色 director-agent 仍在 scripts/run-production.mjs 里被调用 
+ok    角色 build-agent 仍在 scripts/build-groups.mjs 里被调用 
+ok    角色 qc-agent 仍在 scripts/qc.mjs 里被调用 
+AGENT GATE PASS {"provider":"stdin/stdout json","envelope_states":3,"timeouts":"enforced"}
+<<< verify:agent PASS 2455ms
+
+>>> verify:approval
+approval PASS
+<<< verify:approval PASS 175ms
+
+>>> verify:build
+build PASS
+<<< verify:build PASS 237ms
+
+>>> verify:scheduler
+scheduler PASS
+<<< verify:scheduler PASS 184ms
+
+>>> verify:store
+store PASS
+<<< verify:store PASS 142ms
+
+>>> verify:visual
+visual PASS
+<<< verify:visual PASS 215ms
+
+>>> verify:visual-contracts
+ok    contracts == code
+ok    single source: DOT_FIELD
+ok    single source: STAR_FIELD
+ok    single source: SET_PIECE
+ok    single source: GLOW_PURPLE_SPEC
+ok    single source: HERO_MEASURE
+ok    single source: SOFT_GLOW
+ok    single source: PURPLE_DEBRIS
+ok    single source: MOTION
+ok    single source: EMPTY_FIELD
+ok    single source: LUMA
+ok    single source: CAMERA_LIMITS
+ok    single source: BEAT_WINDOW
+ok    single source: HERO_MIN
+ok    single source: TEXT_MIN
+ok    single source: SUBJECT_SMALL
+ok    glow css unchanged
+ok    glow_s css unchanged
+ok    orange/red/bloom css unchanged
+ok    contracts hold == CAMERA_LIMITS.clear
+ok    contracts hero_min 与渲染层一致
+ok    两种画幅都有取景区
+ok    9:16 设备像素下限按 s 折算
+verify:visual-contracts PASS {"owned_constants":15,"ratios":["16x9","9x16"]}
+<<< verify:visual-contracts PASS 360ms
+
+>>> verify:visual-grammar
+visual grammar PASS {"beats":4,"min_duration":7}
+<<< verify:visual-grammar PASS 156ms
+
+>>> verify:visual-benchmark
+visual benchmark PASS {"positives":3,"anti":3,"embedding":"visual-pixel-v2","thresholds":{"pass":0.62,"reference":0.78,"excellent":0.88,"anti_fail":0.9}}
+<<< verify:visual-benchmark PASS 124ms
+
+>>> verify:measure:quick
+ok   contracts 与 field.mjs 一致（单一真源未漂）
+ok   contracts 内部不变式
+ok   测量层只用标准库 — 7 个文件
+ok   判据没有退回成脚本字面量 — 顶层数字 0 个
+ok   python 可用且版本够（python3 → C:\Users\guolintao\AppData\Local\Python\bin\python3.exe） — 3.14.6
+ok   vision.objects 与暴力法一致 — vision.objects brute-force: PASS (1241 cases)
+skip test_measurement.py（--quick；完整跑约 5–6 分钟，去掉 --quick 即可）
+verify:measure PASS (quick)
+<<< verify:measure:quick PASS 1554ms
+
+>>> verify:semantic-director
+semantic director PASS [{"variant":"comparison","narrative_job":"hook","confidence":0.5,"matched_rules":["\\bversus\\b","\\bvs\\.?\\b","\\bcompare\\b","\\bcomparison\\b","相比|对比|区别|差异|优于|劣于"]},{"variant":"causal","narrative_job":"mechanism","confidence":0.5,"matched_rules":["\\bbecause\\b","\\btherefore\\b","\\bcaus(e|al)\\b","因为|因此|导致|原因|机制|原理"]},{"variant":"sequence","narrative_job":"sequence","confidence":0.5,"matched_rules":["\\bfirst\\b","\\bthen\\b","\\bnext\\b","\\bstep\\b","首先|然后|接着|下一步|步骤|流程"]},{"variant":"evidence","narrative_job":"evidence","confidence":1,"matched_rules":["\\bevidence\\b","\\bsource\\b","\\bproof\\b","证据|来源|证明|依据|数据|研究"]},{"variant":"code","narrative_job":"mechanism","confidence":0.5,"matched_rules":["\\bcode\\b","\\bapi\\b","\\bfunction\\b","代码|接口|函数|调用|协议"]},{"variant":"preference","narrative_job":"hook","confidence":0.9,"matched_rules":["want-content-digest","want-repr-digest","\\bpreference\\b","\\bwanted\\b","偏好|选择|想要|需要|目标"]}]
+<<< verify:semantic-director PASS 286ms
+
+>>> verify:footage
+footage PASS 0
+<<< verify:footage PASS 222ms
+
+>>> verify:text-provenance
+⚠ 画面有 6 条文案既不在解说词/调研里、也没登记成结构标签（不阻断，理由见脚本 §A2 注释）：
+  - 16x9/scene-002 hero: explain  ← src\shots\G1\SC02.jsx
+  - 16x9/scene-003 hero: hook  ← src\shots\G1\SC03.jsx
+  - 16x9/scene-004 hero: explain  ← src\shots\G1\SC04.jsx
+  - 9x16/scene-002 hero: explain  ← src\shots\G1\SC02.jsx
+  - 9x16/scene-003 hero: hook  ← src\shots\G1\SC03.jsx
+  - 9x16/scene-004 hero: explain  ← src\shots\G1\SC04.jsx
+text provenance PASS {"ir_text_elements":8,"rendered_texts":40,"registered_literals":99,"discovered_literals":168,"unsourced_rendered_text":6}
+<<< verify:text-provenance PASS 279ms
+
+>>> verify:limits
+limits PASS {"default_per_group":6,"still_frames":6,"still_highlight_min":10,"sampled_points":6,"grouping_cells":9408,"budget_cases":12,"consumers_pinned":8}
+<<< verify:limits PASS 182ms
+
+>>> verify:reference-sample
+reference sample PASS {"shots":44,"groups":8,"per_group":"6/6/6/6/6/6/6/2","max_per_group":6,"qc_rounds":2,"settle_min":30,"still_kinds":6}
+<<< verify:reference-sample PASS 192ms
+
+>>> verify:authored-shots
+authored shots PASS {"shots":44,"groups":8,"variants_recognised":10,"cameras_used":["pan","parallax","push"]}
+<<< verify:authored-shots PASS 150ms
+
+>>> verify:tts-parity
+tts parity PASS {"engine":"edge","cache":true,"timing":"tts-word-boundary","portable_engines":["edge","kokoro","piper","kokoro_onnx","wav"]}
+<<< verify:tts-parity PASS 205ms
+
+>>> verify:repair
+repair PASS (pixel + storyboard-classified + 记账链真跑)
+<<< verify:repair PASS 1128ms
+
+>>> verify:hyperframes
+hyperframes contract PASS
+<<< verify:hyperframes PASS 183ms
+
+>>> verify:instruction-filter
+instruction filter PASS {"rules":9,"positives":9,"negatives":5,"claims_kept":13,"dropped":3,"judged":16,"contract_errors":0}
+<<< verify:instruction-filter PASS 220ms
+
+FAST VERIFY SUMMARY {"checks":30,"passed":30,"failed":0,"elapsed_ms":37961}
+FAST VERIFY PASS {"checks":30,"elapsed_ms":37961}

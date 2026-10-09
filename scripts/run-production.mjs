@@ -4,6 +4,7 @@ import {createAgentProvider} from "../src/providers/agent/index.mjs";
 import {runNamedAgents} from "../src/agents/orchestrator.mjs";
 import {FileLock} from "../src/runtime/lock.mjs";
 import {initCheckpoints} from "../src/runtime/checkpoints.mjs";
+import {buildResearchMarkdown} from "../src/research/research-md.mjs";
 
 const project=JSON.parse(fs.readFileSync(process.argv[2]||"fixtures/project.json","utf8"));
 const scriptFile=process.argv[3]||"fixtures/script.json";
@@ -25,13 +26,9 @@ try {
 
   const rootDir=root+"/"+project.project_id;
   fs.mkdirSync(rootDir,{recursive:true});
-  fs.writeFileSync(rootDir+"/research.md",[
-    "# Research","",
-    "## Sources",
-    ...result.research.sources.map(source=>"- "+source.id+" — "+source.title+" — "+source.url),
-    "","## Claims",
-    ...result.research.claims.map(claim=>"- "+claim.id+" — "+claim.statement+" ["+claim.source_ids.join(", ")+"]")
-  ].join("\n"));
+  // 装配本体在 src/research/research-md.mjs（纯函数）：门用合成 research 真跑它，
+  // 而不是 grep 这里的数组字面量 —— 见 docs/knowledge/agent-protocol.md §6 与 verify-instruction-filter E 段。
+  fs.writeFileSync(rootDir+"/research.md",buildResearchMarkdown(result.research));
   for(const [name,value] of [
     ["research",result.research],["script",result.script],["beats",result.beats],
     ["scene",{project_id:project.project_id,scenes:result.scenes}],["render-ir",result.renderIR],

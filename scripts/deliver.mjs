@@ -50,7 +50,7 @@ const qc = JSON.parse(fs.readFileSync(base + "qc/report.json", "utf8"));
 if (qc.status !== "PASS") throw new Error("delivery requires PASS QC");
 const provenance = JSON.parse(fs.readFileSync(base + "qc/text_provenance.json", "utf8"));
 if (provenance.status !== "PASS") throw new Error("delivery requires traceable on-screen text");
-// visual-pixel-v1 仅为回归记录，不参与交付判定。
+// visual-pixel 回归记录仅为 run-to-run 位移，不参与交付判定（清单/脚本 embedding 版本由 verify:visual-benchmark 对撞）。
 for (const ratio of ["16x9", "9x16"]) {
   const frame = JSON.parse(fs.readFileSync(base + "qc/frame_metrics_" + ratio + ".json", "utf8"));
   const motion = JSON.parse(fs.readFileSync(base + "qc/motion_" + ratio + ".json", "utf8"));

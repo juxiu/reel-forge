@@ -1,9 +1,14 @@
 import fs from"node:fs";
 import path from"node:path";
-import{spawn}from"node:child_process";
+import{runAsync}from"../../runtime/spawn.mjs";
 const DEFAULTS={kokoro:["python3",["scripts/native_tts_provider.py"]],piper:["python3",["scripts/native_tts_provider.py"]],kokoro_onnx:["python3",["scripts/native_tts_provider.py"]]};
-function execCommand(command,args,input){
-  return new Promise((resolve,reject)=>{const p=spawn(command,args,{stdio:["pipe","pipe","inherit"]});let out="";p.stdout.on("data",data=>{out+=String(data)});p.on("error",reject);p.on("exit",code=>code===0?resolve(out):reject(new Error("native TTS provider failed: "+code)));p.stdin.end(input);});
+async function execCommand(command,args,input){
+  // provider 命令由 TTS_*_COMMAND 给出，写错名字时老代码只报 "spawn ENOENT"，
+  // 这里让错误说清楚是**哪个命令**起不来，而不是退出码。
+  const r=await runAsync(command,args,{input});
+  if(r.error) throw new Error(r.error);
+  if(r.status!==0) throw new Error("native TTS provider failed: "+(r.status??"signal "+r.signal)+(r.stderr?" | "+String(r.stderr).slice(-300):""));
+  return r.stdout;
 }
 export async function nativeTts({engine,text,voice,outDir,rate="+0%",env=process.env,index=1}){
   fs.mkdirSync(outDir,{recursive:true});

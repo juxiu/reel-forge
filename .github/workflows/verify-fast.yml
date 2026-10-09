@@ -37,4 +37,5 @@ jobs:
           node-version: 22
       - run: npm install --no-audit --no-fund
       - run: npm run verify:fast
-      - run: npm run verify:authored-shots
+      # verify:authored-shots 已在 scripts/verify-fast.mjs 的检查清单里（`:47`），这里不再单跑一遍。
+      # 它此前必须单列，是因为当时 fast 清单里没有它，PR 之外没人判 authored 合规。

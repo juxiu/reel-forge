@@ -1,0 +1,650 @@
+{
+  "version": "1.0",
+  "generated_by": "npm run export-visual-contracts",
+  "note": "渲染层视觉常量与 QC 测量判据的同一份真源。Python 侧只允许从这里取数；改判据请改 src/visual/field.mjs 再重新导出，不要手改本文件。",
+  "sources": {
+    "field": "src/visual/field.mjs",
+    "style": "src/visual/style.mjs",
+    "camera": "src/visual/camera.mjs"
+  },
+  "canvas": {
+    "design_width": 1280,
+    "fps": 30,
+    "frame_base": 1,
+    "frame_convention": "N = useCurrentFrame() + 1；分镜表与字幕帧号 1-based，Remotion 0-based",
+    "ratios": {
+      "16x9": {
+        "device": {
+          "width": 1280,
+          "height": 720
+        },
+        "scale": 1,
+        "logical": {
+          "width": 1280,
+          "height": 720
+        },
+        "bands": {
+          "hudTop": 28,
+          "hudBottom": 79,
+          "railTop": 118,
+          "railBottom": 162,
+          "contentTop": 175,
+          "contentTopNoRail": 100,
+          "contentBottom": 620,
+          "subTop": 637,
+          "subBottom": 690,
+          "barTop": 687,
+          "barBottom": 720,
+          "left": 60,
+          "right": 1220
+        },
+        "bands_device": {
+          "hudTop": 28,
+          "hudBottom": 79,
+          "railTop": 118,
+          "railBottom": 162,
+          "contentTop": 175,
+          "contentTopNoRail": 100,
+          "contentBottom": 620,
+          "subTop": 637,
+          "subBottom": 690,
+          "barTop": 687,
+          "barBottom": 720,
+          "left": 60,
+          "right": 1220
+        },
+        "camera_safe": {
+          "left": 89,
+          "right": 1191,
+          "top": 122,
+          "bottom": 607
+        },
+        "camera_safe_device": {
+          "left": 89,
+          "right": 1191,
+          "top": 122,
+          "bottom": 607
+        },
+        "qc_zone": {
+          "design": {
+            "top": 100,
+            "bottom": 620
+          },
+          "device": {
+            "top": 100,
+            "bottom": 620
+          },
+          "sample": {
+            "width": 320,
+            "height": 180,
+            "top": 25,
+            "bottom": 155
+          },
+          "with_rail": {
+            "design": {
+              "top": 175,
+              "bottom": 620
+            },
+            "device": {
+              "top": 175,
+              "bottom": 620
+            }
+          }
+        },
+        "limits_device": {
+          "hero_min": 170,
+          "hero_large": 260,
+          "hero_huge": 360,
+          "big_text_min": 96,
+          "subject_small": 110,
+          "text_min": 22,
+          "subtitle_size": 44
+        },
+        "dot_field_device": {
+          "design": {
+            "step": 48,
+            "x0": 32,
+            "y0": 24,
+            "r": 2.5,
+            "mask_margin": 1.5
+          },
+          "device": {
+            "step": 48,
+            "x0": 32,
+            "y0": 24,
+            "r": 2.5,
+            "mask_radius": 4,
+            "mask_area_ratio": 0.0218
+          },
+          "mask_radius_design": 4,
+          "count": 390,
+          "first_points": [
+            [
+              32,
+              24
+            ],
+            [
+              80,
+              24
+            ],
+            [
+              128,
+              24
+            ],
+            [
+              176,
+              24
+            ]
+          ]
+        },
+        "measure_device": {
+          "scale": 1,
+          "hero": {
+            "struct_half": {
+              "x": 20,
+              "y": 6
+            },
+            "min_ink_px": 30,
+            "bright_luma": 120,
+            "small_box": 60,
+            "width_over_height": 4,
+            "width_divisor": 2.5,
+            "no_content_bright_px": 200,
+            "glow_pad_px": 30
+          },
+          "soft_glow": {
+            "sat_min": 0.25,
+            "lum_min": 10,
+            "lum_min_dots": 22,
+            "lum_max": 110,
+            "activity_px": 10000,
+            "hero_area_min_px": 800
+          },
+          "purple_debris": {
+            "sat_min": 0.45,
+            "lum_min": 45,
+            "struct_half": {
+              "x": 12,
+              "y": 3
+            },
+            "min_area_px": 80,
+            "median_max": 8
+          },
+          "empty_field": {
+            "hero_min_px": 110,
+            "severe_hero_px": 80,
+            "sustained_frames_max": 45,
+            "debris_count_median_max": 10
+          },
+          "thresholds_device": {
+            "hero_min_px": 170,
+            "big_text_min_px": 96,
+            "subject_small_px": 110
+          },
+          "motion": {
+            "diff_px": 25,
+            "class_true_static_px": 800,
+            "class_small_motion_px": 2500,
+            "sample_width": 320
+          }
+        }
+      },
+      "9x16": {
+        "device": {
+          "width": 720,
+          "height": 1280
+        },
+        "scale": 0.5625,
+        "logical": {
+          "width": 1280,
+          "height": 2276
+        },
+        "bands": {
+          "hudTop": 28,
+          "hudBottom": 79,
+          "railTop": 118,
+          "railBottom": 162,
+          "contentTop": 175,
+          "contentTopNoRail": 100,
+          "contentBottom": 2176,
+          "subTop": 2193,
+          "subBottom": 2246,
+          "barTop": 2243,
+          "barBottom": 2276,
+          "left": 60,
+          "right": 1220
+        },
+        "bands_device": {
+          "hudTop": 15.75,
+          "hudBottom": 44.44,
+          "railTop": 66.38,
+          "railBottom": 91.13,
+          "contentTop": 98.44,
+          "contentTopNoRail": 56.25,
+          "contentBottom": 1224,
+          "subTop": 1233.56,
+          "subBottom": 1263.38,
+          "barTop": 1261.69,
+          "barBottom": 1280.25,
+          "left": 33.75,
+          "right": 686.25
+        },
+        "camera_safe": {
+          "left": 89,
+          "right": 1191,
+          "top": 122,
+          "bottom": 607
+        },
+        "camera_safe_device": {
+          "left": 50.06,
+          "right": 669.94,
+          "top": 68.63,
+          "bottom": 341.44
+        },
+        "qc_zone": {
+          "design": {
+            "top": 100,
+            "bottom": 2176
+          },
+          "device": {
+            "top": 56,
+            "bottom": 1224
+          },
+          "sample": {
+            "width": 320,
+            "height": 569,
+            "top": 25,
+            "bottom": 544
+          },
+          "with_rail": {
+            "design": {
+              "top": 175,
+              "bottom": 2176
+            },
+            "device": {
+              "top": 98,
+              "bottom": 1224
+            }
+          }
+        },
+        "limits_device": {
+          "hero_min": 95.63,
+          "hero_large": 146.25,
+          "hero_huge": 202.5,
+          "big_text_min": 54,
+          "subject_small": 61.88,
+          "text_min": 12.38,
+          "subtitle_size": 24.75
+        },
+        "dot_field_device": {
+          "design": {
+            "step": 48,
+            "x0": 32,
+            "y0": 24,
+            "r": 2.5,
+            "mask_margin": 1.5
+          },
+          "device": {
+            "step": 26.99,
+            "x0": 18,
+            "y0": 13.5,
+            "r": 1.41,
+            "mask_radius": 3,
+            "mask_area_ratio": 0.0388
+          },
+          "mask_radius_design": 4,
+          "count": 1222,
+          "first_points": [
+            [
+              18,
+              13.5
+            ],
+            [
+              44.99,
+              13.5
+            ],
+            [
+              71.99,
+              13.5
+            ],
+            [
+              98.98,
+              13.5
+            ]
+          ]
+        },
+        "measure_device": {
+          "scale": 0.5625,
+          "hero": {
+            "struct_half": {
+              "x": 11,
+              "y": 3
+            },
+            "min_ink_px": 9,
+            "bright_luma": 120,
+            "small_box": 33.75,
+            "width_over_height": 4,
+            "width_divisor": 2.5,
+            "no_content_bright_px": 63,
+            "glow_pad_px": 16.88
+          },
+          "soft_glow": {
+            "sat_min": 0.25,
+            "lum_min": 10,
+            "lum_min_dots": 22,
+            "lum_max": 110,
+            "activity_px": 3164,
+            "hero_area_min_px": 253
+          },
+          "purple_debris": {
+            "sat_min": 0.45,
+            "lum_min": 45,
+            "struct_half": {
+              "x": 7,
+              "y": 2
+            },
+            "min_area_px": 25,
+            "median_max": 8
+          },
+          "empty_field": {
+            "hero_min_px": 61.88,
+            "severe_hero_px": 45,
+            "sustained_frames_max": 45,
+            "debris_count_median_max": 10
+          },
+          "thresholds_device": {
+            "hero_min_px": 95.63,
+            "big_text_min_px": 54,
+            "subject_small_px": 61.88
+          },
+          "motion": {
+            "diff_px": 25,
+            "class_true_static_px": 253,
+            "class_small_motion_px": 791,
+            "sample_width": 320
+          }
+        }
+      }
+    }
+  },
+  "palette": {
+    "PURPLE": {
+      "hex": "#6630F8",
+      "rgb": [
+        102,
+        48,
+        248
+      ]
+    },
+    "GLOW_PURPLE_RGB": {
+      "r": 102,
+      "g": 45,
+      "b": 248
+    },
+    "glow_rgb_differs_from_purple": true
+  },
+  "typography": {
+    "HERO_MIN": 170,
+    "HERO_LARGE": 260,
+    "HERO_HUGE": 360,
+    "BIG_TEXT_MIN": 96,
+    "SUBJECT_SMALL": 110,
+    "TEXT_MIN": 22,
+    "SUBTITLE_SIZE": 44
+  },
+  "beat": {
+    "BEAT_WINDOW": [
+      -6,
+      3
+    ],
+    "SHOT_MIN_FRAMES": 120,
+    "SWEEP_WHITELIST_MAX": 2,
+    "GLITCH_PER_SHOT_MAX": 1,
+    "HIGHLIGHT_PER_CHAPTER_MAX": 1,
+    "gaps": {
+      "paragraph": 10,
+      "para_end": 30,
+      "chapter": 45
+    },
+    "SET_PIECE": {
+      "sweeps": [
+        4,
+        22,
+        40
+      ],
+      "line": 18,
+      "ghost": 37,
+      "pulse": 12,
+      "sub": 16,
+      "pills": 24,
+      "minLen": 90
+    }
+  },
+  "camera": {
+    "limits": {
+      "min": 20,
+      "max": 45,
+      "clear": 30,
+      "maxScale": 1.4
+    },
+    "presets": [
+      "push",
+      "slow_push",
+      "slowPush",
+      "pull",
+      "pan",
+      "scroll",
+      "handoff",
+      "parallax",
+      "static",
+      "none"
+    ],
+    "parallax": {
+      "front": 12.8,
+      "mid": 9.6,
+      "back": 2.7520000000000002
+    },
+    "parallax_depth": {
+      "front": 1.3333333333333335,
+      "mid": 1,
+      "back": 0.2866666666666667
+    }
+  },
+  "background": {
+    "DOT_FIELD": {
+      "step": 48,
+      "x0": 32,
+      "y0": 24,
+      "r": 2.5,
+      "base": "#0b0c11",
+      "dot": "#cfe0ff",
+      "sweepPeriod": 279,
+      "halo": 220,
+      "grain": 0.06,
+      "qc_mask_margin": 1.5
+    },
+    "STAR_FIELD": {
+      "count": 80,
+      "twinkle": 0.3,
+      "size": [
+        2,
+        4
+      ],
+      "brightness": [
+        35,
+        255
+      ],
+      "seed": 7,
+      "rise": 5
+    }
+  },
+  "glow": {
+    "purple": {
+      "spec": {
+        "color": {
+          "r": 102,
+          "g": 45,
+          "b": 248
+        },
+        "layers": [
+          {
+            "dx": 0,
+            "dy": 0,
+            "blur": 12,
+            "spread": 3,
+            "alpha": 0.35
+          },
+          {
+            "dx": 0,
+            "dy": 0,
+            "blur": 42,
+            "spread": 14,
+            "alpha": 0.45
+          }
+        ]
+      },
+      "css": "0 0 12px 3px rgba(102,45,248,.35), 0 0 42px 14px rgba(102,45,248,.45)",
+      "outer_radius": 56
+    },
+    "purple_s": {
+      "spec": {
+        "color": {
+          "r": 102,
+          "g": 45,
+          "b": 248
+        },
+        "layers": [
+          {
+            "dx": 0,
+            "dy": 0,
+            "blur": 8,
+            "spread": 2,
+            "alpha": 0.32
+          },
+          {
+            "dx": 0,
+            "dy": 0,
+            "blur": 24,
+            "spread": 8,
+            "alpha": 0.38
+          }
+        ]
+      },
+      "css": "0 0 8px 2px rgba(102,45,248,.32), 0 0 24px 8px rgba(102,45,248,.38)"
+    },
+    "orange": {
+      "spec": {
+        "color": {
+          "r": 240,
+          "g": 95,
+          "b": 65
+        },
+        "layers": [
+          {
+            "dx": 0,
+            "dy": 0,
+            "blur": 12,
+            "spread": 3,
+            "alpha": 0.35
+          },
+          {
+            "dx": 0,
+            "dy": 0,
+            "blur": 42,
+            "spread": 14,
+            "alpha": 0.42
+          }
+        ]
+      },
+      "css": "0 0 12px 3px rgba(240,95,65,.35), 0 0 42px 14px rgba(240,95,65,.42)"
+    },
+    "red": {
+      "spec": {
+        "color": {
+          "r": 236,
+          "g": 8,
+          "b": 31
+        },
+        "layers": [
+          {
+            "dx": 0,
+            "dy": 0,
+            "blur": 12,
+            "spread": 3,
+            "alpha": 0.35
+          },
+          {
+            "dx": 0,
+            "dy": 0,
+            "blur": 42,
+            "spread": 14,
+            "alpha": 0.42
+          }
+        ]
+      }
+    }
+  },
+  "measure": {
+    "luma": {
+      "coeffs": [
+        299,
+        587,
+        114
+      ],
+      "divisor": 1000
+    },
+    "hero": {
+      "struct": {
+        "x": 41,
+        "y": 13
+      },
+      "min_ink_px": 30,
+      "bright_luma": 120,
+      "small_box": 60,
+      "width_over_height": 4,
+      "width_divisor": 2.5,
+      "no_content_bright_px": 200,
+      "glow_pad_px": 30
+    },
+    "soft_glow": {
+      "sat_min": 0.25,
+      "lum_min": 10,
+      "lum_min_dots": 22,
+      "lum_max": 110,
+      "activity_px": 10000,
+      "hero_area_min": 800
+    },
+    "purple_debris": {
+      "channel_rule": "b>r>g",
+      "sat_min": 0.45,
+      "lum_min": 45,
+      "struct": {
+        "x": 25,
+        "y": 7
+      },
+      "min_area_px": 80,
+      "median_max": 8
+    },
+    "empty_field": {
+      "hero_min": 110,
+      "sustained_frames_max": 45,
+      "severe_hero_px": 80,
+      "debris_count_median_max": 10
+    },
+    "motion": {
+      "sample_width": 320,
+      "step": 3,
+      "analysis_step": 4,
+      "still_thr": 0.35,
+      "hold_thr": 1.5,
+      "still_max_seconds": 3,
+      "hold_min_frames": 30,
+      "exit_brightness_k": 0.9,
+      "exit_tail_frames": 20,
+      "glow_off_frames": 6,
+      "diff_px_thr": 25,
+      "class_true_static": 800,
+      "class_small_motion": 2500
+    }
+  }
+}
