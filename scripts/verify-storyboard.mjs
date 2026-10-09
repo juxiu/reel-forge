@@ -22,35 +22,6 @@ const failed = [];
 
 fs.mkdirSync(SANDBOX, {recursive: true});
 
-/** 合成时间轴：4 句 / 1 章，每镜都 ≥120 帧、末拍 hold 36f —— 即「合规分镜」的基准样本。 */
-function timeline(overrides = {}) {
-  const base = {
-    fps: 30,
-    total_frames: 820,
-    engine: "synthetic",
-    voice: "synthetic",
-    rate: "+0%",
-    language: "en",
-    timing_mode: "tts-word-boundary",
-    speech_seconds: 27.33,
-    chapters: [{n: 1, title: "", from: 1}],
-    sentences: [
-      {id: "S01", from: 1, to: 200, chapter: 1},
-      {id: "S02", from: 201, to: 420, chapter: 1},
-      {id: "S03", from: 421, to: 600, chapter: 1},
-      {id: "S04", from: 601, to: 820, chapter: 1},
-    ],
-  };
-  return {...base, ...overrides};
-}
-
-function py(script, args = []) {
-  return run(PY, [path.join("scripts", script), ...args], {
-    env: {...process.env, PYTHONIOENCODING: "utf-8"},
-    encoding: "utf8",
-  });
-}
-
 const out = (r) => `${r.stdout || ""}${r.stderr || ""}`.trim();
 const sourceText = () => fs.readFileSync(SOURCE, "utf8");
 
@@ -59,6 +30,107 @@ function mutate(find, replace) {
   const text = sourceText();
   if (!text.includes(find)) throw new Error(`分镜源里没有「${find}」：变异锚点过期了，这条判据现在测不到任何东西`);
   return text.replace(find, replace);
+}
+
+/**
+ * 合成时间轴：**从分镜源自己推导**句子与章节，而不是写死 4 句。
+ *
+ * ⚠ 为什么要推导：这份时间轴的职责是「给仓库里那份分镜源配一个说得通的输入」，
+ *   而分镜源会随样片一起改（4 镜 → 44 镜）。写死 4 句时，样片一改大，
+ *   所有用例都退化成「时间轴没有句子 S05」这一条 —— 判据全测不到，门禁却只显示几条失败，
+ *   看起来像是分镜有问题，实际是自测输入过期了。现在句数与章节数跟着源走，
+ *   换片子也不用改这里。
+ *
+ * 每句 220 帧（≥120 帧下限的两倍余量），句间 20 帧；章节从 `# CHAPTER` / `## Gn` 读。
+ */
+function deriveTimelineFromSource() {
+  const text = sourceText();
+  const ids = [...new Set([...text.matchAll(/\{(S\d+)\.(?:from|to|c\d)/g)].map((m) => m[1]))].sort();
+  const n = Math.max(1, ids.length);
+  const per = 220;
+  const sentences = ids.map((id, i) => {
+    const from = 1 + i * (per + 20);
+    return {id, from, to: from + per - 1, chapter: chapterOfShot(i)};
+  });
+  const chapters = [];
+  for (let c = 1; c <= maxChapter; c++) {
+    const first = sentences.find((s) => s.chapter === c);
+    chapters.push({n: c, title: "", from: first ? first.from : 1});
+  }
+  return {
+    fps: 30,
+    total_frames: (sentences.at(-1)?.to ?? 820) + 40,
+    engine: "synthetic",
+    voice: "synthetic",
+    rate: "+0%",
+    language: "zh",
+    timing_mode: "tts-word-boundary",
+    speech_seconds: +((sentences.at(-1)?.to ?? 820) / 30).toFixed(2),
+    chapters,
+    sentences,
+  };
+}
+
+/** 第 i 镜属于第几章：按分镜源里 `## Gn` 的出现顺序与 `## 全局约束` 推定。 */
+function shotChapterMap() {
+  const text = sourceText();
+  const marks = [];
+  for (const line of text.split(/\r?\n/)) {
+    if (/^##\s*G\d+\s*$/.test(line)) marks.push({kind: "group"});
+    if (/^\|\s*SC\d+\s*\|/.test(line)) marks.push({kind: "shot"});
+  }
+  // 组数 → 章数：每 2 个构建组一章（与 src/shots 的分组密度一致）
+  let groups = 0;
+  const chapterOf = [];
+  for (const m of marks) {
+    if (m.kind === "group") groups += 1;
+    else chapterOf.push(Math.min(maxChapter, Math.ceil(groups / 2) || 1));
+  }
+  return chapterOf;
+}
+const maxChapter = 4;
+const chapterOf = shotChapterMap();
+function chapterOfShot(i) {
+  return chapterOf[i] ?? 1;
+}
+
+/** 合成时间轴：句子与章节由分镜源推导，每句 220 帧（≥120 下限）。 */
+function timeline(overrides = {}) {
+  return {...deriveTimelineFromSource(), ...overrides};
+}
+
+/**
+ * 在推导出的时间轴上只改一句，并把后面的句整体接上去。
+ *
+ * ⚠ 为什么要重建而不是手写四句：手写的句子列表与分镜源里的 S 数量绑定，
+ *   样片从 4 镜变成 44 镜之后，三条用例（镜头过短 / 帧号漂移 / 覆盖不符）
+ *   全部退化成「时间轴没有句子 S05」——判据没被执行，而失败信息看着像分镜坏了。
+ *   现在这三条只声明「改哪一句、改成什么」，句数与章节跟着源走。
+ */
+function timelineWith(id, fn) {
+  const tl = deriveTimelineFromSource();
+  const GAP = 20;
+  let f = 1;
+  const sentences = tl.sentences.map((s) => {
+    const len = s.to - s.from + 1;
+    let cur = {...s, from: f, to: f + len - 1};
+    if (s.id === id) cur = fn(cur, len);
+    f = cur.to + 1 + GAP;
+    return cur;
+  });
+  const chapters = [];
+  for (let c = 1; c <= maxChapter; c++) {
+    const first = sentences.find((s) => s.chapter === c);
+    if (first) chapters.push({n: c, title: "", from: first.from});
+  }
+  return {...tl, sentences, chapters, total_frames: f + 40};
+}
+
+function py(script, args = []) {
+  return run(PY, [path.join("scripts", script), ...args], {
+    env: {...process.env, PYTHONIOENCODING: "utf-8"},
+    encoding: "utf8",
+  });
 }
 
 /**
@@ -133,32 +205,27 @@ try {
   expect(
     "镜头不足 120 帧要失败",
     {match: "shot too short (<120f): SC03"},
-    produce({caseName: "short-shot", tl: timeline({sentences: [
-      {id: "S01", from: 1, to: 200, chapter: 1},
-      {id: "S02", from: 201, to: 420, chapter: 1},
-      {id: "S03", from: 421, to: 500, chapter: 1},
-      {id: "S04", from: 501, to: 820, chapter: 1},
-    ]})}),
+    produce({caseName: "short-shot", tl: timelineWith("S03", (s) => ({...s, to: s.from + 89}))}),
   );
   expect(
     "没有持续动作要失败",
     {match: "missing continuous action: SC02"},
-    produce({caseName: "no-continuous", srcText: mutate("continuous: digest signal travels between nodes", "signal travels between nodes")}),
+    produce({caseName: "no-continuous", srcText: mutate("split + camera parallax; continuous: 轨道点行进撑到下一拍", "split + camera parallax")}),
   );
   expect(
     "末拍稳定期 <30 帧要失败",
     {match: "insufficient settle hold (<30f): SC02"},
-    produce({caseName: "weak-hold", srcText: mutate("digest signal travels between nodes; hold: 36f", "digest signal travels between nodes; hold: 20f")}),
+    produce({caseName: "weak-hold", srcText: mutate("hold: 30f |\n| SC03", "hold: 20f |\n| SC03")}),
   );
   expect(
     "白名单外的镜头用 Glitch 要失败",
     {match: "glitch over whitelist: SC02"},
-    produce({caseName: "glitch-offlist", srcText: mutate("Content-Digest protects message content", "Content-Digest protects message content (GlitchIn)")}),
+    produce({caseName: "glitch-offlist", srcText: mutate("头部却带着一串看不懂的字段。", "头部却带着一串看不懂的字段。(GlitchIn)")}),
   );
   expect(
     "白名单外的镜头用扫光图元要失败",
     {match: "light-sweep over whitelist: SC02"},
-    produce({caseName: "sweep-offlist", srcText: mutate("Content-Digest protects message content", "Content-Digest protects message content + LightSweep")}),
+    produce({caseName: "sweep-offlist", srcText: mutate("头部却带着一串看不懂的字段。", "头部却带着一串看不懂的字段。 + LightSweep")}),
   );
   expect(
     "分镜引用了时间轴没有的句子要出声（不是 KeyError 回溯）",
@@ -177,12 +244,7 @@ try {
     {match: "timeline mismatch: SC02"},
     produce({
       caseName: "frame-drift",
-      checkTl: timeline({sentences: [
-        {id: "S01", from: 1, to: 200, chapter: 1},
-        {id: "S02", from: 205, to: 420, chapter: 1},
-        {id: "S03", from: 421, to: 600, chapter: 1},
-        {id: "S04", from: 601, to: 820, chapter: 1},
-      ]}),
+      checkTl: timelineWith("S02", (s) => ({...s, from: s.from + 5})),
     }),
   );
   expect(
@@ -190,11 +252,7 @@ try {
     {match: "coverage mismatch"},
     produce({
       caseName: "coverage",
-      checkTl: timeline({sentences: [
-        {id: "S01", from: 1, to: 200, chapter: 1},
-        {id: "S02", from: 201, to: 420, chapter: 1},
-        {id: "S03", from: 421, to: 600, chapter: 1},
-      ]}),
+      checkTl: (() => {const t = deriveTimelineFromSource(); return {...t, sentences: t.sentences.slice(0, 3)};})(),
     }),
   );
   // 把**每一行**的帧号分隔符换成 ASCII 连字符：一条都解析不到时，必须说「格式变了」，

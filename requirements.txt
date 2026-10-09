@@ -5,3 +5,27 @@
 # 只有 TTS provider 需要 numpy（float32 音频拼接与归一化）。
 edge-tts>=7.2,<8
 numpy>=1.26,<3
+
+# ---- 非 edge 引擎：可选，按需单装（不要一次全装）----
+# 这三个引擎的实现是齐的（scripts/native_tts_provider.py + src/providers/tts/native.mjs），
+# 并且由 `npm run verify:tts-native` 用 stub 真跑过 dispatch 与坏输出拒绝 ——
+# 所以「实现存在」这件事有门守着，不靠文档承诺。
+#
+# 装不装是你的选择：默认 TTS_ENGINE=edge（云希 / edge-tts）只需要上面两个包。
+# 换引擎时再装对应的那一个，并给出它要求的模型/声音参数：
+#
+#   TTS_ENGINE=kokoro        pip install kokoro>=0.9          （英文片；另需 espeak-ng）
+#                            KOKORO_VOICE=am_liam KOKORO_LANG=a
+#   TTS_ENGINE=kokoro_onnx   pip install kokoro-onnx          （免 espeak-ng 依赖）
+#                            KOKORO_ONNX_MODEL=<model.onnx> KOKORO_ONNX_VOICES=<voices.bin>
+#                            KOKORO_ONNX_VOICE=<voice> KOKORO_ONNX_LANG=en-us
+#   TTS_ENGINE=piper         pip install piper-tts
+#                            PIPER_MODEL=<voice.onnx>
+#
+# 用户自带成品 wav（不装任何模型）：
+#   TTS_ENGINE=wav  TTS_WAV_DIR=<逐句 wav 目录>  TTS_WORD_TIMINGS_DIR=<逐句时间轴目录>
+#   文件名固定 sentence-001 / 002 …；时间轴是 [{text,start,end}] 或 {words:[…]}。
+#
+# ⚠ 无论用哪个引擎，生产时间轴口径只有一个：tts-word-boundary（词边界）。
+#   没有词边界的引擎必须逐块合成并给出**真实的块边界**（本仓库的实现就是这么做的：
+#   逐 token 合成、逐 token 记 start/end），禁止伪装成 external ASR。

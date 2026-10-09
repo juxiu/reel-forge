@@ -74,18 +74,71 @@ function parseRecipe(source, file) {
   return {error: `${file}: SHOT_RECIPE 花括号不配`};
 }
 
+/**
+ * 扫出 SHOT_RECIPE 里**顶层**（深度 0）的键及其所在行号。
+ *
+ * ⚠ 为什么要按深度扫而不是逐行正则：recipe 有了嵌套结构（stage.hub / stage.items[]）之后，
+ *   `/[a-z_]+:/g` 会把 `hub: {cx: 640, cy: 372}` 里的 `cx:` / `cy:` 也数成顶层键，
+ *   于是「一行一个键」这条检查对任何带嵌套的 recipe 都误报 —— 检查必须跟得上数据结构。
+ *   字符串与转义要跳过，否则文案里的冒号会把深度算错。
+ */
+function topLevelKeys(source) {
+  const decl = source.match(/export const SHOT_RECIPE\s*=\s*\{/);
+  if (!decl) return [];
+  const start = decl.index + decl[0].length - 1;
+  const out = [];
+  let depth = 0;
+  let line = 1;
+  let keyStart = -1;
+  let key = "";
+  let inStr = null;
+  for (let i = start; i < source.length; i++) {
+    const c = source[i];
+    if (c === "\n") line++;
+    if (inStr) {
+      if (c === "\\") { i++; continue; }
+      if (c === inStr) inStr = null;
+      continue;
+    }
+    if (c === '"' || c === "'" || c === "`") { inStr = c; continue; }
+    if (c === "{" || c === "[" || c === "(") {
+      // 顶层键后面紧跟的 { 是它的值，不算进入新层。
+      if (c === "{" && depth === 1 && keyStart >= 0) { keyStart = -1; key = ""; depth++; continue; }
+      depth++;
+      continue;
+    }
+    if (c === "}" || c === "]" || c === ")") {
+      depth--;
+      if (depth === 0) break;
+      continue;
+    }
+    if (depth === 1 && c === ":") {
+      out.push({key, line});
+      keyStart = -1;
+      key = "";
+      continue;
+    }
+    if (depth === 1 && keyStart < 0 && /[A-Za-z_]/.test(c)) { keyStart = i; key = c; continue; }
+    if (depth === 1 && keyStart >= 0 && /[A-Za-z0-9_]/.test(c)) { key += c; continue; }
+    if (depth === 1 && keyStart >= 0 && !/\s/.test(c)) { keyStart = -1; key = ""; }
+  }
+  return out;
+}
+
 function structuralChecks(source, file) {
   const out = [];
   const crlf = (source.match(/\r\n/g) || []).length;
   const lf = (source.match(/\n/g) || []).length;
   if (/\r(?!\n)/.test(source)) out.push(`${file}: 行中残留裸 \\r`);
   if (crlf > 0 && crlf !== lf) out.push(`${file}: 行尾混用 CRLF(${crlf}) / LF(${lf - crlf})`);
-  const block = /export const SHOT_RECIPE\s*=\s*\{([\s\S]*?)\n\};/.exec(source)?.[1];
-  if (block !== undefined) {
-    // 用「行首或空白后」数键：`^` 不带 m 标志只锚定字符串开头，
-    // 写成 /^\s*[a-z_]+:/g 时每行最多只数到 1 个，这条检查就等于不存在。
-    const merged = block.split(/\r\n|\n/).filter((l) => (l.match(/(?:^|[ \t])[a-z_]+:/g) || []).length > 1);
-    if (merged.length) out.push(`${file}: recipe 一行出现多个键 → ${JSON.stringify(merged[0])}`);
+  // 一行一个顶层键：CRLF 下跨行正则会把两行并成一行，语法仍合法、node --check 也不报，只有画面会歪。
+  const byLine = new Map();
+  for (const {key, line} of topLevelKeys(source)) {
+    if (!byLine.has(line)) byLine.set(line, []);
+    byLine.get(line).push(key);
+  }
+  for (const [line, keys] of byLine) {
+    if (keys.length > 1) out.push(`${file}: recipe 第 ${line} 行出现多个顶层键 → ${keys.join(" / ")}`);
   }
   const calls = source.match(/<ExplainerShot\b/g) || [];
   if (calls.length !== 1) out.push(`${file}: ExplainerShot 委托 ${calls.length} 次（必须恰好 1 次）`);
@@ -96,7 +149,60 @@ function structuralChecks(source, file) {
 const variants = recognisedVariants();
 const byId = new Map();
 const errors = [];
-const stats = {checked: 0, cameras: new Set(), variantCases: variants.size};
+const stats = {checked: 0, cameras: new Set(), variantCases: variants.size, stages: new Set(), kinds: new Map()};
+
+/**
+ * 组私有舞台的接线审计。
+ *
+ * 这一段是整道门里唯一能回答「这 44 镜是不是真的各有构图」的地方。以前这道门只查
+ * variant 名在不在 switch 里，于是 44 个只有 variant/hero_size/camera 之差的空壳
+ * 一样报 PASS —— 它们全塌进 SemanticShots 的同一条两带布局里，画面的差别只来自
+ * hero_size 那几个数字。这和仓库已经记过的 motion_too_low「假修复」是同一类缺陷：
+ * 校验对象与校验强度不匹配。
+ *
+ * 判据（逐条都可证伪，不靠人眼）：
+ *   1. 每个镜头必须声明 stage.kind —— 没有它就是空壳，直接 FAIL；
+ *   2. stage.kind 在**组内**必须互不相同 —— 同组两镜同拓扑 = 复制粘贴；
+ *   3. 组私有模块 stage.jsx 必须真的导出该镜的组件（查 components 映射表），
+ *      且镜头文件必须把 stage={...} 传下去 —— 声明了不接���是「假开关」；
+ *   4. stage.jsx 的 topologies 清单必须与组内实际用到的 kind 一致（不多不少），
+ *      否则清单会变成装饰；
+ *   5. 全片任何一种 kind 占比不得超过 MAX_KIND_SHARE —— 挡住「一种版式铺满全片」。
+ */
+const MAX_KIND_SHARE = 0.15;
+
+const stageSrc = new Map();
+function stageModule(group) {
+  if (!stageSrc.has(group)) {
+    const f = `src/shots/${group}/stage.jsx`;
+    stageSrc.set(group, fs.existsSync(f) ? {file: f, src: fs.readFileSync(f, "utf8").replace(/\r\n/g, "\n")} : null);
+  }
+  return stageSrc.get(group);
+}
+
+/** 抓 `components: {SC01: Radial, ...}` 里声明的 shot_id → 组件名映射。 */
+function stageComponents(src) {
+  const head = src.indexOf("components:");
+  if (head < 0) return null;
+  const open = src.indexOf("{", head);
+  let depth = 0;
+  for (let i = open; i < src.length; i++) {
+    if (src[i] === "{") depth++;
+    else if (src[i] === "}" && --depth === 0) {
+      const out = new Map();
+      for (const m of src.slice(open, i + 1).matchAll(/([A-Z]{2}\d{2,})\s*:\s*([A-Za-z0-9_]+)/g)) out.set(m[1], m[2]);
+      return out;
+    }
+  }
+  return null;
+}
+
+/** 抓 `topologies: [...]`。 */
+function stageTopologies(src) {
+  const m = /topologies:\s*\[([^\]]*)\]/.exec(src);
+  if (!m) return null;
+  return [...m[1].matchAll(/["']([a-z0-9_]+)["']/g)].map((x) => x[1]);
+}
 
 for (const shot of shots) {
   if (byId.has(shot.shot_id)) errors.push(`blueprint shot_id 重复: ${shot.shot_id}`);
@@ -135,12 +241,65 @@ for (const shot of shots) {
     errors.push(`${name("accent_index")}: 强调序号 ${recipe.accent_index} 超出 support_count ${recipe.support_count}`);
   }
 
+  // ---- 组私有舞台 ----
+  const kind = String(recipe.stage?.kind || "");
+  if (!kind) {
+    errors.push(`${name("stage")}: 没有 stage.kind —— 这是一个空壳镜头（全塌进通用两带布局），必须给本镜声明拓扑`);
+  } else {
+    stats.stages.add(shot.group);
+    stats.kinds.set(kind, (stats.kinds.get(kind) || 0) + 1);
+    const mod = stageModule(shot.group);
+    if (!mod) {
+      errors.push(`${name("stage")}: 本镜声明了拓扑「${kind}」但 ${shot.group}/stage.jsx 不存在`);
+    } else {
+      const comps = stageComponents(mod.src);
+      if (!comps) errors.push(`${shot.group}/stage.jsx: 没有 components 映射表，镜头接不上舞台`);
+      else if (!comps.has(shot.shot_id)) errors.push(`${name("stage")}: ${shot.group}/stage.jsx 的 components 里没有 ${shot.shot_id}`);
+    }
+    if (!/stage=\{[A-Za-z0-9_.]+\}/.test(source)) {
+      errors.push(`${name("stage")}: 声明了拓扑却没把 stage={...} 传给 ExplainerShot —— 声明了不接 = 假开关`);
+    }
+  }
+
   for (const [re, why] of BANNED) if (re.test(source)) errors.push(`${name("source")}: ${why}`);
 
   // 与 blueprint 对齐（blueprint 是参考片的记录，authored 不得悄悄漂移）。
   for (const field of ["shot_id", "variant", "hero_size", "camera", "settle_frames"]) {
     if (shot[field] !== undefined && recipe[field] !== shot[field]) errors.push(`${name(field)}: 与 blueprint 不一致（${recipe[field]} vs ${shot[field]}）`);
   }
+}
+
+// 组内拓扑互不相同（复制粘贴检测）；同时校验 stage.jsx 的 topologies 清单不多不少。
+const groupKinds = new Map();
+for (const shot of shots) {
+  const file = "src/shots/" + shot.group + "/" + shot.shot_id + ".jsx";
+  if (!fs.existsSync(file)) continue;
+  const parsed = parseRecipe(fs.readFileSync(file, "utf8"), file);
+  if (parsed.error) continue;
+  const kind = String(parsed.value?.stage?.kind || "");
+  if (!kind) continue;
+  if (!groupKinds.has(shot.group)) groupKinds.set(shot.group, new Map());
+  const seen = groupKinds.get(shot.group);
+  if (seen.has(kind)) errors.push(`${shot.group}: ${seen.get(kind)} 与 ${shot.shot_id} 同用拓扑「${kind}」—— 组内两镜同版式`);
+  else seen.set(kind, shot.shot_id);
+
+  const mod = stageModule(shot.group);
+  if (!mod) continue;
+  const declared = stageTopologies(mod.src);
+  if (declared && !declared.includes(kind)) {
+    errors.push(`${shot.group}/stage.jsx: topologies 清单里没有「${kind}」（${shot.shot_id} 在用）`);
+  }
+}
+for (const [group, mod] of stageSrc) {
+  if (!mod) continue;
+  const declared = stageTopologies(mod.src);
+  if (!declared) continue;
+  const used = new Set([...(groupKinds.get(group)?.keys() || [])]);
+  for (const k of declared) if (!used.has(k)) errors.push(`${group}/stage.jsx: topologies 声明了「${k}」但组内没有镜头用它`);
+}
+for (const [kind, n] of stats.kinds) {
+  const share = n / Math.max(1, shots.length);
+  if (share > MAX_KIND_SHARE) errors.push(`拓扑「${kind}」占全片 ${(share * 100).toFixed(1)}%（${n}/${shots.length}），超过上限 ${(MAX_KIND_SHARE * 100).toFixed(0)}% —— 一种版式铺满全片`);
 }
 
 // 盘上的 authored 文件必须都在 blueprint 里 —— 不然新增一镜可以完全不过这道门。
@@ -168,4 +327,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("authored shots PASS", JSON.stringify({shots: stats.checked, groups: groups.size, variants_recognised: stats.variantCases, cameras_used: [...stats.cameras].sort()}));
+console.log("authored shots PASS", JSON.stringify({shots: stats.checked, groups: groups.size, variants_recognised: stats.variantCases, cameras_used: [...stats.cameras].sort(), stage_groups: [...stats.stages].sort(), distinct_topologies: stats.kinds.size, max_kind_share: Math.round(Math.max(0, ...[...stats.kinds.values()]) / shots.length * 1000) / 10 + "%"}));

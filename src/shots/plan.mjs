@@ -112,6 +112,15 @@ export function pickHero(scene, recipe, bands, logicalH = 720) {
   const maxW = Math.round(focus === 'single-hero' ? full : full * 0.6);
   const issues = [];
 
+  // authored 舞台镜：主角是**画出来**的（中心节点 / 面板 / 斜置平面），不是一行文案。
+  // 以前这里一律去找主角文案，找不到就报 hero-overlong —— 于是组私有舞台（SC01 的中心节点那种）
+  // 明明有 210px 的主角，仍被判成「主角文案装不下」，把分镜层已经解决的问题又变成一条阻断项。
+  // 舞台镜的主角尺寸仍然照 hero_size / hero_scale 判（heroSizeOf 已在上面算好），
+  // 缺的只是「主角得是一段文字」这个前提。
+  if (recipe?.stage?.kind) {
+    return {kind: 'stage', text: '', sub: str(recipe?.hero?.sub), size, maxW, issues, visual: true, minSize: Math.round(size * 0.78)};
+  }
+
   const declared = [
     str(recipe?.hero?.display),
     str(recipe?.hero),

@@ -19,13 +19,21 @@ description: 将任意知识或技术主题生产为原创代码动画讲解视�
 ## 样片级硬规则
 
 ### 视觉
-每个 scene 必须绑定独立 SCxx 源码与 `SHOT_RECIPE`；语义变体不得退回通用卡片。主角高度至少 170px，末拍稳定至少 30 帧。镜头按画面单元组织，不为每句机械切镜。
+每个 scene 必须绑定独立 SCxx 源码与 `SHOT_RECIPE`；**每个镜头必须声明自己的拓扑 `SHOT_RECIPE.stage.kind`**，并把组私有舞台 `stage={Gn_STAGE}` 传给 `ExplainerShot`。没有 `stage.kind` 就是空壳镜头（会全塌进通用两带布局），`npm run verify:authored-shots` 直接判红。拓扑在**组内互不相同**，全片单一拓扑占比 ≤15%。
+
+舞台只负责画面内容：离场归零、运镜、扫光白名单与 setPiece 时序由引擎外层统一施加，组里无法私开扫光。入场帧一律取 `buildPlan` 推出的 `plan.hero.f0`（锚在字幕块 −6…+3 窗口），`stage.focus` 存**相对入场帧的偏移**——换字幕块时整组焦点交接自动跟着首句走。
+
+主角高度至少 170px，末拍稳定至少 30 帧。镜头按画面单元组织，不为每句机械切镜。
+
+共用语汇与 17 种拓扑在 `src/shots/stage-kit.jsx`；各组 `stage.jsx` 只声明拓扑清单与镜头映射，几何/文案/焦点拍写在镜头自己的 `recipe.stage` 里。**不要把坐标埋进与内容无关的通用函数**——那样镜头之间就看不出差别了。
 
 ### Build Agent
 G1…Gn 为独立构建角色，Agent provider 配置后每组分别收到 Build Agent task；任务明确只修改 `src/shots/Gn/**`，并要求每镜至少 6 张 still（高光镜头 ≥10 张）+ 30 帧测渲。CI 无 Agent 时使用 deterministic builder，但产物必须明确标注 agent_mode=deterministic。
 
 ### TTS
 支持 edge、kokoro、piper、kokoro_onnx 与用户 wav 能力；实际 production gate 仍以 tts-word-boundary 为唯一生产时间轴口径。无词边界引擎必须通过逐块/逐词适配层提供真实块边界，禁止伪装为 external ASR。
+
+四个非 edge 通道由 `npm run verify:tts-native` 用 stub provider **真跑 dispatch**（含四类坏输出必须被拒绝），不是只比对一份名单常量——装法与模型参数见 `requirements.txt`。
 
 ### B-roll
 可选 `renderIR.footage[]`，素材必须来自 `public/assets/<slug>/`，并登记 source/sha/license/purpose manifest。单帧最多 1 个 OffthreadVideo。
@@ -53,6 +61,10 @@ Render → Frame Metrics → Motion →画面文字出处（阻断）→ Agent Q
 双比例成片、Frame Metrics、Motion、画面文字出处（text provenance）、QC、Repair、tts-word-boundary、Delivery checksum、still manifest 与 `verify:production` 全部通过。
 
 Visual Regression 不在完成定义内，它是非阻断回归记录。
+
+## 双比例与竖屏边界
+
+16:9 是设计基准（逻辑像素 = 实际像素，可与参照片逐像素对齐）。9:16 保证**时长 / 镜头顺序 / 拓扑 / 画面文案完全一致**，画面是**同一块 16:9 构图居中**到竖屏内容区；真正的纵向重排（双栏改单栏、字号按设备像素下限重算）**尚未实现**，不要按已达标对待。`cameraSafe` 按画幅推导：16:9 仍是 x89–1191 / y122–607，9:16 是 y122–2163。
 
 ### 画面文字出处（阻断）
 对应 anything2explainer 的硬性原则 2「事实有出处」与样片 QC「画面英文/数字逐个核对调研文档」：

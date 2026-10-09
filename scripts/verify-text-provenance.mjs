@@ -156,7 +156,12 @@ for (const [ratio, ir] of [["16x9", wide], ["9x16", tall]]) {
 // ---- B. 字面量白名单 ----
 // ⚠ 通道清单必须与「画面文字的出身」对齐（src/shots/plan.mjs 的 DISPLAY_KEYS 与 pickHero/pickSupport）：
 //   少一条通道，B 就退化成"扫不到东西所以永远绿"，而那正是它上一版失效的原因。
-const attrLiteral = /\b(?:text|title|label|alt|caption|placeholder|display|headline|sub|unit|fallback_hero)\s*[:=]\s*\{?\s*["']([^"'\n]{2,})["']/g;
+// ⚠ 双引号串必须允许转义（`(?:[^"\\\n]|\\.){2,}`）：报文/头字段类文案天然带引号，
+//   例如 text: "username=\"Mufasa\""。旧式 `[^"'\n]{2,}` 会在第一个 \" 处截断，
+//   把整条文案登记成碎片 `username=\` —— 白名单里躺着一条谁也认不出的垃圾，
+//   而真正上画面的 `username="Mufasa"` 从未被登记。这正是本脚本注释里
+//   记着的「扫不到东西所以全绿」那类假绿，只是发生在引号上。
+const attrLiteral = /\b(?:text|title|label|alt|caption|placeholder|display|headline|sub|unit|fallback_hero)\s*[:=]\s*\{?\s*(?:"((?:[^"\\\n]|\\.){2,})"|'([^'\n]{2,})')/g;
 const stringArray = /\b(?:labels|rows|key_terms|chips|steps)\s*:\s*\[([^\]]*)\]/g;
 const legacyFallback = /\b(?:labels|rows)\|\|\[([^\]]*)\]/g;
 const jsxChildren = />([^<>{}"\n][^<>{}"\n]{1,})</g;
@@ -164,7 +169,15 @@ const quotedChildren = />\s*["']([^"'<>{}\n]{2,})["']\s*</g;
 const ignore = /^[\s\d.,:;!?/\\|()[\]{}+\-*=<>]*$/;
 
 function pushLiteral(found, raw) {
-  const value = String(raw || "").replace(/\s+/g, " ").trim().replace(/^["'`]|["'`]$/g, "").trim();
+  // 源码里是转义写法（\"），登记的是上屏的真实文案 —— 两边必须一致，
+  // 否则白名单里躺着 `username=\` 这种碎片，而真文案永远缺登记。
+  let value = String(raw || "").replace(/\\(["'`\\])/g, "$1").replace(/\s+/g, " ").trim();
+  //⚠ 只在**整条都被同一种引号包住**时才剥引号。
+  //   旧写法 /^["'`]|["'`]$/g 是「开头或结尾」两条独立分支，会把
+  //   username="mutK" 这种**结尾真引号**也吃掉，登记成 username="mutK，
+  //   于是刚修好的转义引号支持又被这里弄坏，报错信息还指向扫描器（误导）。
+  const wrapped = value.match(/^(["'`])([\s\S]*)\1$/);
+  if (wrapped) value = wrapped[2].trim();
   if (!value || value.length < 2) return;
   if (ignore.test(value)) return;
   if (!/[a-zA-Z一-鿿]/.test(value)) return;
@@ -174,7 +187,7 @@ function pushLiteral(found, raw) {
 
 function literalsInSource(source) {
   const found = new Set();
-  for (const m of source.matchAll(attrLiteral)) pushLiteral(found, m[1]);
+  for (const m of source.matchAll(attrLiteral)) pushLiteral(found, m[1] ?? m[2]);
   for (const m of source.matchAll(stringArray)) for (const part of m[1].split(",")) pushLiteral(found, part);
   for (const m of source.matchAll(legacyFallback)) for (const part of m[1].split(",")) pushLiteral(found, part);
   for (const m of source.matchAll(jsxChildren)) pushLiteral(found, m[1]);
@@ -209,6 +222,10 @@ function scannerSelfTest() {
     ["JSX 子元素", '<CText>mutG</CText>', ["mutG"]],
     ["骨架 labels（冒号后带空格、单引号）", "labels: ['mutH', 'mutI']", ["mutH", "mutI"]],
     ["带引号的子元素", '<CText> "mutJ" </CText>', ["mutJ"]],
+    // 带转义引号的头字段文案：报文类镜头天然会写text: "username=\"mutK\""。
+    // 旧式捕获类不含转义时会截断成 `username=\`，白名单被碎片污染而真文案从未登记。
+    ["带转义引号的字符串字段", 'stage:{items:[{id:"a",text:"username=\\"mutK\\""}]}', ["username=\"mutK\""]],
+    ["带转义引号的 JSX 属性", '<MonoText text={"q=\\"mutL\\""} />', ['q="mutL"']],
   ];
   const dead = [];
   for (const [name, source, expect] of probes) {

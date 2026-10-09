@@ -50,7 +50,7 @@ export function layoutBands(bands, logicalH = 720) {
 
 const isCJK = (s) => /[㐀-䶿一-鿿]/.test(String(s || ''));
 
-export function SemanticShot({scene, recipe = {}, variant, captions: captionsProp}) {
+export function SemanticShot({scene, recipe = {}, variant, captions: captionsProp, stage}) {
   const frame = useCurrentFrame();
   const d = useDesign();
   const ctx = React.useContext(ReelContext) || {};
@@ -72,10 +72,60 @@ export function SemanticShot({scene, recipe = {}, variant, captions: captionsPro
         {sweepAllowed ? <LightSweep N={N} rounds={sp.sweeps} dy={pos.cy - 335} /> : null}
         {plan.fx.setPiece ? <StageLine N={N} f0={sp.line} flashAt={sp.flash} cy={pos.cy} w={760} /> : null}
         {plan.fx.setPiece ? <GhostHero plan={plan} N={N} pos={pos} until={sp.pulse} /> : null}
-        <SceneContent plan={plan} N={N} pos={pos} lb={lb} sp={sp} />
+        {stage
+          ? <StageLayer stage={stage} plan={plan} N={N} scene={scene} recipe={recipe} lb={lb} pos={pos} sp={sp} d={d} />
+          : <SceneContent plan={plan} N={N} pos={pos} lb={lb} sp={sp} />}
       </CameraRig>
     </div>
   );
+}
+
+/**
+ * 组私有舞台层。
+ *
+ * ⚠ 离场 / 运镜 / 扫光 / setPiece 全部在外层（SemanticShot）统一施加，这里只画画面内容 ——
+ *    让舞台组件拿到 N（镜头内 1-based 帧号）就能按绝对节拍编排，不需要也不允许自己管相机。
+ * ⚠ stage.components 是**按组**给的映射：镜头文件只报自己的 shot_id，
+ *    映射查不到就退回通用引擎（而不是抛错）——舞台是增强，不该成为单点故障。
+ */
+function StageLayer({stage, plan, N, scene, recipe, lb, pos, sp, d}) {
+  const Comp = pickStageComponent(stage, plan, recipe);
+  if (!Comp) return <SceneContent plan={plan} N={N} pos={pos} lb={lb} sp={sp} />;
+  return (
+    <StageOrientation d={d}>
+      <Comp plan={plan} N={N} scene={scene} recipe={recipe} lb={lb} pos={pos} sp={sp} design={d} />
+    </StageOrientation>
+  );
+}
+
+/**
+ * 竖屏摆位：把按 16:9 设计的构图块**居中**到竖屏内容区。
+ *
+ * ⚠ 现状与边界要说清楚：竖屏逻辑画布高 2276，而各拓扑的内容块按 16:9 写在 y175–620。
+ *   不做这一步时，构图被钉在画布顶部 —— 只占竖屏内容区的 22%，下面 1700px 全空，
+ *   字幕带孤零零挂在最底下。这不是「另有一套竖屏构图」，那是**同一块构图居中**。
+ *
+ * ⚠ 真正的竖屏重构（纵向堆叠、字号按设备像素下限重算、双栏改单栏）**没有做**，
+ *   参照项目本身也只有 1280×720，没有竖屏参照物。这里不把它写成「已支持竖屏」：
+ *   能保证的是双比例**时长/顺序/拓扑/文案完全一致**（verify:text-provenance C 段在判），
+ *   画面是同一块构图居中，不做纵向重排。
+ */
+const PORTRAIT_MIN_LOGICAL_H = 900;
+const BASE_CONTENT_CENTER = 398; // 16:9 内容区 y175–620 的中点
+function StageOrientation({d, children}) {
+  if (!d || d.height <= PORTRAIT_MIN_LOGICAL_H) return children;
+  const dy = Math.round((d.bands.contentTop + d.bands.contentBottom) / 2 - BASE_CONTENT_CENTER);
+  if (!dy) return children;
+  return <div style={{position: 'absolute', inset: 0, transform: `translateY(${dy}px)`}}>{children}</div>;
+}
+
+/** 按 shot_id 在组私有映射里取组件；取不到返回 null（退回通用引擎）。 */
+function pickStageComponent(stage, plan, recipe) {
+  if (typeof stage === 'function') return stage;
+  const id = String(recipe?.shot_id || plan?.variant || '');
+  const map = stage?.components;
+  if (map && typeof map === 'object') return map[id] || null;
+  return null;
 }
 
 /** 主角位置：单主角模式吃满内容区宽，双带模式左置（mirror 时右置）。 */

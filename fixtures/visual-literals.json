@@ -10,400 +10,864 @@
   ],
   "literals": [
     {
+      "literal": "/orders",
+      "file": "src/shots/G4/SC20.jsx"
+    },
+    {
       "literal": "1 && textEm(v)",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
     },
     {
       "literal": "= perBlock && bi",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
     },
     {
       "literal": "= start1 && c.from",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
     },
     {
       "literal": "AFTER",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
+    },
+    {
+      "literal": "Authorization:",
+      "file": "src/shots/G1/SC02.jsx"
+    },
+    {
+      "literal": "Authorization: Digest",
+      "file": "src/shots/G2/SC10.jsx"
     },
     {
       "literal": "BEFORE",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "Content-Digest",
-      "file": "src\\shots\\G5\\SC29.jsx"
+      "literal": "GET",
+      "file": "src/shots/G4/SC20.jsx"
     },
     {
-      "literal": "RFC 9530",
-      "file": "src\\shots\\G5\\SC29.jsx"
+      "literal": "GET /orders",
+      "file": "src/shots/G1/SC02.jsx"
     },
     {
-      "literal": "Repr-Digest",
-      "file": "src\\shots\\G5\\SC29.jsx"
+      "literal": "GET /orders HTTP/1.1",
+      "file": "src/shots/G2/SC10.jsx"
     },
     {
-      "literal": "accept",
-      "file": "src\\shots\\G3\\SC13.jsx"
+      "literal": "HTTP Digest Fields",
+      "file": "src/shots/G1/SC01.jsx"
     },
     {
-      "literal": "algorithm",
-      "file": "src\\shots\\G8\\SC44.jsx"
+      "literal": "algorithm 必填",
+      "file": "src/shots/G3/SC15.jsx"
     },
     {
-      "literal": "bytes",
-      "file": "src\\shots\\G6\\SC36.jsx"
+      "literal": "algorithm 缺省",
+      "file": "src/shots/G3/SC15.jsx"
     },
     {
-      "literal": "candidate",
-      "file": "src\\shots\\G1\\SC03.jsx"
+      "literal": "algorithm=强摘要",
+      "file": "src/shots/G7/SC40.jsx"
     },
     {
-      "literal": "check",
-      "file": "src\\shots\\G5\\SC27.jsx"
+      "literal": "auth",
+      "file": "src/shots/G4/SC20.jsx"
     },
     {
-      "literal": "claim",
-      "file": "src\\shots\\G4\\SC19.jsx"
+      "literal": "canonical request",
+      "file": "src/shots/G4/SC20.jsx"
     },
     {
-      "literal": "compare",
-      "file": "src\\shots\\G2\\SC10.jsx"
+      "literal": "cnonce",
+      "file": "src/shots/G1/SC02.jsx"
     },
     {
-      "literal": "constraint",
-      "file": "src\\shots\\G1\\SC03.jsx"
+      "literal": "cnonce + qop",
+      "file": "src/shots/G1/SC04.jsx"
     },
     {
-      "literal": "content",
-      "file": "src\\shots\\G5\\SC28.jsx"
+      "literal": "cnonce 与 opaque",
+      "file": "src/shots/G4/SC22.jsx"
     },
     {
-      "literal": "content-digest",
-      "file": "src\\shots\\G7\\SC42.jsx"
-    },
-    {
-      "literal": "coverage",
-      "file": "src\\shots\\G6\\SC35.jsx"
-    },
-    {
-      "literal": "current",
-      "file": "src\\shots\\G3\\SC16.jsx"
-    },
-    {
-      "literal": "data",
-      "file": "src\\shots\\G7\\SC38.jsx"
-    },
-    {
-      "literal": "destination",
-      "file": "src\\shots\\G6\\SC31.jsx"
+      "literal": "cnonce 每次随机",
+      "file": "src/shots/G5/SC30.jsx"
     },
     {
       "literal": "digest",
-      "file": "src\\shots\\G8\\SC44.jsx"
-    },
-    {
-      "literal": "digest-fields",
-      "file": "src\\shots\\G3\\SC15.jsx"
-    },
-    {
-      "literal": "encode",
-      "file": "src\\shots\\G7\\SC40.jsx"
-    },
-    {
-      "literal": "encoding",
-      "file": "src\\shots\\G3\\SC14.jsx"
-    },
-    {
-      "literal": "end-to-end",
-      "file": "src\\shots\\G1\\SC05.jsx"
-    },
-    {
-      "literal": "evidence",
-      "file": "src\\shots\\G7\\SC39.jsx"
-    },
-    {
-      "literal": "field",
-      "file": "src\\shots\\G7\\SC39.jsx"
-    },
-    {
-      "literal": "hash",
-      "file": "src\\shots\\G5\\SC28.jsx"
+      "file": "src/shots/G4/SC20.jsx"
     },
     {
       "literal": "header",
-      "file": "src\\shots\\G1\\SC04.jsx"
-    },
-    {
-      "literal": "hop",
-      "file": "src\\shots\\G4\\SC21.jsx"
-    },
-    {
-      "literal": "input",
-      "file": "src\\shots\\G3\\SC18.jsx"
-    },
-    {
-      "literal": "integrity",
-      "file": "src\\shots\\G8\\SC44.jsx"
-    },
-    {
-      "literal": "intermediary",
-      "file": "src\\shots\\G6\\SC31.jsx"
-    },
-    {
-      "literal": "item",
-      "file": "src\\shots\\G6\\SC34.jsx"
-    },
-    {
-      "literal": "legacy",
-      "file": "src\\shots\\G6\\SC35.jsx"
-    },
-    {
-      "literal": "match",
-      "file": "src\\shots\\G6\\SC36.jsx"
-    },
-    {
-      "literal": "message",
-      "file": "src\\shots\\G6\\SC32.jsx"
+      "file": "src/shots/plan.mjs"
     },
     {
       "literal": "meta",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "metadata",
-      "file": "src\\shots\\G1\\SC04.jsx"
+      "literal": "method + uri",
+      "file": "src/shots/G1/SC04.jsx"
     },
     {
-      "literal": "migration",
-      "file": "src\\shots\\G3\\SC15.jsx"
+      "literal": "method 与 uri",
+      "file": "src/shots/G4/SC22.jsx"
     },
     {
-      "literal": "new-field",
-      "file": "src\\shots\\G6\\SC35.jsx"
+      "literal": "nc",
+      "file": "src/shots/G1/SC02.jsx"
     },
     {
-      "literal": "old-digest",
-      "file": "src\\shots\\G3\\SC15.jsx"
+      "literal": "nc 每次自增",
+      "file": "src/shots/G7/SC40.jsx"
     },
     {
-      "literal": "origin",
-      "file": "src\\shots\\G6\\SC31.jsx"
+      "literal": "nonce + nc",
+      "file": "src/shots/G1/SC04.jsx"
     },
     {
-      "literal": "parameter",
-      "file": "src\\shots\\G6\\SC34.jsx"
+      "literal": "nonce count",
+      "file": "src/shots/G5/SC30.jsx"
     },
     {
-      "literal": "parse",
-      "file": "src\\shots\\G5\\SC27.jsx"
+      "literal": "nonce 加计数",
+      "file": "src/shots/G5/SC27.jsx"
     },
     {
       "literal": "payload",
-      "file": "src\\shots\\G5\\SC26.jsx"
+      "file": "src/shots/plan.mjs"
     },
     {
       "literal": "policy",
-      "file": "src\\shots\\G1\\SC04.jsx"
+      "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "prefer",
-      "file": "src\\shots\\G3\\SC13.jsx"
+      "literal": "qop 与 nc",
+      "file": "src/shots/G4/SC22.jsx"
     },
     {
-      "literal": "preference",
-      "file": "src\\shots\\G8\\SC43.jsx"
+      "literal": "qop 固定取值",
+      "file": "src/shots/G5/SC30.jsx"
     },
     {
-      "literal": "receive",
-      "file": "src\\shots\\G5\\SC27.jsx"
+      "literal": "qop, nc, cnonce",
+      "file": "src/shots/G2/SC10.jsx"
     },
     {
-      "literal": "receiver",
-      "file": "src\\shots\\G7\\SC41.jsx"
+      "literal": "qop=auth",
+      "file": "src/shots/G7/SC40.jsx"
     },
     {
-      "literal": "repr-digest",
-      "file": "src\\shots\\G7\\SC42.jsx"
+      "literal": "realm",
+      "file": "src/shots/G1/SC02.jsx"
     },
     {
-      "literal": "representation",
-      "file": "src\\shots\\G7\\SC38.jsx"
+      "literal": "realm=\"testrealm\"",
+      "file": "src/shots/G2/SC10.jsx"
     },
     {
       "literal": "request",
-      "file": "src\\shots\\G7\\SC37.jsx"
+      "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "scope",
-      "file": "src\\shots\\G1\\SC05.jsx"
+      "literal": "response",
+      "file": "src/shots/G4/SC22.jsx"
     },
     {
-      "literal": "selected",
-      "file": "src\\shots\\G1\\SC03.jsx"
-    },
-    {
-      "literal": "sender",
-      "file": "src\\shots\\G7\\SC41.jsx"
-    },
-    {
-      "literal": "sf-dictionary",
-      "file": "src\\shots\\G4\\SC24.jsx"
-    },
-    {
-      "literal": "sf-item",
-      "file": "src\\shots\\G4\\SC24.jsx"
-    },
-    {
-      "literal": "sf-list",
-      "file": "src\\shots\\G4\\SC24.jsx"
-    },
-    {
-      "literal": "standard",
-      "file": "src\\shots\\G7\\SC39.jsx"
-    },
-    {
-      "literal": "structured",
-      "file": "src\\shots\\G8\\SC44.jsx"
-    },
-    {
-      "literal": "structured-field",
-      "file": "src\\shots\\G6\\SC34.jsx"
+      "literal": "response hash",
+      "file": "src/shots/G1/SC04.jsx"
     },
     {
       "literal": "transform",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "transport",
-      "file": "src\\shots\\G6\\SC32.jsx"
+      "literal": "uri=\"/orders\"",
+      "file": "src/shots/G2/SC10.jsx"
     },
     {
-      "literal": "validate",
-      "file": "src\\shots\\G3\\SC17.jsx"
+      "literal": "username",
+      "file": "src/shots/G1/SC02.jsx"
     },
     {
-      "literal": "value",
-      "file": "src\\shots\\G6\\SC34.jsx"
-    },
-    {
-      "literal": "verified",
-      "file": "src\\shots\\G7\\SC37.jsx"
+      "literal": "username=\"Mufasa\"",
+      "file": "src/shots/G2/SC10.jsx"
     },
     {
       "literal": "verify",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "want",
-      "file": "src\\shots\\G3\\SC13.jsx"
+      "literal": "一次请求",
+      "file": "src/shots/G2/SC11.jsx"
     },
     {
-      "literal": "want-content",
-      "file": "src\\shots\\G8\\SC43.jsx"
+      "literal": "三档强度",
+      "file": "src/shots/G3/SC17.jsx"
     },
     {
-      "literal": "want-repr",
-      "file": "src\\shots\\G8\\SC43.jsx"
+      "literal": "三档防护",
+      "file": "src/shots/G5/SC27.jsx"
+    },
+    {
+      "literal": "不加密",
+      "file": "src/shots/G3/SC17.jsx"
+    },
+    {
+      "literal": "不开就没有这些代价",
+      "file": "src/shots/G7/SC39.jsx"
+    },
+    {
+      "literal": "两侧字段不同",
+      "file": "src/shots/G4/SC22.jsx"
+    },
+    {
+      "literal": "两侧必须按同一顺序拼接",
+      "file": "src/shots/G4/SC19.jsx"
+    },
+    {
+      "literal": "两侧时钟必须足够接近",
+      "file": "src/shots/G5/SC29.jsx"
+    },
+    {
+      "literal": "两侧顺序要对齐",
+      "file": "src/shots/G7/SC38.jsx"
+    },
+    {
+      "literal": "中间代理",
+      "file": "src/shots/G6/SC31.jsx"
+    },
+    {
+      "literal": "为什么弱算法被弃用",
+      "file": "src/shots/G3/SC18.jsx"
+    },
+    {
+      "literal": "为什么明文口令不够",
+      "file": "src/shots/G2/SC08.jsx"
     },
     {
       "literal": "主张",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
+    },
+    {
+      "literal": "事实与出处",
+      "file": "src/shots/G2/SC09.jsx"
+    },
+    {
+      "literal": "仅 nonce",
+      "file": "src/shots/G5/SC27.jsx"
+    },
+    {
+      "literal": "代价从这几处来",
+      "file": "src/shots/G7/SC38.jsx"
+    },
+    {
+      "literal": "代价落在两侧",
+      "file": "src/shots/G7/SC42.jsx"
+    },
+    {
+      "literal": "代价集中在哪里",
+      "file": "src/shots/G7/SC39.jsx"
+    },
+    {
+      "literal": "代价集中在顺序与时钟",
+      "file": "src/shots/G7/SC39.jsx"
+    },
+    {
+      "literal": "代理",
+      "file": "src/shots/G2/SC11.jsx"
+    },
+    {
+      "literal": "代理可读原文",
+      "file": "src/shots/G6/SC35.jsx"
+    },
+    {
+      "literal": "代理链",
+      "file": "src/shots/G6/SC31.jsx"
     },
     {
       "literal": "优选",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
+    },
+    {
+      "literal": "偏差过大会被拒",
+      "file": "src/shots/G5/SC29.jsx"
+    },
+    {
+      "literal": "先看场景再决定",
+      "file": "src/shots/G8/SC43.jsx"
+    },
+    {
+      "literal": "全程不可读原文",
+      "file": "src/shots/G6/SC35.jsx"
+    },
+    {
+      "literal": "全链摘要",
+      "file": "src/shots/G6/SC33.jsx"
+    },
+    {
+      "literal": "公网该上",
+      "file": "src/shots/G8/SC43.jsx"
+    },
+    {
+      "literal": "共享密钥",
+      "file": "src/shots/G6/SC36.jsx"
+    },
+    {
+      "literal": "共享密钥变成每跳一把",
+      "file": "src/shots/G6/SC36.jsx"
+    },
+    {
+      "literal": "内网可省",
+      "file": "src/shots/G8/SC43.jsx"
+    },
+    {
+      "literal": "再加窗口",
+      "file": "src/shots/G5/SC27.jsx"
+    },
+    {
+      "literal": "再认证",
+      "file": "src/shots/G6/SC34.jsx"
+    },
+    {
+      "literal": "判断有先后",
+      "file": "src/shots/G8/SC44.jsx"
+    },
+    {
+      "literal": "单跳摘要",
+      "file": "src/shots/G1/SC03.jsx"
+    },
+    {
+      "literal": "单跳校验",
+      "file": "src/shots/G1/SC05.jsx"
     },
     {
       "literal": "原文",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/G1/SC06.jsx"
+    },
+    {
+      "literal": "口令",
+      "file": "src/shots/G3/SC16.jsx"
+    },
+    {
+      "literal": "口令不经过网络",
+      "file": "src/shots/G3/SC16.jsx"
+    },
+    {
+      "literal": "只有端到端能覆盖整条链路",
+      "file": "src/shots/G1/SC03.jsx"
+    },
+    {
+      "literal": "只能换成摘要",
+      "file": "src/shots/G2/SC08.jsx"
+    },
+    {
+      "literal": "只能覆盖一段",
+      "file": "src/shots/G6/SC32.jsx"
+    },
+    {
+      "literal": "可单独撤回",
+      "file": "src/shots/G6/SC36.jsx"
+    },
+    {
+      "literal": "可原样重放",
+      "file": "src/shots/G5/SC25.jsx"
+    },
+    {
+      "literal": "可带 userhash",
+      "file": "src/shots/G3/SC15.jsx"
     },
     {
       "literal": "可检验",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
+    },
+    {
+      "literal": "同一凭据可被复用",
+      "file": "src/shots/G2/SC08.jsx"
+    },
+    {
+      "literal": "四层字段共用一条校验链",
+      "file": "src/shots/G1/SC04.jsx"
+    },
+    {
+      "literal": "回应",
+      "file": "src/shots/G2/SC07.jsx"
+    },
+    {
+      "literal": "场景",
+      "file": "src/shots/G8/SC44.jsx"
+    },
+    {
+      "literal": "多存一次摘要",
+      "file": "src/shots/G7/SC42.jsx"
+    },
+    {
+      "literal": "多算一次摘要",
+      "file": "src/shots/G7/SC42.jsx"
+    },
+    {
+      "literal": "头字段",
+      "file": "src/shots/G4/SC24.jsx"
+    },
+    {
+      "literal": "字段分四层",
+      "file": "src/shots/G4/SC24.jsx"
+    },
+    {
+      "literal": "字段名的变化",
+      "file": "src/shots/G3/SC15.jsx"
+    },
+    {
+      "literal": "字段顺序",
+      "file": "src/shots/G4/SC21.jsx"
     },
     {
       "literal": "实测 B",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
+    },
+    {
+      "literal": "客户端",
+      "file": "src/shots/G7/SC41.jsx"
+    },
+    {
+      "literal": "客户端发出的那一行",
+      "file": "src/shots/G2/SC10.jsx"
+    },
+    {
+      "literal": "客户端时钟偏快",
+      "file": "src/shots/G5/SC28.jsx"
+    },
+    {
+      "literal": "对齐顺序",
+      "file": "src/shots/G7/SC37.jsx"
+    },
+    {
+      "literal": "差别在链路长度",
+      "file": "src/shots/G6/SC35.jsx"
+    },
+    {
+      "literal": "常见的三种部署",
+      "file": "src/shots/G6/SC33.jsx"
+    },
+    {
+      "literal": "序号必须递增",
+      "file": "src/shots/G5/SC25.jsx"
+    },
+    {
+      "literal": "应用",
+      "file": "src/shots/G7/SC41.jsx"
+    },
+    {
+      "literal": "弱摘要",
+      "file": "src/shots/G3/SC17.jsx"
+    },
+    {
+      "literal": "强度分档，按需选",
+      "file": "src/shots/G3/SC13.jsx"
+    },
+    {
+      "literal": "强摘要",
+      "file": "src/shots/G3/SC17.jsx"
+    },
+    {
+      "literal": "成本",
+      "file": "src/shots/G8/SC44.jsx"
+    },
+    {
+      "literal": "手写固定序",
+      "file": "src/shots/G4/SC23.jsx"
+    },
+    {
+      "literal": "抓包即可读出口令",
+      "file": "src/shots/G2/SC08.jsx"
+    },
+    {
+      "literal": "报文",
+      "file": "src/shots/G5/SC26.jsx"
+    },
+    {
+      "literal": "拒绝重放",
+      "file": "src/shots/G5/SC26.jsx"
+    },
+    {
+      "literal": "拼接",
+      "file": "src/shots/G4/SC24.jsx"
+    },
+    {
+      "literal": "按字典序",
+      "file": "src/shots/G4/SC23.jsx"
+    },
+    {
+      "literal": "按规范序",
+      "file": "src/shots/G4/SC23.jsx"
+    },
+    {
+      "literal": "按链路判断",
+      "file": "src/shots/G8/SC43.jsx"
+    },
+    {
+      "literal": "挑战",
+      "file": "src/shots/G2/SC07.jsx"
+    },
+    {
+      "literal": "接入要改三处",
+      "file": "src/shots/G7/SC37.jsx"
+    },
+    {
+      "literal": "摘要",
+      "file": "src/shots/G4/SC24.jsx"
+    },
+    {
+      "literal": "摘要值来自这四层",
+      "file": "src/shots/G3/SC14.jsx"
+    },
+    {
+      "literal": "摘要是 HTTP 里可选的认证机制",
+      "file": "src/shots/G2/SC09.jsx"
+    },
+    {
+      "literal": "摘要是可选机制",
+      "file": "src/shots/G7/SC39.jsx"
+    },
+    {
+      "literal": "摘要认证要走完这三步",
+      "file": "src/shots/G2/SC07.jsx"
     },
     {
       "literal": "改造前",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
     },
     {
       "literal": "改造后",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
+    },
+    {
+      "literal": "整条链只算一次",
+      "file": "src/shots/G6/SC32.jsx"
     },
     {
       "literal": "方案 A",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
     },
     {
       "literal": "方案 B",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
+    },
+    {
+      "literal": "无 userhash",
+      "file": "src/shots/G3/SC15.jsx"
+    },
+    {
+      "literal": "日志",
+      "file": "src/shots/G2/SC11.jsx"
+    },
+    {
+      "literal": "时钟",
+      "file": "src/shots/G2/SC11.jsx"
+    },
+    {
+      "literal": "时钟偏了就会失败",
+      "file": "src/shots/G5/SC28.jsx"
+    },
+    {
+      "literal": "时钟漂移",
+      "file": "src/shots/G1/SC01.jsx"
+    },
+    {
+      "literal": "服务器只回一个摘要，密码仍不经过网络",
+      "file": "src/shots/G1/SC06.jsx"
+    },
+    {
+      "literal": "服务端",
+      "file": "src/shots/G6/SC31.jsx"
+    },
+    {
+      "literal": "服务端判定过期",
+      "file": "src/shots/G5/SC28.jsx"
     },
     {
       "literal": "机制",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
     },
     {
       "literal": "来源 A",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
     },
     {
       "literal": "校验",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/G3/SC16.jsx"
+    },
+    {
+      "literal": "每一跳都要做",
+      "file": "src/shots/G6/SC34.jsx"
+    },
+    {
+      "literal": "每次请求都要变的东西",
+      "file": "src/shots/G5/SC30.jsx"
+    },
+    {
+      "literal": "每跳各自计算",
+      "file": "src/shots/G6/SC32.jsx"
+    },
+    {
+      "literal": "每跳多算一次",
+      "file": "src/shots/G7/SC38.jsx"
+    },
+    {
+      "literal": "每跳密钥",
+      "file": "src/shots/G6/SC36.jsx"
+    },
+    {
+      "literal": "比对摘要",
+      "file": "src/shots/G2/SC12.jsx"
+    },
+    {
+      "literal": "测试向量",
+      "file": "src/shots/G4/SC21.jsx"
     },
     {
       "literal": "现象",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
+    },
+    {
+      "literal": "生成挑战",
+      "file": "src/shots/G2/SC12.jsx"
+    },
+    {
+      "literal": "碰撞更易构造",
+      "file": "src/shots/G3/SC18.jsx"
+    },
+    {
+      "literal": "示例语境取自摘要规范",
+      "file": "src/shots/G2/SC09.jsx"
+    },
+    {
+      "literal": "窗口仍有限",
+      "file": "src/shots/G5/SC25.jsx"
+    },
+    {
+      "literal": "端到端摘要",
+      "file": "src/shots/G1/SC03.jsx"
+    },
+    {
+      "literal": "端到端校验",
+      "file": "src/shots/G1/SC05.jsx"
     },
     {
       "literal": "第一步",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
+    },
+    {
+      "literal": "第一跳",
+      "file": "src/shots/G6/SC31.jsx"
     },
     {
       "literal": "第三步",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
     },
     {
       "literal": "第二步",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
+    },
+    {
+      "literal": "算摘要",
+      "file": "src/shots/G2/SC12.jsx"
+    },
+    {
+      "literal": "算法",
+      "file": "src/shots/G3/SC14.jsx"
+    },
+    {
+      "literal": "篡改风险",
+      "file": "src/shots/G1/SC01.jsx"
     },
     {
       "literal": "结构化",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
     },
     {
       "literal": "结果",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
     },
     {
       "literal": "结论",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
+    },
+    {
+      "literal": "缓存",
+      "file": "src/shots/G6/SC31.jsx"
+    },
+    {
+      "literal": "网关",
+      "file": "src/shots/G7/SC41.jsx"
+    },
+    {
+      "literal": "职责落在两侧",
+      "file": "src/shots/G2/SC12.jsx"
+    },
+    {
+      "literal": "落到配置上",
+      "file": "src/shots/G7/SC40.jsx"
+    },
+    {
+      "literal": "落地涉及",
+      "file": "src/shots/G7/SC41.jsx"
     },
     {
       "literal": "落库",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/G6/SC34.jsx"
+    },
+    {
+      "literal": "覆盖整条链",
+      "file": "src/shots/G6/SC32.jsx"
+    },
+    {
+      "literal": "覆盖范围不同",
+      "file": "src/shots/G6/SC32.jsx"
+    },
+    {
+      "literal": "覆盖范围的差别不在算法，在链路长度",
+      "file": "src/shots/G1/SC05.jsx"
     },
     {
       "literal": "观测",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
+    },
+    {
+      "literal": "规范",
+      "file": "src/shots/G4/SC21.jsx"
+    },
+    {
+      "literal": "规范化",
+      "file": "src/shots/G4/SC24.jsx"
+    },
+    {
+      "literal": "规范化之后",
+      "file": "src/shots/G4/SC20.jsx"
+    },
+    {
+      "literal": "规范定义字段与算法",
+      "file": "src/shots/G2/SC09.jsx"
+    },
+    {
+      "literal": "规范给出规范串定义",
+      "file": "src/shots/G4/SC19.jsx"
+    },
+    {
+      "literal": "规范要求同步时间",
+      "file": "src/shots/G5/SC29.jsx"
+    },
+    {
+      "literal": "规范里的时钟要求",
+      "file": "src/shots/G5/SC29.jsx"
+    },
+    {
+      "literal": "计数器挡掉重放",
+      "file": "src/shots/G5/SC25.jsx"
+    },
+    {
+      "literal": "计数窗口",
+      "file": "src/shots/G5/SC26.jsx"
+    },
+    {
+      "literal": "认证",
+      "file": "src/shots/G6/SC34.jsx"
     },
     {
       "literal": "诱因",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
+    },
+    {
+      "literal": "请求被拒",
+      "file": "src/shots/G5/SC28.jsx"
+    },
+    {
+      "literal": "调试成本变高",
+      "file": "src/shots/G7/SC38.jsx"
     },
     {
       "literal": "转发",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/G6/SC34.jsx"
     },
     {
       "literal": "输入",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
+    },
+    {
+      "literal": "边缘摘要",
+      "file": "src/shots/G6/SC33.jsx"
+    },
+    {
+      "literal": "过期即拒绝",
+      "file": "src/shots/G5/SC25.jsx"
+    },
+    {
+      "literal": "过渡摘要",
+      "file": "src/shots/G3/SC13.jsx"
+    },
+    {
+      "literal": "运维",
+      "file": "src/shots/G7/SC41.jsx"
+    },
+    {
+      "literal": "返回结果",
+      "file": "src/shots/G2/SC12.jsx"
+    },
+    {
+      "literal": "选算法",
+      "file": "src/shots/G7/SC37.jsx"
+    },
+    {
+      "literal": "逐步淘汰",
+      "file": "src/shots/G3/SC18.jsx"
+    },
+    {
+      "literal": "逐跳摘要",
+      "file": "src/shots/G6/SC33.jsx"
+    },
+    {
+      "literal": "通过",
+      "file": "src/shots/G1/SC06.jsx"
+    },
+    {
+      "literal": "配字段",
+      "file": "src/shots/G7/SC37.jsx"
+    },
+    {
+      "literal": "配置片段",
+      "file": "src/shots/G7/SC40.jsx"
+    },
+    {
+      "literal": "重放窗口",
+      "file": "src/shots/G1/SC01.jsx"
+    },
+    {
+      "literal": "重放被压进窗口里",
+      "file": "src/shots/G5/SC26.jsx"
     },
     {
       "literal": "重试",
-      "file": "src\\shots\\plan.mjs"
+      "file": "src/shots/plan.mjs"
+    },
+    {
+      "literal": "链路",
+      "file": "src/shots/G8/SC44.jsx"
+    },
+    {
+      "literal": "长度可被穷举",
+      "file": "src/shots/G3/SC18.jsx"
+    },
+    {
+      "literal": "顺序为什么有讲究",
+      "file": "src/shots/G4/SC19.jsx"
+    },
+    {
+      "literal": "顺序的三种取法",
+      "file": "src/shots/G4/SC23.jsx"
+    },
+    {
+      "literal": "顺序错则摘要不等",
+      "file": "src/shots/G4/SC19.jsx"
     }
   ]
 }

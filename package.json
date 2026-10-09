@@ -78,7 +78,8 @@
     "verify:still-benchmark": "node scripts/verify-still-benchmark.mjs",
     "verify:limits": "node scripts/verify-limits.mjs",
     "verify:reference-sample": "node scripts/verify-reference-sample.mjs",
-    "verify:tts-parity": "node scripts/verify-tts-parity.mjs"
+    "verify:tts-parity": "node scripts/verify-tts-parity.mjs",
+    "verify:tts-native": "node scripts/verify-tts-native.mjs"
   },
   "dependencies": {
     "@remotion/cli": "4.0.534",

@@ -173,30 +173,35 @@ export const CHAPTER_GAP = 45;
 export function design(width, height) {
   const s = width / W;
   const logicalH = Math.round(height / s);
-  return {
-    s,
-    width: W,
-    height: logicalH,
-    device: {width, height},
-    // band 全部由 logicalH 推导：16:9 时 s=1、logicalH=720，还原样片的 y637–690 / y687–720
-    bands: {
-      hudTop: 28,
-      hudBottom: 79, // 28 + 51
-      railTop: 118,
-      railBottom: 162,
-      contentTop: 175, // 有流程轨时 y<175 不放内容
-      contentTopNoRail: 100,
-      contentBottom: logicalH - 100, // = subTop − 17
-      subTop: logicalH - 83, // 16:9 → 637
-      subBottom: logicalH - 30, // 16:9 → 690
-      barTop: logicalH - 33, // 16:9 → 687
-      barBottom: logicalH,
-      left: 60,
-      right: W - 60, // x60–1220
-    },
-    // 慢推安全区：运镜不得把元素推出这些边界（样片实测 x89–1191 / y122–607）
-    cameraSafe: {left: 89, right: 1191, top: 122, bottom: 607},
+  // band 全部由 logicalH 推导：16:9 时 s=1、logicalH=720，还原样片的 y637–690 / y687–720
+  const bands = {
+    hudTop: 28,
+    hudBottom: 79, // 28 + 51
+    railTop: 118,
+    railBottom: 162,
+    contentTop: 175, // 有流程轨时 y<175 不放内容
+    contentTopNoRail: 100,
+    contentBottom: logicalH - 100, // = subTop − 17
+    subTop: logicalH - 83, // 16:9 → 637
+    subBottom: logicalH - 30, // 16:9 → 690
+    barTop: logicalH - 33, // 16:9 → 687
+    barBottom: logicalH,
+    left: 60,
+    right: W - 60, // x60–1220
   };
+  // 慢推安全区：运镜不得把元素推出这些边界。
+  // ⚠ 必须按画幅推导，不能写死 16:9 的那组数：竖屏逻辑画布高 2276，
+  //   写死 y122–607 会让相机在竖屏里按「只覆盖顶部四分之一」的边界限位，
+  //   慢推推到画面中部就被判出界 —— 画面本身没问题，是判据坐标系错了。
+  //   16:9 时它仍然还原样片实测的 x89–1191 / y122–607。
+  const insetX = Math.round(W * 0.0695); // 89 / 1280
+  const cameraSafe = {
+    left: insetX,
+    right: W - insetX,
+    top: Math.max(122, bands.contentTop - 53),
+    bottom: Math.min(logicalH - 113, bands.contentBottom - 13),
+  };
+  return {s, width: W, height: logicalH, device: {width, height}, bands, cameraSafe};
 }
 
 // ---- 兼容旧签名（既有代码仍按左右上下边距取安全区）----

@@ -46,6 +46,11 @@ const checks = [
   // 于是「新增一镜不进蓝图就完全不过门」这件事在本地永远看不见。它只读 44 个 .jsx 文本，秒级。
   "verify:authored-shots",
   "verify:tts-parity",
+  // 原生 TTS 通道（kokoro / piper / kokoro_onnx / 用户 wav）真跑一遍 dispatch。
+  // verify:tts-parity 只比对那份「支持哪些引擎」的名单，而名单是脚本里的常量，
+  // 删掉 native.mjs 的 kokoro 分支它照样绿 —— 声明与实现之间没有任何连线。
+  // 这道门用 stub provider 真调dispatch，并确认坏输出会被拒绝。秒级、不联网、不需要装模型。
+  "verify:tts-native",
   "verify:repair",
   "verify:hyperframes",
   // claims 里的指令性文字过滤：抓回来的网页句子会带着 claim 编号变成"事实"并喂给 agent，
