@@ -11,6 +11,7 @@ const maxPerGroup=maxShotsPerGroup();
 const concurrency=Number(process.env.BUILD_CONCURRENCY||4);
 const agent=createAgentProvider();
 const strict=process.env.AGENT_STRICT==="1";
+const videoShotcraftDir=String(process.env.VIDEO_SHOTCRAFT_DIR||"").trim()?path.resolve(process.env.VIDEO_SHOTCRAFT_DIR):null;
 const groups=[];
 for(let i=0;i<ir.scenes.length;i+=maxPerGroup) groups.push({id:"G"+String(groups.length+1),scenes:ir.scenes.slice(i,i+maxPerGroup)});
 
@@ -24,6 +25,7 @@ const built=await buildScenes(groups,async(group)=>{
   const agentReview=await runNamedAgent(agent,"build-agent",{
     project,
     group:{id:group.id,scene_ids:deterministic.scene_ids},
+    videoShotcraftDir,
     constraints:{
       only_paths:["src/shots/"+group.id+"/**"],
       six_stills_per_shot:true,
