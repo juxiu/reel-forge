@@ -29,7 +29,7 @@ const body = skill.slice(end + 5);
 for (const field of ["name:", "description:"]) {
   if (!frontmatter.split("\n").some((line) => line.startsWith(field))) throw new Error("SKILL.md missing frontmatter field: " + field);
 }
-const required = ["# reel-forge Skill", "## 目标", "## 四个人工确认点", "## 样片级硬规则", "## Build Agent", "## TTS", "## B-roll", "## Still / 性能", "## QC", "## 一键入口", "## 完成定义"];
+const required = ["# reel-forge Skill", "## 目标", "## 四个人工确认点", "## 样片级硬规则", "### Build Agent", "## Video Shotcraft 接入（可选）", "## TTS", "## B-roll", "## Still / 性能", "## QC", "## 一键入口", "## 完成定义"];
 for (const section of required) {
   if (!body.includes(section)) throw new Error("SKILL.md missing section: " + section);
 }
