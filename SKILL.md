@@ -65,6 +65,25 @@ Render → Frame Metrics → Motion →画面文字出处（阻断）→ Agent Q
 
 调单个镜头不必跑全片：`npm run debug:shot -- <scene-id> [--ratio 16x9|9x16]` 只渲染该镜头片段、抽成 PNG 帧，并只对这个区间跑 `frame_metrics` / `motion_check`（判据与全片同源，只是把输入裁到单镜头，输出落在 `artifacts/debug/<ratio>/<scene-id>/`）。全片渲染留给最终交付。
 
+## Video Shotcraft 接入（可选）
+
+[video-shotcraft](https://github.com/Vincentwei1021/video-shotcraft) 是可选的镜头配方卡与 Remotion demo 参考库，不是第二个渲染引擎。它的仓库 LICENSE 声明 Apache-2.0，但模板、演示素材、参考作品和音频必须分别确认权利；不能从仓库主许可证推断所有素材拥有相同授权。详细规则见 `docs/integrations/video-shotcraft.md`。
+
+配置本地参考库时，将 `VIDEO_SHOTCRAFT_DIR=../video-shotcraft` 指向独立克隆的仓库根目录，然后运行：
+
+```bash
+npm run verify:shotcraft
+```
+
+未配置时会 SKIP，不自动下载，不影响原生产流程。已配置时 Build Agent 应：
+1. 先确定镜头叙事任务，再从 `gallery/api/library.json` 解析卡名和 style key；
+2. 读 `references/shots/` 中完整配方卡，并按卡片的“参考实现”打开准确 demo 源码；不能只凭卡名重写；
+3. 只借用匹配叙事的运动语法/调校参数，适配到 Reel Forge 的 `SHOT_RECIPE` 与组私有 `stage.jsx`，不新增第二个 Composition 或渲染引擎；
+4. 不复制参考宣传片的画面、品牌或未核验授权的素材；默认不复制 Shotcraft 音频。未经评估不得增加依赖；
+5. 在实际使用的 `SCxx.jsx` 注释和组内 `BUILD_NOTES.md` 记录卡名、demo 路径、上游 revision、改编内容与复用素材。
+
+Agent 无法读取本地目录时必须明确说明，不能假称引用过卡片或源码。使用 Shotcraft 后依然执行单镜头预览、`debug:shot`、采样验证与 Pilot 人工审查。当前 9:16 仍是居中适配，不等于完成纵向重排。
+
 ## 一键入口
 `npm run skill -- "TOPIC" --source URL --auto-approve`
 

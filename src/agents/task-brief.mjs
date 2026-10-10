@@ -65,12 +65,23 @@ export function buildTaskBrief(role, context = {}) {
   const scope = role === "build-agent"
     ? (context.group ? `本组：${context.group.id || "?"}，镜头：${(context.group.scene_ids || []).join(", ") || "（未给）"}` : null)
     : context.ratio ? `画幅：${context.ratio}` : null;
+  const shotcraftRules = role === "build-agent"
+    ? (context.videoShotcraftDir
+      ? [
+          "可选视觉参考库已配置，路径为 " + context.videoShotcraftDir + "。先读 gallery/api/library.json 校验卡名/style key，再读 references/shots/ 对应卡片全文，并按卡片的“参考实现”读取准确的 demos/ 源码；卡片名称不是实现参数的真源。",
+          "只把与本镜叙事任务匹配的运动语法和已调参数适配到 Reel Forge 的 SHOT_RECIPE / 组内 stage.jsx。不得新增第二个 Remotion 根组件/渲染引擎；不可盲目复制产品品牌、原片画面、截图或音频。未经评估不加 npm 依赖。",
+          "凡真正使用了 Shotcraft 卡或 demo，在对应 SCxx.jsx 注释与 BUILD_NOTES.md 记录卡名、准确 demo 相对路径、上游 git revision、改编点与复用素材；读不到目录时明确报告，不得编造来源。",
+        ]
+      : [
+          "VIDEO_SHOTCRAFT_DIR 未配置：不要声称读取或使用了 video-shotcraft 的镜头卡/demo。按 Reel Forge 原有镜头设计流程工作；如用户明确要求使用 Shotcraft，报告参考库未配置，不要虚构卡名或路径。",
+        ])
+    : [];
   return {
     role,
     deliverable: context.deliverable || null,
     scope,
-    rules: [...SHARED_RULES, ...own.map((item) => item.rule)],
+    rules: [...SHARED_RULES, ...own.map((item) => item.rule), ...shotcraftRules],
     // 让读的人能回到本仓库核对每条规则的出处，而不是把任务书当无源的口号。
-    provenance: "docs/knowledge/agent-protocol.md §0/§2/§4/§5/§6；数字真源 src/build/limits.mjs",
+    provenance: "docs/knowledge/agent-protocol.md §0/§2/§4/§5/§6；可选镜头参考库见 docs/integrations/video-shotcraft.md；数字真源 src/build/limits.mjs",
   };
 }
