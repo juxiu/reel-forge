@@ -63,6 +63,8 @@ Render → Frame Metrics → Motion →画面文字出处（阻断）→ Agent Q
 
 非阻断项：`visual-pixel-v1` Visual Regression。它的参考资产是 64×36 合成图、embedding 是确定性像素描述子而非语义模型，实测与画面质量反向相关（画面更密更实则分数更低），因此只作为 run-to-run 回归记录，**不参与交付判定**。它的通过不代表质量，只代表没有异常漂移。
 
+调单个镜头不必跑全片：`npm run debug:shot -- <scene-id> [--ratio 16x9|9x16]` 只渲染该镜头片段、抽成 PNG 帧，并只对这个区间跑 `frame_metrics` / `motion_check`（判据与全片同源，只是把输入裁到单镜头，输出落在 `artifacts/debug/<ratio>/<scene-id>/`）。全片渲染留给最终交付。
+
 ## 一键入口
 `npm run skill -- "TOPIC" --source URL --auto-approve`
 

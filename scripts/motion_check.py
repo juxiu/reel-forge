@@ -69,18 +69,25 @@ SAMPLE_W = MD["motion"]["sample_width"]
 
 if not os.path.isdir(args.frames):
     raise SystemExit(f"帧目录不存在：{args.frames}（先 npm run render）")
-files = sorted(p for p in (os.path.join(args.frames, n) for n in os.listdir(args.frames)) if p.lower().endswith(".png"))
-if not files:
-    raise SystemExit(
-        f"{args.frames} 里没有 PNG 帧。motion_check 只读 PNG（JPEG 需要 Pillow，测量层刻意不依赖它）；"
-        "scripts/render.sh 抽帧出的是 f_%04d.png。"
-    )
 
 
 def frame_no(path):
     stem = os.path.splitext(os.path.basename(path))[0]
     digits = "".join(ch for ch in stem if ch.isdigit())
     return int(digits) if digits else 0
+
+
+# 按帧号数值排序，不能按文件名字典序：ffmpeg 的 f_%04d 对 ≥10000 帧会写出 5 位名，
+# 字典序下 f_10000 排在 f_9999 前面 —— 帧差就成了乱序相邻帧的差值，判据数字全错却不报错。
+files = sorted(
+    (p for p in (os.path.join(args.frames, n) for n in os.listdir(args.frames)) if p.lower().endswith(".png")),
+    key=frame_no,
+)
+if not files:
+    raise SystemExit(
+        f"{args.frames} 里没有 PNG 帧。motion_check 只读 PNG（JPEG 需要 Pillow，测量层刻意不依赖它）；"
+        "scripts/render.sh 抽帧出的是 f_%04d.png。"
+    )
 
 
 def zone_rows(small):

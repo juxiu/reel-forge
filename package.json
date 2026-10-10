@@ -56,6 +56,7 @@
     "repair": "node scripts/repair.mjs",
     "deliver": "node scripts/deliver.mjs",
     "still": "node scripts/still.mjs",
+    "debug:shot": "node scripts/debug-shot.mjs",
     "verify:skill": "node scripts/verify-skill.mjs",
     "verify:visual-grammar": "node scripts/verify-visual-grammar.mjs",
     "verify:visual-benchmark": "node scripts/verify-visual-benchmark.mjs",

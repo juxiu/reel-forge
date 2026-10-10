@@ -214,7 +214,13 @@ def frame_no(name):
 
 if not os.path.isdir(args.frames):
     raise SystemExit(f"帧目录不存在：{args.frames}（先 npm run render）")
-files = sorted(p for p in (os.path.join(args.frames, n) for n in os.listdir(args.frames)) if p.lower().endswith(".png"))
+# 必须按帧号数值排序，不能按文件名字典序：ffmpeg 的 f_%04d 对 ≥10000 帧会写出 5 位名，
+# 字典序下 f_10000 排在 f_9999 前面 —— 帧差就成了乱序相邻帧的差值，判据照样出 PASS/FAIL，
+# 只是数字全错（本片 13235 帧，已越界）。按 frame_no 排序对任何补零宽度都成立。
+files = sorted(
+    (p for p in (os.path.join(args.frames, n) for n in os.listdir(args.frames)) if p.lower().endswith(".png")),
+    key=frame_no,
+)
 if not files:
     raise SystemExit(
         f"{args.frames} 里没有 PNG 帧。scripts/render.sh 抽帧出的是 f_%04d.png；"
