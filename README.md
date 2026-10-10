@@ -212,6 +212,7 @@ Production PASS
 
 - [SKILL.md](SKILL.md) — Agent Skill 行为规范
 - [docs/USAGE.md](docs/USAGE.md) — 完整使用说明
+- [docs/integrations/video-shotcraft.md](docs/integrations/video-shotcraft.md) — 可选镜头配方库接入、来源记录与许可证边界
 - [docs/REFERENCE_PROCESS.md](docs/REFERENCE_PROCESS.md) — 生产过程与完成定义
 - [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md) — 当前项目状态
 - [docs/VISUAL_GRAMMAR.md](docs/VISUAL_GRAMMAR.md) — 规则 ↔ 执行者索引页（不是真源，先从这里找入口）
