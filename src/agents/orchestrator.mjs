@@ -17,7 +17,7 @@ export async function runNamedAgent(agent, role, input, {strict=false}={}) {
   }
   // 任务书在这里注入，不在四个调用点各拼一遍：调用点忘了带就是第四份硬编码。
   // 顺序也刻意让 task 排在 ...input 之后，payload 里同名 key 顶不掉任务书。
-  const output=await agent.run({...input, role, task: buildTaskBrief(role, {deliverable: input.deliverable, group: input.group, ratio: input.ratio})});
+  const output=await agent.run({...input, role, task: buildTaskBrief(role, {deliverable: input.deliverable, group: input.group, ratio: input.ratio, videoShotcraftDir: input.videoShotcraftDir})});
   if(output===undefined||output===null) {
     if(strict) throw new Error("agent returned empty output: "+role);
     return resultEnvelope(role,{reason:"empty-output"},"failed");
