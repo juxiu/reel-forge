@@ -4,6 +4,7 @@ import {validate} from "../src/contracts/validate.mjs";
 import {createAgentProvider} from "../src/providers/agent/index.mjs";
 import {commandAgent} from "../src/providers/agent/command.mjs";
 import {runNamedAgent, runNamedAgents} from "../src/agents/orchestrator.mjs";
+import {buildTaskBrief} from "../src/agents/task-brief.mjs";
 
 /**
  * Agent 层门禁：provider 的输入输出形态、信封三态、契约真不真、以及「agent 输出有没有消费者」这件事。
@@ -95,6 +96,13 @@ checkEnvelope(
   false,
 );
 checkEnvelope("completed 信封带任意 output 形状（数组）合契约", {role: "qc-agent", status: "completed", output: [{node: "SC01"}]});
+
+// ---- Shotcraft 是可选参考库：配置时要求可溯源，未配置时不许声称用过 ----
+const plainBuildBrief = buildTaskBrief("build-agent", {group: {id: "G1", scene_ids: ["scene-001"]}});
+check("Shotcraft 未配置时任务书禁止虚构使用记录", plainBuildBrief.rules.some((r) => r.includes("VIDEO_SHOTCRAFT_DIR 未配置") && r.includes("不要声称读取或使用")));
+const shotcraftBuildBrief = buildTaskBrief("build-agent", {group: {id: "G1", scene_ids: ["scene-001"]}, videoShotcraftDir: "/tmp/video-shotcraft"});
+check("Shotcraft 已配置时任务书要求校验卡名并读取准确 demo 源码", shotcraftBuildBrief.rules.some((r) => r.includes("gallery/api/library.json") && r.includes("references/shots/") && r.includes("准确的 demos/ 源码")));
+check("Shotcraft 已配置时任务书要求记录来源与改编", shotcraftBuildBrief.rules.some((r) => r.includes("上游 git revision") && r.includes("BUILD_NOTES.md")));
 
 // ---- 3) 真命令 provider：四类结果四种报法 ----
 const viaProvider = createAgentProvider({AGENT_COMMAND: process.execPath, AGENT_ARGS: JSON.stringify([okAgent])});
