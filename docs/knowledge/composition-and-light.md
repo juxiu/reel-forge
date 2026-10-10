@@ -47,7 +47,7 @@ bands 实测值与读取状态：
 |---|---|---|---|
 | `hudTop` 28 | 28 | 28 | ✅ `src/remotion/Primitives.jsx:437`（HUD 胶囊顶边） |
 | `hudBottom` 79 | 79 | 79 | ⚠ 无读者：胶囊高度写死 51（`Primitives.jsx:221` 的 `abs(x, y, width, 51)`） |
-| `railTop` 118 / `railBottom` 162 | 同左 | 同左 | ⚠ 无读者，**渲染层没有流程轨图元**（`contentTop: 175` 的注释说的「有轨时 y<175 不放内容」画不出那个轨） |
+| `railTop` 118 / `railBottom` 162 | 同左 | 同左 | ✅ `Primitives.jsx:472-473`（**片级流程轨** `Rail` 的条体上下沿，由 `Root.jsx:78` 装配）；`contentTop: 175` 的「有轨」前提由此成立 |
 | `contentTop` 175 | 175 | 175 | ✅ `SemanticShots.jsx:36`（内容上界，恒用这一档）、`camera.mjs:130`（`scroll` 取景上界）、contracts 的 `qc_zone.with_rail`——注意后者由 `export-visual-contracts.mjs:233-240` **就地按同一份 bands 重算**，没有调用 `field.mjs:189` 那个同名 helper（见 §10） |
 | `contentTopNoRail` 100 | 100 | 100 | ✅ `camera.mjs:203`（相机取景基准）、`field.mjs:186`（QC 取景区上界） |
 | `contentBottom` `logicalH−100` | 620 | 2176 | ✅ `SemanticShots.jsx:37`、`camera.mjs:131, 204`、`field.mjs:186` |
@@ -266,7 +266,7 @@ size  = round(min(hi, max(HERO_MIN, base × scale)))
 ## 10. 无执行者与已知破口
 
 1. ⚠ **`cameraSafe` 零读者，`cameraViewRect()` 零调用点**：`camera.mjs:10` 声明的硬约束「位移量必须让所有元素留在 cameraSafe 内」没有任何代码执行；`Fx.jsx:310` 只是 re-export，没调用。加上它是硬编码的 16:9 数（`style.mjs:198`），竖屏下会把 2/3 画面判成出界。分镜里不要引用它。
-2. ⚠ `railTop` / `railBottom` / `hudBottom` 无读者；渲染层没有流程轨图元，`contentTop: 175` 的「有轨」前提不成立（§1）。
+2. ⚠ `hudBottom` 无读者（HUD 胶囊高度在 `Primitives.jsx:221` 写死 51）。`railTop`/`railBottom` 已有读者（**片级** `Primitives.Rail`，`Primitives.jsx:467-473` + `Root.jsx:78`），`contentTop: 175` 的「有轨」前提成立（§1）。
 3. ⚠ `composition.hero_weight`、`light.mode`、`light.accent` 只被生产侧 lint 看，渲染层不读——改它们不构成一次修复（§3、§7）。
 4. ⚠ `HERO_LARGE` / `HERO_HUGE` / `SET_PIECE.minLen` / `SHOT_MIN_FRAMES` 只参与 contracts 不变式与导出，不是画面参数（§5.1；`style-guide.md` §10 记着同源项）。
 5. ⚠ **`qcZoneWithRail` 与 `glowOuterRadius` 零调用**：contracts 里的 `qc_zone.with_rail` 由 `export-visual-contracts.mjs:233-240` 就地用同一份 bands 重算，**没走** `field.mjs:189` 那个 helper——同一个规则两句实现，将来改上界只改一处就会分叉（这是已知重复，不是已实现的双保险）。`glowOuterRadius`（`:97`，只被 `style.mjs:98` 再导出）本意是给 QC 问「柔光外接半径多大」，实际测量用 `glow_pad_px` + 面积，所以没人读它。

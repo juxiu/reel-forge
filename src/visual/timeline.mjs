@@ -90,6 +90,35 @@ export function hudEntries(timeline, chapters, totalFrames) {
 }
 
 /**
+ * 片级流程轨（参照 anything2explainer 的 config.rails → overlay/Rail）。
+ * 只在 timeline.rails 标了轨的章出现：把「首句 id / 末句 id / 切换句 id 列表」解成绝对帧号。
+ * ⚠ 与 hud 同一套取法：窗口 = 首句 from − 8 … 末句 to + 2（含端点，1-based），
+ *    切换帧 = 对应句子的 from —— 于是「当前第几步」是纯查表，不另存一份时序。
+ * ⚠ 句 id 写错（解不出帧号）就丢掉这条轨，而不是回退到第 1 帧：rails 是可选片级配置，
+ *    宁可少一条轨，也不要让一条错误的轨横在画面上；错配由 verify:timeline 在装配前拦下。
+ * 几何只有 5 个槽位（style.mjs 的 railTop/railBottom + Primitives 的 RAIL_CX），所以步骤截到 RAIL_STEPS_MAX。
+ */
+export const RAIL_STEPS_MAX = 5;
+export function railEntries(timeline, totalFrames) {
+  const rails = timeline?.rails;
+  if (!Array.isArray(rails) || !rails.length) return [];
+  const byId = new Map((timeline?.sentences || []).map((s) => [String(s.id), s]));
+  const atFrom = (id) => { const s = byId.get(String(id)); return s ? Math.round(Number(s.from)) : NaN; };
+  const atTo = (id) => { const s = byId.get(String(id)); return s ? Math.round(Number(s.to)) : NaN; };
+  return rails
+    .map((r, i) => {
+      const steps = (r.steps || []).map(String).slice(0, RAIL_STEPS_MAX);
+      const switchIds = r.switches || r.switchS || [];
+      const switches = switchIds.map(atFrom).filter((n) => Number.isFinite(n));
+      const from = Number.isFinite(r.from) ? Math.round(r.from) : atFrom(r.fromS) - 8;
+      const to = Number.isFinite(r.to) ? Math.round(r.to) : atTo(r.toS) + 2;
+      if (!Number.isFinite(from) || !Number.isFinite(to)) return null;
+      return {id: `RAIL${i + 1}`, steps, switches, from, to: Math.max(from, to)};
+    })
+    .filter((r) => r && r.steps.length > 0);
+}
+
+/**
  * HUD 空档清单（QC 用）：既不是过场窗口、又没有任何小节名覆盖的**帧段**。
  * ⚠ 只判「该有字的地方没字」：首条之前（片头）与末条之后（片尾）本来就该空，
  *    而 fadeIn(10)/淡出(8) 的交叠窗口会造成几帧的假空档 —— 所以限制 minFrames，

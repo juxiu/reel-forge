@@ -317,7 +317,10 @@ if (process.env.VERIFY === "1" || process.argv.includes("--check")) {
     process.exit(1);
   }
   const current = fs.readFileSync(OUT, "utf8");
-  if (current !== json) {
+  // 行尾无关比较：仓库要求 LF（.gitattributes），但 Windows 上 core.autocrlf=true 会把工作树
+  // 写成 CRLF，逐字节比会报一个和内容无关的 DRIFT。判据是「数一致」，不是「行尾一致」。
+  const lf = (s) => s.replace(/\r\n/g, "\n");
+  if (lf(current) !== lf(json)) {
     console.error("visual contracts DRIFT: " + OUT + " 与代码不一致（改过 src/visual/field.mjs 或 style.mjs？重跑 npm run export-visual-contracts）");
     const before = JSON.parse(current);
     const diffKeys = Object.keys(contracts).filter((k) => JSON.stringify(before[k]) !== JSON.stringify(contracts[k]));

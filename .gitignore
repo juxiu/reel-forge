@@ -16,3 +16,7 @@ script/timeline.md
 
 # 系统文件
 .DS_Store
+
+# Python 字节码缓存（verify:measure 等真跑 Python 脚本时生成）
+__pycache__/
+*.pyc

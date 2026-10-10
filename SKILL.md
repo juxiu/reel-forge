@@ -27,6 +27,19 @@ description: 将任意知识或技术主题生产为原创代码动画讲解视�
 
 共用语汇与 17 种拓扑在 `src/shots/stage-kit.jsx`；各组 `stage.jsx` 只声明拓扑清单与镜头映射，几何/文案/焦点拍写在镜头自己的 `recipe.stage` 里。**不要把坐标埋进与内容无关的通用函数**——那样镜头之间就看不出差别了。
 
+### 片级流程轨（rails）
+可选片级编排，参照 anything2explainer 的 `config.rails` → `overlay/Rail`。**作者源是 `fixtures/project.json` 的 `rails[]`** —— 不要写进 `fixtures/script.json`，那是 `sync-script` 从解说词派生的产物，写进去会被下次同步抹掉：
+
+```json
+{"steps": ["角色", "摘要构成", "三步认证"], "switchS": ["S01", "S04", "S07"], "fromS": "S01", "toS": "S12"}
+```
+
+- `steps` ≤5（几何只有 5 个槽位）；`switchS` 是每一步开始的**句 id**，`fromS`/`toS` 是轨的起止句。
+- 帧号**全部由句 id 解出**：窗口 = `fromS` 句的 `from − 8` … `toS` 句的 `to + 2`，切换帧 = 各 `switchS` 句的 `from`。轨与 TTS 时间轴同源，改词/换配音自动跟着走；**没跑 TTS 时没有帧可解，轨是休眠的**。
+- 几何取 `bands.railTop`/`railBottom`（16:9 → y118–162）与 `Primitives` 的 `RAIL_CX`，**不要在镜头里写死 y**；有轨时内容区上沿让到 `bands.contentTop`(175)。
+- 句 id 写错会让整条轨被**静默丢弃** —— `npm run verify:timeline-source` 在装配前 fail-fast（同时判轨窗口与章卡窗口、相邻轨是否重叠）。
+- ⚠ 与 `SemanticShots.jsx` 的 `Rail` 不是一回事：那个是**镜头内**的装饰轨；本节的 `Primitives.Rail` 是**片级**流程轨。
+
 ### Build Agent
 G1…Gn 为独立构建角色，Agent provider 配置后每组分别收到 Build Agent task；任务明确只修改 `src/shots/Gn/**`，并要求每镜至少 6 张 still（高光镜头 ≥10 张）+ 30 帧测渲。CI 无 Agent 时使用 deterministic builder，但产物必须明确标注 agent_mode=deterministic。
 

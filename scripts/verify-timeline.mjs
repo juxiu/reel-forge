@@ -17,7 +17,7 @@ const ok = (c, m) => {
 const eq = (a, b, m) => ok(a === b, `${m}（期望 ${JSON.stringify(b)}，实得 ${JSON.stringify(a)}）`);
 const eqJson = (a, b, m) => ok(JSON.stringify(a) === JSON.stringify(b), `${m}（期望 ${JSON.stringify(b)}，实得 ${JSON.stringify(a)}）`);
 
-const {captionBlocks, chaptersOf, chapterCardAt, chapterCardWindows, hudEntries, hudBlankSpans, scenesUnderChapterCard} = await import('../src/visual/timeline.mjs');
+const {captionBlocks, chaptersOf, chapterCardAt, chapterCardWindows, hudEntries, hudBlankSpans, scenesUnderChapterCard, railEntries, RAIL_STEPS_MAX} = await import('../src/visual/timeline.mjs');
 
 const FPS = 30;
 
@@ -64,6 +64,23 @@ ok(blanks.length === 1 && blanks[0].from <= 561 && blanks[0].to >= 640, `漏写�
 const fallback = hudEntries({...tl, hud: undefined}, ch, 900);
 eqJson(fallback.map((e) => e.text), ['问题', '构建', '取舍'], '没有 hud 声明时退回章名');
 
+// ---- 3b) 片级流程轨：句 id → 绝对帧；错配整条丢掉而不是回退到第 1 帧 ----
+const tlRail = {...tl, rails: [
+  {steps: ['采集', '切分', '入库'], switchS: ['S01', 'S08', 'S12'], fromS: 'S01', toS: 'S18'},
+  {steps: ['召回', '重排'], switchS: ['S20', 'S24'], fromS: 'S20', toS: 'S24'},
+]};
+const rails = railEntries(tlRail, 900);
+eq(rails.length, 2, '两条轨都要解出来');
+eqJson([rails[0].from, rails[0].to], [46 - 8, 654 + 2], '轨窗口 = 首句 from − 8 … 末句 to + 2');
+eqJson(rails[0].switches, [46, 121, 421], 'switches 按切换句 id 解成绝对帧（1-based）');
+eqJson(rails[0].steps, ['采集', '切分', '入库'], 'steps 原样保留，不做句 id 解析');
+eqJson([rails[1].from, rails[1].to], [701 - 8, 880 + 2], '第二条轨窗口独立解析');
+ok(rails.every((r) => r.from < r.to), '轨窗口不得倒挂');
+eqJson(railEntries(tl, 900), [], '没有 rails 声明时返回空数组（可选片级配置）');
+eqJson(railEntries({...tl, rails: [{steps: ['x'], switchS: ['NOPE'], fromS: 'NOPE', toS: 'S24'}]}, 900), [], '句 id 解不出帧号时丢掉整条轨，不回退到第 1 帧');
+const sixSteps = railEntries({...tl, rails: [{steps: ['a', 'b', 'c', 'd', 'e', 'f'], switchS: ['S01'], fromS: 'S01', toS: 'S24'}]}, 900);
+eq(sixSteps[0].steps.length, RAIL_STEPS_MAX, `步骤截到 ${RAIL_STEPS_MAX} 个槽位（几何只有 5 个）`);
+
 // ---- 4) 字幕块：1-based、秒→帧、to 不早于 from ----
 const caps = captionBlocks([{id: 'c1', start: 1.6, end: 4.025}, {from: 50, to: 80, text: 'x'}, {from: 90, to: 85, text: '倒挂'}], FPS);
 eq(caps[0].from, 49, '秒制字幕块换算成 1-based 帧号');
@@ -91,4 +108,4 @@ if (fails.length) {
   for (const f of fails) console.error(' - ' + f);
   process.exit(1);
 }
-console.log('TIMELINE GATE PASS', JSON.stringify({chapters: ch.length, hud: hud.length, card_frames: cardFrames}));
+console.log('TIMELINE GATE PASS', JSON.stringify({chapters: ch.length, hud: hud.length, rails: rails.length, card_frames: cardFrames}));

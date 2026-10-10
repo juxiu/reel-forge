@@ -57,7 +57,7 @@ npm install
 pip install -r requirements.txt
 ~~~
 
-建议使用 Node.js 22、Python 3.11，并安装 FFmpeg。
+建议使用 Node.js 22、Python 3.11，并安装 **完整版 FFmpeg**。⚠ 精简构建（如 TRAE 自带的 `--disable-everything` 版本，只留 `scale,fps`）**跑不了 `npm run tts`** —— 混音需要 `adelay`/`amix`/`alimiter`/`apad` 与 `libmp3lame`。装不了系统级 ffmpeg 时，可用 `pip install imageio-ffmpeg` 并把 `FFMPEG_PATH` 指向它的二进制。
 
 ### 2. 快速验证
 
@@ -70,9 +70,12 @@ npm run verify:fast
 **要渲染或跑 <code>verify:e2e</code>，必须先生成 TTS 产物**：<code>public/audio.mp3</code>、<code>script/timeline.json</code>、<code>fixtures/captions.json</code>。它们由 <code>npm run tts</code> 生成、不入库（<code>src/remotion/index.jsx</code> 会 import时间轴，<code>&lt;Audio&gt;</code> 依赖配音文件），所以全新 clone 的第一步是：
 
 ~~~bash
-npm run tts
-npm run run-production
+npm run tts            # 配音 + 帧级时间轴（需完整版 FFmpeg）
+npm run sync-script    # 按 timeline 重写 script.json 与 captions.json
+npm run materialize-ir # 按 script + timeline 重算 render-ir-*.json
 ~~~
+
+⚠ <code>sync-script</code> 不能省：<code>tts</code> 写出的 <code>captions.json</code> 是按词流**自动分组**的（会跨句界），只有 <code>sync-script</code> 把它按 <code>timeline.sentences[].subs</code> 重写成句内对齐的字幕块 —— 少了这步 <code>verify:timeline-source</code> 会红（报「字幕块不落在任何句子区间内」）。
 
 ### 3. 作为 Skill 一键执行
 

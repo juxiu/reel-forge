@@ -1,5 +1,11 @@
 {
   "project_id": "digest-explainer",
+  "rails": [
+    {"steps": ["角色", "摘要构成", "三步认证"], "switchS": ["S01", "S04", "S07"], "fromS": "S01", "toS": "S12"},
+    {"steps": ["算法三档", "规范化", "顺序取法"], "switchS": ["S13", "S20", "S23"], "fromS": "S13", "toS": "S24"},
+    {"steps": ["重放窗口", "时钟", "代理链路"], "switchS": ["S25", "S28", "S31"], "fromS": "S25", "toS": "S36"},
+    {"steps": ["改动三处", "代价", "场景判断"], "switchS": ["S37", "S38", "S43"], "fromS": "S37", "toS": "S44"}
+  ],
   "request": "Explain how HTTP Digest Fields protect message integrity.",
   "language": "zh",
   "target_ratios": [

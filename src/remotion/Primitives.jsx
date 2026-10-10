@@ -8,6 +8,7 @@ import {
   FONT_ORB,
   FONT_TECH,
   FONT_WIDE,
+  GLOW_PURPLE_S,
   GREY,
   GREY_LINE,
   GREY_MID,
@@ -24,7 +25,7 @@ import {
   clamp01,
 } from '../visual/style.mjs';
 import {DOT_FIELD, STAR_FIELD} from '../visual/field.mjs';
-import {clamp, clamp01 as c01, easeInOutPow, exitDrop, fadeIn, powOutRemain, rnd, slideIn, softOp} from '../visual/easing.mjs';
+import {clamp, clamp01 as c01, easeInOutPow, emphasisPulse, exitDrop, fadeIn, powOutRemain, rnd, slideIn, softOp} from '../visual/easing.mjs';
 import {EM_HEAVY, EM_ORB, EM_TECH, EM_WIDE, fitSize, textW} from '../visual/textfit.mjs';
 import {abs, useDesign} from './Design.jsx';
 import {GLITCH_SEQ, GlitchIn} from './Glitch.jsx';
@@ -184,30 +185,36 @@ export const Box = ({x, y, w, h, border = GREY_LINE, fill = 'rgba(0,0,0,0)', rad
     {children}
   </div>
 );
-/** 胶囊：HUD / 标签。宽度按实测字宽算，避免写死宽度导致文字被截或两侧留白失衡。 */
+/** 胶囊：HUD / 标签 / 流程轨。宽度按实测字宽算，避免写死宽度导致文字被截或两侧留白失衡。
+ *  fill/stroke/glow 是给流程轨三态着色的显式覆盖：一旦给了就不再按 active 推默认色，
+ *  这样「当前重点 / 已完成 / 未开始」能共用同一个胶囊，而语义色仍在调用处决定。 */
 export const pillWidth = (text, size = 24) => Math.max(216, textW(String(text ?? ''), size, EM_HEAVY) + 60);
-export const Pill = ({x, y, text, size = 24, color = WHITE, border = GREY_LINE, active = false, opacity = 1, w}) => {
+export const Pill = ({x, y, text, size = 24, color = WHITE, border = GREY_LINE, active = false, opacity = 1, w, h = 44, fill, stroke, glow, sw = 1.5, weight = 700, letterSpacing = 0.5, textDy = 0}) => {
   const width = w ?? pillWidth(text, size);
+  const bg = fill ?? (active ? 'rgba(102,48,248,.14)' : 'rgba(0,0,0,.7)');
+  const line = stroke ?? (active ? PURPLE : border);
+  const fg = fill ? color : active ? PURPLE_LIGHT : color;
   return (
     <div
       style={{
-        ...abs(x, y, width, 44),
+        ...abs(x, y, width, h),
         boxSizing: 'border-box',
-        borderRadius: 22,
-        border: `1.5px solid ${active ? PURPLE : border}`,
-        background: active ? 'rgba(102,48,248,.14)' : 'rgba(0,0,0,.7)',
+        borderRadius: h / 2,
+        border: `${sw}px solid ${line}`,
+        background: bg,
         opacity,
+        boxShadow: glow,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: active ? PURPLE_LIGHT : color,
+        color: fg,
         fontFamily: FONT_HEAVY,
-        fontWeight: 700,
+        fontWeight: weight,
         fontSize: size,
-        letterSpacing: 0.5,
+        letterSpacing,
       }}
     >
-      {text}
+      <span style={{transform: textDy ? `translateY(${textDy}px)` : undefined}}>{text}</span>
     </div>
   );
 };
@@ -440,6 +447,74 @@ export const Hud = ({entries = [], N}) => {
         return el;
       })}
     </>
+  );
+};
+
+// ---------------- 片级流程轨 ----------------
+/**
+ * 片级流程轨（参照 anything2explainer 的 overlay/Rail）：固定 5 槽、胶囊 + 箭头，
+ * 只在 timeline.rails 标了轨的章出现，槽位按 switches（切换句的绝对帧）逐段点亮：
+ * active 紫底白字脉冲、done 深灰、todo 纯黑灰字。
+ *
+ * ⚠ 几何是片级硬约束，与 HUD（y28–79）同属顶部带：条起于 bands.railTop（16:9 → y118），
+ *    高 bands.railBottom − railTop（44），槽心 RAIL_CX。有轨时内容区上沿让到 bands.contentTop（175）。
+ *    所以纵向位置一律从 style.mjs 的 bands 取、不在这里写死 y —— 否则 9:16 会跑到字幕带上。
+ * ⚠ spec 由 railEntries（timeline.mjs）解出，组件不做任何句 id 解析：帧号是唯一真源，
+ *    这里只负责「第几帧点亮第几步」的查表；槽位超过几何容量（5）时截断而不是溢出画外。
+ */
+export const RAIL_CX = [240, 440, 640, 840, 1040];
+export const RAIL_W = 150;
+export const Rail = ({spec, N}) => {
+  const d = useDesign();
+  if (!spec) return null;
+  const {from, to} = spec;
+  if (N < from || N > to) return null;
+  const railY = d.bands.railTop;
+  const railH = d.bands.railBottom - d.bands.railTop;
+  const cy = railY + railH / 2;
+  const steps = (spec.steps || []).slice(0, RAIL_CX.length);
+  const switches = spec.switches || [];
+  let active = -1;
+  switches.forEach((f, i) => {
+    if (N >= f) active = i;
+  });
+  const railOut = 1 - clamp01((N - (to - 8)) / 8);
+  if (railOut <= 0) return null;
+  const arrows = [];
+  for (let i = 0; i < steps.length - 1; i++) {
+    const p = clamp01((N - (from + 4 + i * 2)) / 10);
+    if (p <= 0.001) continue;
+    const x1 = RAIL_CX[i] + RAIL_W / 2 + 6;
+    const x2 = RAIL_CX[i + 1] - RAIL_W / 2 - 6;
+    arrows.push(<LineArrow key={`arw-${i}`} x1={x1} y1={cy} x2={x2} y2={cy} progress={p} color={i < active ? WHITE : GREY} width={2} head={9} />);
+  }
+  return (
+    <div style={{position: 'absolute', inset: 0, opacity: railOut}}>
+      <Svg w={W} h={d.height} bloom={false}>{arrows}</Svg>
+      {steps.map((text, i) => {
+        const state = i === active ? 'active' : i < active ? 'done' : 'todo';
+        const pulse = state === 'active' ? emphasisPulse(N - (switches[i] ?? from), {peak: 1.1, up: 10, hold: 3, down: 10}) : 1;
+        const fill = state === 'active' ? PURPLE : state === 'done' ? '#2A2A2A' : '#000';
+        const stroke = state === 'active' ? WHITE : state === 'done' ? GREY_MID : GREY;
+        const f0 = from + i * 2;
+        return (
+          <div
+            key={`step-${i}`}
+            style={{
+              position: 'absolute',
+              left: RAIL_CX[i] - RAIL_W / 2,
+              top: railY + 40 * powOutRemain(N - f0, 16, 2.5),
+              width: RAIL_W,
+              height: railH,
+              transform: `scale(${pulse})`,
+              opacity: fadeIn(N - f0, 8),
+            }}
+          >
+            <Pill x={0} y={0} w={RAIL_W} h={railH} text={text} size={24} weight={700} color={state === 'todo' ? GREY : WHITE} fill={fill} stroke={stroke} sw={2} letterSpacing={1} textDy={-1.5} glow={state === 'active' ? GLOW_PURPLE_S : undefined} />
+          </div>
+        );
+      })}
+    </div>
   );
 };
 

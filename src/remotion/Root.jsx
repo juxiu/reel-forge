@@ -1,15 +1,15 @@
 import React from 'react';
 import {AbsoluteFill, Audio, Sequence, staticFile, useCurrentFrame} from 'remotion';
-import {Backdrop, ChapterCard, EndingCredit, Hud, ProgressBar, Subtitle} from './Primitives.jsx';
+import {Backdrop, ChapterCard, EndingCredit, Hud, ProgressBar, Rail, Subtitle} from './Primitives.jsx';
 import {Design, Fonts} from './Design.jsx';
 import {FootageTrack} from './Footage.jsx';
 import {SHOT_REGISTRY} from '../shots/registry.jsx';
 import {ReelContext} from '../shots/context.mjs';
 import {SWEEP_WHITELIST_MAX} from '../visual/style.mjs';
-import {captionBlocks, chaptersOf, chapterCardAt, hudEntries} from '../visual/timeline.mjs';
+import {captionBlocks, chaptersOf, chapterCardAt, hudEntries, railEntries} from '../visual/timeline.mjs';
 
 // 装配取数是纯函数层，QC 与 node 测试直接 import src/visual/timeline.mjs；这里再导出一次只为兼容旧引用。
-export {captionBlocks, chaptersOf, chapterCardAt, hudEntries};
+export {captionBlocks, chaptersOf, chapterCardAt, hudEntries, railEntries};
 
 /**
  * 成片装配：幕底 → 实拍底 → 镜头 → 常驻覆盖层（HUD / 进度条 / 章节卡 / 字幕 / 片尾）。
@@ -45,6 +45,7 @@ export function ReelForgeComposition({renderIR, captions = [], timeline = null, 
   const blocks = captionBlocks(captions, fps);
   const chapters = chaptersOf(timeline, totalFrames, fps);
   const hud = hudEntries(timeline, chapters, totalFrames);
+  const rails = railEntries(timeline, totalFrames);
   const scenes = renderIR.scenes || [];
   const lastSceneFrame = scenes.length ? Math.max(...scenes.map((s) => toFrames(s.start + s.duration, fps))) : 0;
   const footage = Array.isArray(renderIR.footage) ? renderIR.footage : [];
@@ -74,6 +75,7 @@ export function ReelForgeComposition({renderIR, captions = [], timeline = null, 
               })
             : null}
           <Hud entries={hud} N={N} />
+          {rails.map((r) => <Rail key={r.id} spec={r} N={N} />)}
           <ProgressBar chapters={chapters} totalFrames={totalFrames} N={N} />
           {card ? <ChapterCard N={N} chapter={card.chapter} prevTo={chapters[card.index - 1].to} from={card.start} to={card.end} tech={card.chapter.tech} /> : null}
           {blocks.map((b) => (b.text ? <Subtitle key={b.id} text={b.text} N={N} from={b.from} to={b.to} /> : null))}

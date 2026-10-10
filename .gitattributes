@@ -1,0 +1,8 @@
+# 统一按 LF 结存与检出。
+#
+# 门禁里有几处按字节比对（export-visual-contracts --check 把重算结果与
+# fixtures/visual_contracts.json 逐字节比）和按 "\n" 匹配（verify-storyboard 的变异锚点
+# 找 "hold: 30f |\n| SC03"）。Windows 上 core.autocrlf=true 会把工作树变成 CRLF，
+# 于是这些门在 Windows 上全部假红 —— 判据本身没问题，是行尾在作祟。
+# 强制 eol=lf 后，任何平台检出都是 LF，门禁不再依赖本地 git 配置。
+* text=auto eol=lf

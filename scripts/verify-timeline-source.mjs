@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import {railEntries, chaptersOf, chapterCardWindows} from "../src/visual/timeline.mjs";
 
 /**
  * 时序单真源门：**镜区间、字幕块必须与`script/timeline.json` 同源**。
@@ -32,12 +33,22 @@ const CAPS = "fixtures/captions.json";
 const problems = [];
 
 if (!fs.existsSync(TL)) {
-  console.error("TIMELINE SOURCE GATE FAIL " + JSON.stringify({
+  // fresh clone / CI 上 TTS 还没跑，就没有运行产物可对 —— 这不是缺陷，判失败会让
+  // 「verify:fast 不需要任何运行产物」这条承诺失效（本地/CI 永远假红）。
+  // 一旦跑过 npm run tts，这一门立刻真跑：它守的漂移正是「重跑 TTS 却没重跑 materialize-ir」。
+  // 需要强制先跑 TTS 的场合（post-TTS 链）设 REQUIRE_TIMELINE_SOURCE=1 即可恢复硬失败。
+  const strict = process.env.REQUIRE_TIMELINE_SOURCE === "1";
+  const payload = {
     missing: TL,
-    why: "没有时序真源。镜区间与字幕块此刻是各自独立的数据，两者对不对得上没有任何东西能判定 —— 这正是「末帧差 104 帧」能一路绿灯的原因。",
-    fix: "先跑 npm run tts（产出 timeline.json + audio），再跑 npm run materialize-ir 从它派生 IR。",
-  }, null, 2));
-  process.exit(1);
+    why: "没有时序真源（TTS 未运行）。镜区间与字幕块此刻是各自独立的数据，两者对不对得上无从判定 —— 跳过而不是判失败。",
+    enable: "先跑 npm run tts（产出 script/timeline.json + audio），再跑 npm run sync-script（按 timeline 重写 script.json 与 captions.json），最后 npm run materialize-ir。",
+  };
+  if (strict) {
+    console.error("TIMELINE SOURCE GATE FAIL " + JSON.stringify(payload, null, 2));
+    process.exit(1);
+  }
+  console.log("timeline source SKIP " + JSON.stringify(payload));
+  process.exit(0);
 }
 
 const tl = JSON.parse(fs.readFileSync(TL, "utf8"));
@@ -103,6 +114,43 @@ if (Math.abs(sceneEndFrame - capEndFrame) > TOL) {
   );
 }
 
+// 5) 片级流程轨：作者在 fixtures/project.json 声明的句 id 必须都能解出帧号。
+//    ⚠ railEntries 的既定行为是「id 写错就丢掉这条轨」——对渲染是安全的，但生产里
+//      就是「少了一条轨却没人发现」。所以错配必须在这里 fail-fast，而不是静默少画一条。
+//    顺带钉住窗口冲突：轨横在章卡窗口上（全屏压黑时顶栏还在抢注意力）与相邻轨互相重叠，
+//    都是 railEntries 照常返回、渲染照常出图、只有肉眼看片才能发现的问题。
+const PROJECT = "fixtures/project.json";
+let railsResolved = 0;
+if (fs.existsSync(PROJECT)) {
+  const project = JSON.parse(fs.readFileSync(PROJECT, "utf8"));
+  const declared = project.rails || [];
+  const ids = new Set(sentences.map((s) => String(s.id)));
+  const badRefs = [];
+  for (const r of declared) {
+    for (const id of [r.fromS, r.toS, ...(r.switchS || r.switches || [])]) {
+      if (id != null && !ids.has(String(id))) badRefs.push(String(id));
+    }
+  }
+  if (badRefs.length) {
+    problems.push(`project.rails 引用了时间轴上不存在的句 id：${[...new Set(badRefs)].join(", ")} —— 写错会让整条轨被静默丢弃`);
+  }
+  if (declared.length) {
+    const entries = railEntries({...tl, rails: declared}, tl.total_frames);
+    railsResolved = entries.length;
+    if (entries.length !== declared.length) {
+      problems.push(`声明 ${declared.length} 条轨，只有 ${entries.length} 条解出帧号`);
+    }
+    const cards = chapterCardWindows(chaptersOf(tl, tl.total_frames, FPS));
+    for (const e of entries) {
+      const hit = cards.find((w) => e.from <= w.to && e.to >= w.from);
+      if (hit) problems.push(`${e.id} 窗口 f${e.from}-${e.to} 与第 ${hit.n} 章章卡窗口 f${hit.from}-${hit.to} 重叠`);
+    }
+    for (let i = 0; i < entries.length - 1; i++) {
+      if (entries[i].to >= entries[i + 1].from) problems.push(`${entries[i].id}(to=${entries[i].to}) 与 ${entries[i + 1].id}(from=${entries[i + 1].from}) 窗口重叠`);
+    }
+  }
+}
+
 if (problems.length) {
   console.error("TIMELINE SOURCE GATE FAIL " + JSON.stringify({
     timeline: TL, scenes: ir.scenes.length, sentences: sentences.length, captions: caps.length,
@@ -116,6 +164,7 @@ console.log("timeline source PASS " + JSON.stringify({
   scenes: ir.scenes.length,
   sentences: sentences.length,
   captions: caps.length,
+  rails: railsResolved,
   total_frames: tl.total_frames,
   duration_s: +(tl.total_frames / FPS).toFixed(2),
   tolerance_frames: TOL,

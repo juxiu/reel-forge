@@ -23,7 +23,9 @@ const failed = [];
 fs.mkdirSync(SANDBOX, {recursive: true});
 
 const out = (r) => `${r.stdout || ""}${r.stderr || ""}`.trim();
-const sourceText = () => fs.readFileSync(SOURCE, "utf8");
+// 归一化成 LF 再匹配：变异锚点写的是 "\n"（"hold: 30f |\n| SC03"），而 Windows 上
+// core.autocrlf=true 的工作树是 CRLF，不归一化就会「锚点过期」假红（判据其实完好）。
+const sourceText = () => fs.readFileSync(SOURCE, "utf8").replace(/\r\n/g, "\n");
 
 /** 把分镜源里某一处子串换掉（只换第一次出现，逐行找）。 */
 function mutate(find, replace) {

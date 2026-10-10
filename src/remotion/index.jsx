@@ -4,9 +4,15 @@ import fixtureWide from '../../fixtures/render-ir-16x9.json';
 import fixtureTall from '../../fixtures/render-ir-9x16.json';
 import captions from '../../fixtures/captions.json';
 import buildGroups from '../../fixtures/build-groups.json';
+import project from '../../fixtures/project.json';
 import {ReelForgeComposition} from './Root.jsx';
 // 时间轴走生成占位模块，不直接 import script/timeline.json（那是 gitignore 的运行产物）。
-import {timeline} from './timeline.gen.mjs';
+import {timeline as rawTimeline} from './timeline.gen.mjs';
+
+// 片级编排（rails）由 fixtures/project.json 声明：它是稳定的人工作者源
+// （fixtures/script.json 是 sync-script 的派生产物，写进去会被下次同步重写）。
+// 在装配处并入时间轴 —— script/timeline.json 保持纯时序产物，编排只作用于渲染层。
+const timeline = rawTimeline && project.rails ? {...rawTimeline, rails: project.rails} : rawTimeline;
 
 /**
  * 合成注册表。
