@@ -2,7 +2,7 @@
 
 Branch: `feat/director-preflight-system`
 Checkpoint: source audit and first contract/preflight implementation.
-Execution state includes GitHub Actions run evidence. Static CI and production-release preflight are separate modes; the release mode requires a real TTS timeline and fingerprint-bound review evidence for high-risk shots.
+Execution state records the successful earlier GitHub Actions run for history, but both repository workflows are now temporarily removed at user request. Local verification commands remain. Current production mode is 16:9 only; the 9:16 IR is dormant.
 
 | Task ID | Goal | Depends on | Files / outputs | Status | Latest result / blocker |
 |---|---|---|---|---|---|
@@ -14,7 +14,7 @@ Execution state includes GitHub Actions run evidence. Static CI and production-r
 | PREFLIGHT-LAYOUT | Geometry, text bounds, safe zones and collision checks | DIRECTOR-CONTRACT, DIRECTOR-AUDIT | Existing visual contracts / browser measurement integration | BLOCKED | No measured geometry implementation added; requires inspection of current layout/measurement interfaces before coding |
 | PREFLIGHT-RISK | Compute weighted risk and select visual evidence | DIRECTOR-CONTRACT, PREFLIGHT-STATIC | risk score + validationPlan in generated SHOTBOOK/report | PARTIAL | Weighted score and fingerprint-bound independent-review evidence are implemented; automatic preview generation and actual image-content verification remain |
 | DIRECTOR-REVIEW | Independent review protocol and repair schema | DIRECTOR-CONTRACT, PREFLIGHT-RISK | docs/DIRECTOR_PLAN.md, report findings shape | PARTIAL | Findings are structured; independent review agent prompt, evidence capture and verification workflow remain |
-| DIRECTOR-CI | Run director checks in fast CI | PREFLIGHT-STATIC, DIRECTOR-CONTRACT | package.json, scripts/verify-fast.mjs, scripts/render.sh | PASS-FAST-CI | GitHub Actions run 47: 38/38 checks PASS in 8.46s; full-release gate is wired before full render but not exercised because CI lacks generated TTS timeline |
+| DIRECTOR-CI | Keep the repository free of GitHub Actions automation temporarily | PREFLIGHT-STATIC, DIRECTOR-CONTRACT | .github/workflows/ (removed), package.json, scripts/verify-fast.mjs | DISABLED-BY-REQUEST | GitHub workflow files removed; `npm run verify:fast` remains a manual local check |
 | DIRECTOR-ACCEPTANCE | Run positive/negative/boundary tests and close defects | all above | test results, acceptance report | BLOCKED | Cannot claim PASS until commands execute in a repository checkout and remaining layout/review work is resolved |
 
 ## Checkpoint discipline
@@ -24,3 +24,11 @@ Execution state includes GitHub Actions run evidence. Static CI and production-r
 - A missing check is not a pass.
 - Static PASS, keyframe review PASS and full-render PASS are distinct states.
 - Do not mark the system complete while PREFLIGHT-LAYOUT, visual evidence generation, independent review, or acceptance remain unresolved.
+
+
+## Current operating scope (2026-10-11)
+
+- GitHub Actions workflow files `.github/workflows/verify-fast.yml` and `.github/workflows/verify.yml` are removed from this feature branch.
+- Active output ratio: `16:9` only. Remotion no longer registers `ReelForge9x16`; render, QC, repair, production verification and delivery require only 16:9 artifacts.
+- `fixtures/render-ir-9x16.json` and portrait-oriented design tests are retained as dormant assets. They do not imply that a 9:16 video is currently produced or quality-approved.
+- No fresh local test run has been performed through this GitHub file interface; prior GitHub Actions result is historical and will not rerun while workflow definitions are absent.
