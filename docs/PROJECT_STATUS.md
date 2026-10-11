@@ -1,5 +1,7 @@
 # 项目当前状态
 
+> **当前运行范围（2026-10-11）**：GitHub Actions workflow 文件已移除；当前生产入口、Remotion 注册、QC、Repair 与 Delivery 只处理 16:9。9:16 IR 保留但处于休眠状态，未生成、未审查、未交付当前竖屏成片。快速验证可在本地手动执行 `npm run verify:fast`。
+
 更新日期：2026-10-11
 
 ## 总体状态
