@@ -1,10 +1,12 @@
 # reel-forge Agent Skill 使用说明
 
+> **当前临时模式（2026-10-11）**：GitHub Actions 工作流已移除；生产链只注册、渲染、检查和交付 16:9。9:16 Composition 暂停，不要求其视频或 QC 产物；`fixtures/render-ir-9x16.json` 保留为休眠数据，供未来恢复。需要检查时可本地运行 `npm run verify:fast`。
+
 ## 1. 项目定位
 
 reel-forge 是一个 **Agent-native 视频生产 Skill**，而不是单纯的视频编辑器、Remotion 模板或渲染脚本集合。
 
-它的核心任务是：把一个知识主题、技术问题、标准、RFC、文章或网页资料，经过 Research、Narration、TTS/Timeline、Storyboard、镜头构建、双比例渲染、视觉/媒体质量检查、局部 Repair 和最终 Delivery，生产成可追溯的解释型视频。
+它的核心任务是：把一个知识主题、技术问题、标准、RFC、文章或网页资料，经过 Research、Narration、TTS/Timeline、Storyboard、镜头构建、16:9 渲染（9:16 暂停）、视觉/媒体质量检查、局部 Repair 和最终 Delivery，生产成可追溯的解释型视频。
 
 ~~~text
 用户需求
@@ -21,7 +23,7 @@ G1…Gn Build Agent
   ↓
 Authored Shots
   ↓
-Render 16:9 + 9:16
+Render 16:9 only
   ↓
 Frame Metrics / Motion / Visual Regression
   ↓
@@ -139,7 +141,7 @@ npm run skill -- \
   "project_id": "digest-explainer",
   "request": "Explain how HTTP Digest Fields protect message integrity.",
   "language": "en",
-  "target_ratios": ["16:9", "9:16"],
+  "target_ratios": ["16:9"],
   "source_urls": [
     "https://www.rfc-editor.org/rfc/rfc9530.html"
   ],
@@ -478,7 +480,7 @@ fixtures/render-ir-9x16.json
 - layout；
 - footage。
 
-生产目标是同时支持 16:9 和 9:16。
+当前临时生产目标只有 16:9；9:16 支持暂时关闭。
 
 ## 19. Render
 
@@ -488,14 +490,13 @@ fixtures/render-ir-9x16.json
 npm run render
 ~~~
 
-目标：
+当前仅生成：
 
 ~~~text
 16:9 master
-9:16 master
 ~~~
 
-不能把单比例成片直接当成完整双比例交付。
+此为临时单画幅运行模式，不代表 9:16 版已生成或验收。
 
 ## 20. Frame Metrics / Motion
 
@@ -561,7 +562,7 @@ npm run visual-regression -- \
   --out artifacts/<project>/qc/visual_regression_16x9.json
 ~~~
 
-9:16 同样执行。
+9:16 当前不执行；恢复渲染时需要重新打开对应的测量与 QC。
 
 ## 22. Shot Score
 
@@ -661,7 +662,7 @@ source-repair.json
 
 Repair 的目标是局部修复，而不是无条件重新生成整个项目。
 
-真改动只写 `fixtures/render-ir-16x9.json` / `fixtures/render-ir-9x16.json`（渲染层确实读这两个文件），
+生产修复当前只写 `fixtures/render-ir-16x9.json`；`fixtures/render-ir-9x16.json` 暂停参与生产修复，
 所以 `status.json` 的 `changed_nodes` 等于「下一帧真的会不一样」的镜头。
 
 `source-repair.json` 是**源层待办清单**，不是写回记录，`writeback_count` 恒为 0：
@@ -777,7 +778,7 @@ npm run verify:production
 完成定义：
 
 ~~~text
-双比例成片
+16:9 成片（当前临时模式）
 +
 Frame Metrics
 +
@@ -876,49 +877,18 @@ npm run verify:production
 | Delivery | <code>npm run deliver</code> |
 | 最终 Gate | <code>npm run verify:production</code> |
 
-## 32. CI
+## 32. 本地验证（GitHub Actions 暂停）
 
-快速 CI：
+当前仓库的 `.github/workflows/verify-fast.yml` 与 `.github/workflows/verify.yml` 已临时移除，因此 GitHub 不会自动执行这些工作流。需要时可在本地运行：
 
-<code>.github/workflows/verify-fast.yml</code>
-
-主要验证：
-
-~~~text
+~~~bash
 npm install
 npm run verify:fast
-npm run verify:authored-shots
 ~~~
 
-完整 CI：
+`verify:fast` 是本地快速检查入口；它不需要渲染完整视频，也不代表生产验收通过。生产级验证仍需在生成真实 TTS 时间轴和 16:9 视频后，执行 Frame Metrics、Motion、QC、Repair、Delivery 与 Production Gate。
 
-<code>.github/workflows/verify.yml</code>
-
-覆盖：
-
-~~~text
-contracts
-→ runtime
-→ Research
-→ TTS
-→ WordBoundary
-→ Storyboard
-→ Build
-→ Pilot
-→ Render
-→ Frame Metrics
-→ Motion
-→ Visual Regression
-→ Shot Score
-→ QC
-→ Repair
-→ Delivery
-→ Production Gate
-~~~
-
-因此：
-
-> <code>verify:fast PASS</code> 不等于 <code>Production PASS</code>。
+> `verify:fast PASS` 不等于 `Production PASS`。
 
 ## 33. 当前 44-shot 状态
 
@@ -965,7 +935,7 @@ G8/SC43–SC44
 - 44 authored shot sources；
 - Still benchmark；
 - 30-frame test-render contract；
-- 双比例 RenderIR；
+- 16:9 RenderIR（9:16 IR 保留为休眠源）；
 - Frame Metrics；
 - Motion；
 - Visual Benchmark；
@@ -983,7 +953,7 @@ G8/SC43–SC44
 尤其要由真实运行最终确认：
 
 - 44 authored source 是否和当前 production script / timeline / RenderIR / registry 完全一致；
-- 16:9 / 9:16 是否真实渲染；
+- 16:9 是否真实渲染；9:16 已暂时禁用；
 - 44 × 6 still 是否真实执行；
 - 各 Build Group 的 30-frame test render；
 - 最终 QC；
@@ -1018,7 +988,7 @@ Authored Scenes
   ↓
 Pilot
   ↓
-16:9 + 9:16 Render
+16:9 Render（9:16 暂停）
   ↓
 QC
   ↓
