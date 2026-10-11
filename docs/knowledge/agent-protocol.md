@@ -94,6 +94,7 @@
 
 | 角色 | 调用点与并发 | 输入 payload | 输出归属 | 输出被谁读 |
 |---|---|---|---|---|
+| `script-agent` | `src/director/pipeline.mjs` 生成解说稿 | `{project, research, task, role}` | `artifacts/<pid>/script.json` | `validateScriptEvidence`：每段至少绑定一个已知 claim，缺失或错绑阻断 |
 | `research-agent` | `run-production.mjs`，并发评审 | `{project, research, task, deliverable}` | `artifacts/<pid>/agent-reviews.json` 与 `agent-review-gate.json` | `src/release/content-gates.mjs`：verdict、issues、claim 全覆盖；未通过阻断 |
 | `director-agent` | 同上 | `{project, research, script, beats, task, deliverable}` | 同上 | `src/release/content-gates.mjs`：verdict、issues、解说段全覆盖；未通过阻断 |
 | `build-agent` | `build-groups.mjs:24-35`，**每个构建组一次**，并发 `BUILD_CONCURRENCY` 默认 4（`:11`） | `{project, group:{id, scene_ids}, constraints:{only_paths, six_stills_per_shot, test_render_frames, semantic_renderer_required, settle_frames_min}, shots:[{scene_id,from,to,variant}]}`（`:25-34`） | `artifacts/<pid>/build-groups/<Gn>.json` 的 `agent` 字段（`:36,:41`）+ `fixtures/build-groups.json` 的 `agent_status`（`:46`） | ⚠ **无人读**（`src/remotion/index.jsx:6,65` 只读 `groups` 的镜头归属来生成 `<Composition>`，不碰 `agent_status`） |
@@ -101,8 +102,8 @@
 
 三条要从表里读出来的事实：
 
-1. **agent 无法影响判定结果。** `qc.mjs` 的阻断集合在 `:15-64` 就成形（frame_metrics / motion / text-provenance / plan-audit / 媒体探针），`:67` 才调 agent，`:73` 的 `status` 完全由 `issues.length` 决定。想给 agent 加牙齿，唯一符合本仓库风格的改法是让它的输出**翻译成 issue 并进 `issues` 数组**（未做，⚠ 无执行者）。
-   ✅ 这条事实本身被钉成了断言：`scripts/verify-agent.mjs` 第 5 节扫描 `scripts/*.mjs`，除了三个写入点（`qc.mjs` / `build-groups.mjs` / `run-production.mjs`）和一个"只校验形状"的知情者（`verify-contracts.mjs:183`，它必须仍然是 `each:"agent_reviews"` 那条，否则先红）之外，**任何文件读到 `agent_reviews` / `agent_status` / `.agent` 都算 FAIL**。它是变更探测器：谁把 agent 输出接成判定依据，它红，并要求同步本节。
+1. **QC Agent 仍不参与 `qc/report.json` 的 PASS/FAIL；Research/Director review 则会影响生产放行。** `qc.mjs` 的阻断集合在 `:15-64` 就成形（frame_metrics / motion / text-provenance / plan-audit / 媒体探针），`:67` 才调 qc-agent，`:73` 的 QC `status` 仍由 `issues.length` 决定。另一个独立的发布门在 `run-production.mjs`：research-agent 与 director-agent 必须 completed、verdict 为 pass、issues 为空并全量覆盖 claims/segments，否则生产脚本非零退出。
+   ✅ `scripts/verify-agent.mjs` 第 5 节扫描 `scripts/*.mjs`，断言唯一的 Research/Director review 消费点是 `scripts/run-production.mjs`；`qc.mjs` / `build-groups.mjs` 仍是评审输出写入点，`verify-contracts.mjs` 只校验 qc 信封形状。若消费面增加/变化，需同步本文。此门只能强制 review 覆盖与明确结论，不会自动证明 Agent 判断为真。
 2. **payload 里的约束是"礼节"，不是"合同"。** `constraints.only_paths` / `six_stills_per_shot` / `test_render_frames` / `semantic_renderer_required` / `settle_frames_min`（`build-groups.mjs:28-32`）在全仓**只有这几行写入点、零读取点**（grep 确认；✅ 现在由 `verify-agent.mjs` 第 5 节逐键断言"写入点恰好 1 处且必须是 `build-groups.mjs`"，多一个读者它就红——多出来的读者要么是真消费，要么是有人又开始在脚本里抄一遍约束）。`settle_frames_min:30` 的真正执行者是另一套东西：`verify-authored-shots.mjs:133` 判 `settle_frames >= CAMERA_LIMITS.clear`、`selfcheck.py` 判 `hold ≥30f`。也就是说**这些约束确实被守住了，但不是被 agent 守的，是被门守的** —— 写进 payload 只是让 agent 知道该怎么做。
 3. **`qc-agent` 拿到的是"已经判完的结论"，不是画面。** 它收到 `issues`（含 `node/type/severity/repair_hint`）与媒体探针摘要。a2e 的 QC agent 是**看 6 张 still 图**判 11 个维度。本仓库现在有一层**通道**：`npm run contact-sheet`（`scripts/contact-sheet.mjs`）把 still manifest 的计划帧与盘上真实 PNG 对账，写出 `artifacts/<pid>/qc/media_index.json` 与 `contact_sheet.html`，并由 `scripts/qc.mjs:70,73` 作为 `media` 字段并进 qc-agent 的 payload —— 索引不存在时如实写 `{status:"NO-INDEX"}`（`scripts/skill.mjs:121` 把这一步排在渲染之后、qc 之前）。⚠ 但**通道不等于看图**：provider 是否有视觉输入、有没有真的打开那些 PNG，本仓库无法验证；contact sheet 也不判画面，它只把帧交到人眼前。缺一件仍然没有的：组界 `boundary_*.png` 与相邻镜头对比（见 §4）。
 
