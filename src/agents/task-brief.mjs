@@ -28,6 +28,9 @@ export const SHARED_RULES = [
 
 /** 每个角色的专属规则；`rule` 会进任务书，`executor` 是它在本仓库的执行者（门或常量）。 */
 export const ROLE_RULES = {
+  "script-agent": [
+    {rule: "输出可直接用于生产的 JSON 对象：顶层包含 project_id 与非空 segments；每段都必须有唯一稳定 id、非空 text，以及至少一个 claim_ids（只引用 input.research.claims 中真实存在的 claim id）。不得把无来源事实写成已核实陈述；来源不足时在 script.notes 中标记，并让 research-agent 评审阻断。", executor: "src/director/pipeline.mjs + src/release/content-gates.mjs"},
+  ],
   "build-agent": [
     {rule: `只修改 src/shots/<你那一组>/**。其余路径（index.jsx、registry.jsx、视觉常量）由脚本重写，你改了也不会留下。`, executor: "scripts/materialize-shots.mjs:26,43-47,82-86（写盘顺序才是真保护，only_paths 只是任务书里的一句话）"},
     {rule: "每个镜头源文件必须导出 SHOT_RECIPE，且 shot_id / variant / hero_size / camera / settle_frames 与 fixtures/reference-shot-blueprint.json 一致。", executor: "npm run verify:authored-shots（scripts/verify-authored-shots.mjs）"},
@@ -38,12 +41,14 @@ export const ROLE_RULES = {
     {rule: "把这组的 motion_check 数字、主角尺寸、是否高光、运镜次数追加进 src/shots/<组>/BUILD_NOTES.md（已存在就追加，不要整篇覆盖）。", executor: "⚠ 无执行者：BUILD_NOTES 全仓零读者，见 agent-protocol §3.2 / §8 第 5 条"},
   ],
   "research-agent": [
-    {rule: "只判 claim 与 evidence：出处是否存在、是否可信、是否自证。不要改写解说词，也不要补事实。", executor: "npm run verify:text-provenance（画面文字一侧）；语义一侧 ⚠ 无执行者"},
+    {rule: "只判 claim 与 evidence：出处是否存在、是否可信、是否自证。不要改写解说词，也不要补事实。必须逐项检查所有 claim 的来源可信度、上下文与支持程度；evidence.excerpt 只是页面摘录，不代表事实本身已被证实。", executor: "src/release/content-gates.mjs 对完整覆盖与未解决 issues 做阻断；它不自动证明来源真实可信"},
+    {rule: "输出必须包含 verdict（仅 pass/fail）、reviewed_claim_ids（逐项列出 input.research.claims 的全部 id）和 issues 数组。凡是缺少独立支持、上下文不符、过时、来源低可信或相互冲突的 claim 都必须列为 issue；有任一未解决 issue 时 verdict 必须为 fail。", executor: "scripts/run-production.mjs + src/release/content-gates.mjs"},
     {rule: "注意 evidence.excerpt 与 claim.statement 在本仓库是同一个字符串（自证），因此「有出处」只证明这句话真在那个页面上，不证明它对。", executor: "src/research/claim-graph.mjs:41-45；论述见 research-brief.md §3"},
     {rule: "发现的可疑 claim 用 issues 报出来并指名 claim id，不要自己删。", executor: "⚠ 无执行者：agent 输出零下游消费者，见 agent-protocol §2 第 1 条 / §8 第 1 条"},
   ],
   "director-agent": [
-    {rule: "逐镜判「这句解说配得上这个画面吗」，并检查镜头是否按画面单元组织而不是按句子切。", executor: "npm run plan-audit（分镜层）；语义一侧 ⚠ 无执行者"},
+    {rule: "逐镜判「这句解说配得上这个画面吗」，并检查镜头是否按画面单元组织而不是按句子切。", executor: "scripts/run-production.mjs + src/release/content-gates.mjs"},
+    {rule: "输出必须包含 verdict（仅 pass/fail）、reviewed_segment_ids（input.script.segments 的全部 id）和 issues 数组。每段都要判解说与拟用画面语义是否匹配；存在未解决的错配、占位内容或无法审核的镜头时必须给出 issue，不能用 pass 带过。", executor: "scripts/run-production.mjs + src/release/content-gates.mjs"},
     {rule: "不得改动源码与产物；你的输出只是评审。", executor: "结构性成立：scripts/run-production.mjs 只把你的信封写进 agent-reviews.json"},
     {rule: "一句 = 一镜是导演层的硬编码而不是设计选择；想合并短句必须回分镜层提，不要在评审里默认它可行。", executor: "src/director/pipeline.mjs:58；论述见 narration-and-storyboard.md §6.1"},
   ],
