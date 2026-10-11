@@ -1,5 +1,7 @@
 # Reel Forge 生产化实施计划
 
+> **当前临时运行范围（2026-10-11）**：GitHub Actions 工作流已移除。活动生产链只渲染、测量、修复与交付 16:9；9:16 Composition 和运行产物暂时禁用。本文中的双画幅内容是恢复能力时的路线图，不代表当前状态。
+
 执行顺序固定为：
 
 Research -> Narration/Timeline -> Storyboard -> Overlay/Primitives -> G1 Pilot -> Parallel Build -> Render -> Frame/Motion -> Visual Regression -> Quantitative QC -> Repair/Recheck -> Delivery。
@@ -122,6 +124,6 @@ Research -> Narration/Timeline -> Storyboard -> Overlay/Primitives -> G1 Pilot -
 
 ## 完成标准
 
-功能完整度以 anything2explainer 的公开生产链为基线：完整 artifact 链、30 秒 Pilot gate、逐镜头源码、双比例渲染、量化 QC、视觉 benchmark、修复重检和 checksum delivery 均必须可以独立运行。
+功能完整度以 anything2explainer 的公开生产链为基线：完整 artifact 链、30 秒 Pilot gate、逐镜头源码、16:9 渲染（当前临时模式；双比例渲染待恢复）、量化 QC、视觉 benchmark、修复重检和 checksum delivery 均必须可以独立运行。
 
 后续优化包括：CLIP/SigLIP provider、真实人工 golden-frame 数据集、对象存储、分布式调度、更多视觉原语、历史版本回归、自动最佳修复方案。

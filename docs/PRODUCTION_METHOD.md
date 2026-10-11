@@ -1,5 +1,7 @@
 # 完整生产方法
 
+> **临时运行模式（2026-10-11）**：GitHub Actions CI 工作流已移除。当前只注册、渲染、QC、Repair 和交付 16:9；9:16 暂停，关联 IR 保留但不参与当前放行。
+
 > 本文记录 reel-forge 的**每一个生产阶段**：输入、输出、执行机制、判断标准、失败路径、验证方法。
 > 与 [ARCHITECTURE.md](ARCHITECTURE.md) 的分工：架构文档讲「系统长什么样、谁调谁」，本文讲「每个阶段怎么做、怎么算过、卡住了怎么办」。
 >
@@ -13,9 +15,9 @@
 
 | 项 | 内容 |
 |---|---|
-| 输入 | 主题 + 来源 URL + 语言 + 目标时长 + 画幅（默认 `16:9,9:16`） |
-| 输出 | `fixtures/project.json`（作者源）、Remotion Composition（双比例） |
-| 执行机制 | `npm install`；`scripts/skill.mjs` 写 `project.json`；[src/remotion/Root.jsx](../src/remotion/Root.jsx) 注册双 Composition |
+| 输入 | 主题 + 来源 URL + 语言 + 目标时长 + 画幅（当前默认 `16:9`；9:16 暂停） |
+| 输出 | `fixtures/project.json`（作者源）、Remotion Composition（仅 16:9） |
+| 执行机制 | `npm install`；`scripts/skill.mjs` 写 `project.json`；[src/remotion/Root.jsx](../src/remotion/Root.jsx) 注册 16:9 Composition |
 | 判断标准 | `project_id` 一致、`duration ≥ 5`、`source` 非空（首跑）；Node 22 / Python 3.11 / **完整版 FFmpeg**（精简构建跑不了 `npm run tts`） |
 | 失败路径 | 缺 source → 直接抛错；`_notice` 类环境缺失 → `verify:env` 报出 |
 | 验证方法 | `npm run verify:env`、`npm run verify:runtime`、`npm run verify:build` |
@@ -134,8 +136,8 @@
 | 项 | 内容 |
 |---|---|
 | 输入 | `fixtures/render-ir-{16x9,9x16}.json` + `public/audio.wav` |
-| 输出 | `artifacts/render/reel-forge-{16x9,9x16}.mp4`、`artifacts/frames/<ratio>/f_%04d.png`、`artifacts/deliver/sheet-*.html`（成片缩略总表） |
-| 执行机制 | [scripts/render.sh](../scripts/render.sh)：Remotion 双比例渲染（1280×720@30fps H.264 crf16 + AAC）→ 抽帧 → `sheet-gen` 绑字幕（**QC 通读全片第一入口**） |
+| 输出 | `artifacts/render/reel-forge-16x9.mp4`、`artifacts/frames/16x9/f_%04d.png`、`artifacts/deliver/sheet-*.html`（成片缩略总表） |
+| 执行机制 | [scripts/render.sh](../scripts/render.sh)：Remotion 单比例渲染（16:9，1280×720@30fps H.264 crf16 + AAC）→ 抽帧 → `sheet-gen` 绑字幕（**QC 通读全片第一入口**） |
 | 判断标准 | 帧数 = `ceil(duration×fps)`；离场动画结束在镜头末帧；`perf:probe` 30 帧测渲 ≥3fps |
 | 失败路径 | 重口味效果拖慢渲染 10–50 倍 → `perf:probe` RED；IR 与 timeline 不同源 → 音画不同步（属于第 4 阶段的门，应在渲染前拦下） |
 | 验证方法 | `npm run perf:probe`、`npm run verify:render-layer`、`npm run verify:footage` |
@@ -148,7 +150,7 @@
 
 | 项 | 内容 |
 |---|---|
-| 输入 | 双比例 mp4 + 帧 + IR + `plan_audit.json` + `text_provenance` |
+| 输入 | 16:9 mp4 + 帧 + IR + `plan_audit.json` + `text_provenance` |
 | 输出 | `qc/{frame_metrics,motion,visual_regression,text_provenance,plan_audit}.json`、`qc/report.json`（含 `input_fingerprint`）、`qc/report.md` |
 | 执行机制 | `npm run plan-audit`（分镜合规，缺失即阻断）→ 三个 python 测量脚本 → `npm run contact-sheet`（计划帧 ↔ 盘上真图对账，给 qc-agent 图像通道）→ `npm run qc`（汇总 issues / warnings / agent 复核） |
 | 判断标准 | **测量覆盖度**：量到的镜头集必须 == IR 镜头集、区间不得漂移（缺测量文件即阻断，不再静默 `continue`）；frame_metrics / motion `status==PASS`；visual_regression 必须 `advisory`；`text_provenance==PASS` |
@@ -197,7 +199,7 @@
 | 失败路径 | 交付件缺失 / 校验和不符 → `verify:production` RED；**产物过期**（QC 记的 `input_fingerprint` ≠ 当前 `releaseFingerprint()`）→ RED（"产物已过期：重跑 render → QC → repair → delivery"） |
 | 验证方法 | `npm run verify:delivery`、`npm run verify:production` |
 
-> **完成定义**：`verify:fast PASS` **不等于** `Production PASS`。只有双比例成片 + 全套 QC 产物 + repair 记账 +
+> **完成定义**：`verify:fast PASS` **不等于** `Production PASS`。当前临时模式要求 16:9 成片 + 对应 QC 产物 + repair 记账 +
 > tts-word-boundary + delivery checksum，并且 `verify:production` 在**当前输入指纹**下通过，才叫生产完成。
 
 ---

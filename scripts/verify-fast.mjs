@@ -42,6 +42,11 @@ const checks = [
   // 完整的合成帧跑法（test_measurement.py，约 5–6 分钟）留在 verify:measure / CI，不进 fast。
   "verify:measure:quick",
   "verify:semantic-director",
+  // Production-linked director preflight: validates IR/script/registry identities and risk flags without rendering.
+  "verify:director-contract",
+  "verify:director-preflight:static",
+  // 9:16 production rendering is temporarily disabled; protect the ratio switch and workflow removal locally.
+  "verify:render-mode",
   "verify:footage",
   // a2e 硬性原则 2「事实有出处」在本仓库**只有这一个执行者**，而它此前只在一键链里跑
   // （skill.mjs:119）—— 本地 fast 与 CI 都不碰它。它的 B 段就是这样在没人跑的地方

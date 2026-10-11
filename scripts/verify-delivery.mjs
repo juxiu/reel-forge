@@ -12,7 +12,6 @@ if (manifest.project_id !== project.project_id) throw new Error("delivery projec
 
 const required = [
   "reel-forge-16x9.mp4",
-  "reel-forge-9x16.mp4",
   "timeline.json",
   "timeline.md",
   "timeline-source.json",
@@ -23,15 +22,11 @@ const required = [
   "report.json",
   "report.md",
   "frame_metrics_16x9.json",
-  "frame_metrics_9x16.json",
   "motion_16x9.json",
-  "motion_9x16.json",
   "visual_regression_16x9.json",
-  "visual_regression_9x16.json",
   "text_provenance.json",
   "asr-second-pass.json",
   "render-ir-16x9.json",
-  "render-ir-9x16.json",
 ];
 
 const entries = new Map((manifest.files || []).map((file) => [file.name, file]));
@@ -45,7 +40,7 @@ if (missing.length) throw new Error("delivery missing: " + missing.join(","));
 if (manifest.metadata?.qc_status !== "PASS") throw new Error("delivery metadata QC is not PASS");
 if (manifest.metadata?.visual_regression !== "advisory") throw new Error("delivery visual regression metadata must be advisory");
 if (manifest.metadata?.text_provenance !== "PASS") throw new Error("delivery text provenance metadata is not PASS");
-if (JSON.stringify(manifest.metadata?.ratios || []) !== JSON.stringify(["16x9", "9x16"])) {
+if (JSON.stringify(manifest.metadata?.ratios || []) !== JSON.stringify(["16x9"])) {
   throw new Error("delivery ratio metadata mismatch");
 }
 
@@ -61,11 +56,9 @@ if (asr.required_real_asr === true && asr.source !== "external-asr-provider") {
 const provenance = JSON.parse(fs.readFileSync(manifestDir + "/text_provenance.json", "utf8"));
 if (provenance.status !== "PASS") throw new Error("delivery text provenance not PASS");
 
-// 验收范围：与 qc.mjs / verify-production.mjs / deliver.mjs 同一口径（用户决策 —— 16:9 是验收基准）。
-// 范围外比例的测量文件照常进包并逐文件校验 sha256（审计可查），只豁免 PASS 判定。
-const ACCEPT = new Set((process.env.ACCEPT_RATIOS || "16x9,9x16").split(",").map((s) => s.trim()).filter(Boolean));
-if (!ACCEPT.has("16x9")) throw new Error("ACCEPT_RATIOS 必须包含 16x9（16:9 是验收基准，不可移出范围）");
-for (const ratio of ["16x9", "9x16"]) {
+// 临时单画幅交付：只检查 16:9 产物与质量报告。
+const ACCEPT = new Set(["16x9"]);
+for (const ratio of ["16x9"]) {
   const frame = JSON.parse(fs.readFileSync(manifestDir + "/frame_metrics_" + ratio + ".json", "utf8"));
   const motion = JSON.parse(fs.readFileSync(manifestDir + "/motion_" + ratio + ".json", "utf8"));
   const visual = JSON.parse(fs.readFileSync(manifestDir + "/visual_regression_" + ratio + ".json", "utf8"));

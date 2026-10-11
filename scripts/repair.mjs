@@ -5,7 +5,7 @@ import {repairRenderIRWithReport, makeRepairPlan} from "../src/repair/engine.mjs
 /**
  * Repair：把 QC 报告落到 render-IR 上，并留下三份账（repair-plan / source-repair / status）。
  *
- * 「只写 render-IR」是设计决定，不是偷懒：渲染层读的就是 fixtures/render-ir-{16x9,9x16}.json，
+ * 「只写 render-IR」是设计决定，不是偷懒：当前启用的渲染层读的是 fixtures/render-ir-16x9.json，
  * 所以「改了 IR」= 「下一帧真的不一样」。别的文件都不满足这条，理由写在 writeSourceRepairAudit 上面。
  */
 
@@ -90,7 +90,7 @@ const autoFixes = [];
 // 于是 repair.mjs 在本仓库里从来没有被执行过 —— 它出过「引用一个早就删掉的变量」这种
 // 连 `node --check` 都过不去的错误，而没有任何门变红。现在那份账是真跑出来的。
 const irDir = process.env.IR_DIR || "fixtures";
-for (const ratio of ["16x9", "9x16"]) {
+for (const ratio of ["16x9"]) {
   const file = path.join(irDir, "render-ir-" + ratio + ".json");
   if (!fs.existsSync(file)) throw new Error(`缺 render-IR ${file}：先跑 npm run materialize-ir（或给沙盒设 IR_DIR）`);
   const ir = JSON.parse(fs.readFileSync(file, "utf8"));

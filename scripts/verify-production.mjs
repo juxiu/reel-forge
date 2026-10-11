@@ -6,22 +6,19 @@ const project = JSON.parse(fs.readFileSync(process.env.PROJECT_FILE || "fixtures
 const root = "artifacts/" + project.project_id;
 const required = [
   "research.json","research.md","script.json","qc/report.json","qc/report.md",
-  "qc/frame_metrics_16x9.json","qc/frame_metrics_9x16.json",
-  "qc/motion_16x9.json","qc/motion_9x16.json",
-  "qc/visual_regression_16x9.json","qc/visual_regression_9x16.json","qc/text_provenance.json",
+  "qc/frame_metrics_16x9.json",
+  "qc/motion_16x9.json",
+  "qc/visual_regression_16x9.json","qc/text_provenance.json",
   "audio/asr-second-pass.json","repair/status.json","repair/source-repair.json",
 ];
 for (const file of required) {
   const full = root + "/" + file;
   if (!fs.existsSync(full) || !fs.statSync(full).size) throw new Error("production artifact missing: " + full);
 }
-// 验收范围：与 qc.mjs 同一个口径（用户决策 —— 16:9 是验收基准；9:16 保持双画幅能力，不投入质量打磨）。
-// 范围外比例仍然强制：成片在位、测量文件在位、覆盖度/区间与当前 IR 一致、visual 必须仍是 advisory；
-// 豁免的只有 frame/motion 的 summary PASS 判定，且豁免结果显式打进 PASS 行，不许静默。
-const ACCEPT = new Set((process.env.ACCEPT_RATIOS || "16x9,9x16").split(",").map((s) => s.trim()).filter(Boolean));
+// 临时单画幅生产门：只要求与 16:9 输出对应的渲染和 QC 产物，9:16 不参与当前发布条件。
+const ACCEPT = new Set(["16x9"]);
 if (!ACCEPT.has("16x9")) throw new Error("ACCEPT_RATIOS 必须包含 16x9（16:9 是验收基准，不可移出范围）");
-const outOfScope = [];
-for (const ratio of ["16x9","9x16"]) {
+for (const ratio of ["16x9"]) {
   const render = "artifacts/render/reel-forge-" + ratio + ".mp4";
   if (!fs.existsSync(render) || !fs.statSync(render).size) throw new Error("production render missing: " + render);
   const frame = JSON.parse(fs.readFileSync(root + "/qc/frame_metrics_" + ratio + ".json","utf8"));
@@ -30,8 +27,6 @@ for (const ratio of ["16x9","9x16"]) {
   if (ACCEPT.has(ratio)) {
     if (frame.summary?.status !== "PASS") throw new Error("frame metrics not PASS: " + ratio);
     if (motion.summary?.status !== "PASS") throw new Error("motion metrics not PASS: " + ratio);
-  } else {
-    outOfScope.push({ratio, frame: frame.summary?.status || "?", motion: motion.summary?.status || "?"});
   }
   if (visual.gate !== "advisory" || visual.blocking !== false) throw new Error("visual regression must stay advisory: " + ratio);
 
@@ -138,7 +133,8 @@ for (const entry of manifest.files || []) {
 console.log("production gate PASS", JSON.stringify({
   project_id:project.project_id,
   accept_ratios:[...ACCEPT],
-  out_of_scope:outOfScope.length?outOfScope:undefined,
+  rendering_ratios:["16x9"],
+  disabled_ratios:["9x16"],
   alignment_mode:asr.alignment_mode,
   timeline_source:"tts-word-boundary",
   qc:qc.status,

@@ -287,7 +287,7 @@ function checkSourceAudit(file, {wantEntries}) {
   const st = readJson(path.join(SANDBOX, "repair", "status.json"));
   if (st.status !== "patched" || st.changed_nodes.join() !== "scene-1") throw new Error("hero_too_small 没被记成画面相关改动: " + JSON.stringify(st));
   if (st.source_writeback_count !== 0) throw new Error("status.json 谎报源层改动数: " + st.source_writeback_count);
-  // 带了 ratio 的 issue 只修那一版：横屏量出来的「主角太小」不该去动竖屏的 render-IR。
+  // 带 ratio 的 issue 只修对应 IR；本轮 9:16 渲染关闭，因此生产修复也不能修改竖屏 IR。
   const wide = readJson(path.join(IR_DIR, "render-ir-16x9.json"));
   const tall = readJson(path.join(IR_DIR, "render-ir-9x16.json"));
   if (!(wide.scenes[0].hero_scale > 1)) throw new Error("16x9 的 render-IR 里 hero_scale 没被改大");
@@ -296,15 +296,14 @@ function checkSourceAudit(file, {wantEntries}) {
   checkSourceAudit(readJson(path.join(SANDBOX, "repair", "source-repair.json")), {wantEntries: 0});
 }
 {
-  // 不带 ratio 的 issue（媒体探针那一类）两版都要改到 —— 和上一条一起把 ratio 的两个方向钉住。
+  // 不带 ratio 的整片 issue 也只改当前启用的 16:9 IR，不能顺手修改已停用画幅。
   freshSandbox();
   const r = runRepair({status: "FAIL", issues: [{node: "scene-1", type: "hero_too_small", severity: "medium"}]});
-  if (r.status !== 0) throw new Error("无 ratio 的 issue 该在两版 IR 上都改到，退出 " + r.status);
+  if (r.status !== 0) throw new Error("无 ratio 的 issue 该修复当前启用的 16:9 IR，退出 " + r.status);
   const st = readJson(path.join(SANDBOX, "repair", "status.json"));
-  if (st.changed_nodes.join() !== "scene-1,scene-1") throw new Error("无 ratio 的 issue 没修满两版: " + JSON.stringify(st));
-  for (const ratio of ["16x9", "9x16"]) {
-    if (!(readJson(path.join(IR_DIR, `render-ir-${ratio}.json`)).scenes[0].hero_scale > 1)) throw new Error(`${ratio} 没被无 ratio 的 issue 修到`);
-  }
+  if (st.changed_nodes.join() !== "scene-1") throw new Error("无 ratio 的 issue 应只修当前启用版本: " + JSON.stringify(st));
+  if (!(readJson(path.join(IR_DIR, "render-ir-16x9.json")).scenes[0].hero_scale > 1)) throw new Error("16x9 没被无 ratio 的 issue 修到");
+  if (readJson(path.join(IR_DIR, "render-ir-9x16.json")).scenes[0].hero_scale !== 1) throw new Error("已停用的 9x16 不应被本轮生产修复修改");
 }
 {
   freshSandbox();

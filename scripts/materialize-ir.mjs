@@ -6,7 +6,8 @@ const script=JSON.parse(fs.readFileSync("fixtures/script.json","utf8"));
 const timeline=JSON.parse(fs.readFileSync("script/timeline.json","utf8"));
 const graph=buildBeatGraph(script,timeline);
 const scenes=script.segments.map((s,i)=>beatToScene(graph.beats[i],s));
-for(const [name,w,h] of [["16x9",1280,720],["9x16",720,1280]]){const ir=toRenderIR(project,scenes,{width:w,height:h,fps:30});ir.duration=timeline.total_frames/30;fs.writeFileSync("fixtures/render-ir-"+name+".json",JSON.stringify(ir,null,2));}
+const irWide=toRenderIR(project,scenes,{width:1280,height:720,fps:30});irWide.duration=timeline.total_frames/30;fs.writeFileSync("fixtures/render-ir-16x9.json",JSON.stringify(irWide,null,2));
+// 9:16 is temporarily disabled. Keep any existing render-ir-9x16.json as a dormant reference fixture, but do not refresh or consume it in the active production path.
 fs.writeFileSync("fixtures/render-ir.json",JSON.stringify(toRenderIR(project,scenes,{width:1280,height:720,fps:30}),null,2));
 fs.mkdirSync("artifacts/"+project.project_id,{recursive:true});
 fs.writeFileSync("artifacts/"+project.project_id+"/beats.json",JSON.stringify(graph,null,2));

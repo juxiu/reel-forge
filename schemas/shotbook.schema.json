@@ -1,0 +1,257 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://reel-forge.local/schemas/shotbook.schema.json",
+  "title": "Reel Forge SHOTBOOK",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "projectId",
+    "source",
+    "shots"
+  ],
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "projectId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ir16x9",
+        "timeline"
+      ],
+      "properties": {
+        "ir16x9": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ir9x16": {
+          "type": "string",
+          "minLength": 1
+        },
+        "timeline": {
+          "type": "string",
+          "minLength": 1
+        },
+        "disabledRatios": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "9x16"
+            ]
+          }
+        }
+      }
+    },
+    "shots": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/shot"
+      }
+    }
+  },
+  "$defs": {
+    "shot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shotId",
+        "narrationBeat",
+        "storyPurpose",
+        "visualRelationship",
+        "visualMetaphor",
+        "heroElement",
+        "layerPlan",
+        "entryState",
+        "keyAction",
+        "holdState",
+        "exitState",
+        "transitionIntent",
+        "continuityIds",
+        "timing",
+        "layoutBudget",
+        "assetManifest",
+        "motionRecipe",
+        "riskLevel",
+        "validationPlan"
+      ],
+      "properties": {
+        "shotId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "narrationBeat": {
+          "type": "object",
+          "required": [
+            "scriptId"
+          ],
+          "properties": {
+            "scriptId": {
+              "type": "string"
+            },
+            "text": {
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "locked",
+                "estimated",
+                "unresolved"
+              ]
+            }
+          }
+        },
+        "storyPurpose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "visualRelationship": {
+          "enum": [
+            "sequence",
+            "causality",
+            "comparison",
+            "aggregation",
+            "decomposition",
+            "flow",
+            "feedback",
+            "evolution",
+            "analogy",
+            "evidence",
+            "spatial-relation",
+            "transition",
+            "unclassified"
+          ]
+        },
+        "visualMetaphor": {
+          "type": "object",
+          "required": [
+            "status"
+          ],
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "decided",
+                "not-applicable",
+                "unresolved"
+              ]
+            }
+          }
+        },
+        "heroElement": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "layerPlan": {
+          "type": "object",
+          "required": [
+            "background",
+            "subject",
+            "text"
+          ],
+          "properties": {
+            "background": {
+              "type": "array"
+            },
+            "subject": {
+              "type": "array"
+            },
+            "text": {
+              "type": "array"
+            },
+            "additional": {
+              "type": "array"
+            }
+          }
+        },
+        "entryState": {
+          "type": "object"
+        },
+        "keyAction": {
+          "type": "object"
+        },
+        "holdState": {
+          "type": "object"
+        },
+        "exitState": {
+          "type": "object"
+        },
+        "transitionIntent": {
+          "type": "object"
+        },
+        "continuityIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "timing": {
+          "type": "object",
+          "required": [
+            "startFrame",
+            "endFrame",
+            "fps",
+            "status"
+          ],
+          "properties": {
+            "startFrame": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "endFrame": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "fps": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "status": {
+              "enum": [
+                "locked",
+                "estimated"
+              ]
+            }
+          }
+        },
+        "layoutBudget": {
+          "type": "object"
+        },
+        "assetManifest": {
+          "type": "array"
+        },
+        "motionRecipe": {
+          "type": "object"
+        },
+        "riskLevel": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "validationPlan": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "riskScore": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    }
+  }
+}
