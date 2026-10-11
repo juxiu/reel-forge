@@ -1,5 +1,9 @@
 # reel-forge
 
+
+
+> **当前临时运行模式（2026-10-11）**：GitHub Actions 工作流已停用；生产渲染、QC、Repair 与 Delivery 当前只执行 16:9。9:16 Composition 暂时未注册，不会生成竖屏成片；对应 IR 文件保留为休眠资产，后续可恢复。`npm run verify:fast` 仍可在本地手动运行。
+
 Agent-native 视频生产引擎。
 
 当前先按 anything2explainer 的生产过程完成可用功能，再做优化。
@@ -29,7 +33,7 @@ G1…Gn Build Agents
   ↓
 Authored Shots
   ↓
-Render 16:9 + 9:16
+Render 16:9 only (temporary)
   ↓
 Frame Metrics / Motion / Visual Regression
   ↓
@@ -119,7 +123,7 @@ npm run checkpoint -- <checkpoint> approved
 5. Overlay/Primitives：统一字幕、HUD、进度条、视觉图元。
 6. Pilot：先生成 G1 / 前 30 秒 preview，并暂停等审批。
 7. Parallel Build：按 G1…Gn 拆镜头并行生产。
-8. Render：16:9 / 9:16 成片。
+8. Render：仅生成 16:9 成片（9:16 暂停）。
 9. Quantitative QC：frame metrics / motion / media probe。
 10. Visual Regression：scene/ratio 采样帧，与 positive / anti-reference benchmark 做 visual embedding similarity。
 11. Repair / Recheck：问题按 node / ratio 局部修复，再复验全部质量层。
@@ -180,7 +184,7 @@ layout_stability
 完成定义要求：
 
 ~~~text
-双比例成片
+16:9 成片
 +
 Frame Metrics
 +
