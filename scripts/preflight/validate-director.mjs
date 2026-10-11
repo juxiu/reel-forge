@@ -94,7 +94,7 @@ if (findings.some((f) => f.severity === "BLOCKER")) {
         const approved = reviewEvidence?.status === "approved"
           && reviewEvidence?.sourceFingerprint === sourceFingerprint
           && Array.isArray(reviewEvidence?.reviewedShots)
-          && reviewEvidence.reviewedShots.some((r) => r.shotId === id && r.status === "approved" && r.evidence);
+          && reviewEvidence.reviewedShots.some((r) => r.shotId === id && r.status === "approved" && typeof r.reviewer === "string" && r.reviewer !== "implementation-agent" && r.reviewer !== "build-agent" && typeof r.evidence === "string" && exists(r.evidence));
         if (!approved) add("REVIEW", "GATE-5", "high-risk-shot-review", id, `Risk score ${score}/100; static checks cannot prove motion/layout quality; fingerprint=${sourceFingerprint}`, "Generate entry/reveal/exit keyframes, then record independent review in artifacts/<project_id>/preflight/visual-review.json with this sourceFingerprint");
       } else if (level === "medium") add("WARN", "GATE-5", "medium-risk-shot-review", id, `Risk score ${score}/100`, "Review entry, reveal and exit states with low-cost keyframes");
       if (!s.continuityIds && !s.transitionIntent) add("WARN", "GATE-1", "continuity-intent-unresolved", id, "No explicit continuity/transition contract in current IR", "Add continuity metadata to authored director decisions; do not infer visual continuity from adjacency");
