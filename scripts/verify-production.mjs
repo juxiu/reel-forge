@@ -1,11 +1,13 @@
 import fs from "node:fs";
 import crypto from "node:crypto";
 import {releaseFingerprint} from "../src/release/fingerprint.mjs";
+import {productionContentFingerprints} from "../src/release/content-gates.mjs";
+import {durationTargetReport} from "../src/release/duration-target.mjs";
 
 const project = JSON.parse(fs.readFileSync(process.env.PROJECT_FILE || "fixtures/project.json", "utf8"));
 const root = "artifacts/" + project.project_id;
 const required = [
-  "research.json","research.md","script.json","qc/report.json","qc/report.md",
+  "research.json","research.md","script.json","agent-review-gate.json","qc/report.json","qc/report.md",
   "qc/frame_metrics_16x9.json",
   "qc/motion_16x9.json",
   "qc/visual_regression_16x9.json","qc/text_provenance.json",
@@ -14,6 +16,21 @@ const required = [
 for (const file of required) {
   const full = root + "/" + file;
   if (!fs.existsSync(full) || !fs.statSync(full).size) throw new Error("production artifact missing: " + full);
+}
+// Research/Director Agent outputs must be complete, clean, and bound to this exact research + script.
+const reviewGate = JSON.parse(fs.readFileSync(root + "/agent-review-gate.json","utf8"));
+if (reviewGate.status !== "PASS" || !Array.isArray(reviewGate.errors) || reviewGate.errors.length) {
+  throw new Error("agent review gate not PASS");
+}
+const researchArtifact = JSON.parse(fs.readFileSync(root + "/research.json","utf8"));
+const scriptArtifact = JSON.parse(fs.readFileSync(root + "/script.json","utf8"));
+const reviewFingerprints = productionContentFingerprints(researchArtifact,scriptArtifact);
+if (reviewGate.project_id !== project.project_id
+  || reviewGate.research_fingerprint !== reviewFingerprints.research_fingerprint
+  || reviewGate.script_fingerprint !== reviewFingerprints.script_fingerprint
+  || reviewGate.claim_count !== (researchArtifact.claims || []).length
+  || reviewGate.segment_count !== (scriptArtifact.segments || []).length) {
+  throw new Error("agent review gate is stale or bound to different research/script inputs");
 }
 // 临时单画幅生产门：只要求与 16:9 输出对应的渲染和 QC 产物，9:16 不参与当前发布条件。
 const ACCEPT = new Set(["16x9"]);
@@ -35,6 +52,9 @@ for (const ratio of ["16x9"]) {
   //   2026-10-08 的 4 镜测量一路配着 44 镜的 IR 报 PASS —— status 是 PASS，但只 PASS 了 4 个镜头。
   //   「量过的都对」不等于「该量的都量了」，这里把后者补上。
   const ir = JSON.parse(fs.readFileSync("fixtures/render-ir-" + ratio + ".json","utf8"));
+  if (ir.project_id !== project.project_id) throw new Error("production project/IR identity mismatch: " + ir.project_id + " != " + project.project_id);
+  const durationGate = durationTargetReport(project, ir.duration);
+  if (durationGate.status !== "PASS") throw new Error("production duration target FAIL: " + durationGate.issues.join(" | "));
   const fps = Number(ir.fps) || 30;
   const want = new Map((ir.scenes || []).map((s) => {
     const from = Math.round(Number(s.start) * fps);
