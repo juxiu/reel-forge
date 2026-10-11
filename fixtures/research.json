@@ -1,0 +1,187 @@
+{
+  "project_id": "digest-explainer",
+  "sources": [
+    {
+      "id": "src-39396ab8bb",
+      "url": "https://www.rfc-editor.org/rfc/rfc9530.html",
+      "title": "RFC 9530: Digest Fields",
+      "content_hash": "b557dca410ad2547b9ca553e95d7996bbbd378d4b79267011ba50f9399b72d73"
+    }
+  ],
+  "claims": [
+    {
+      "id": "claim-001",
+      "statement": "RFC 9530: Digest Fields RFC 9530 Digest Fields February 2024 Polli & Pardue Standards Track [Page] Stream: Internet Engineering Task Force (IETF) RFC: 9530 Obsoletes: 3230 Category: Standards Track Published: February 2024 ISSN: 2070-1721 Authors: R.",
+      "source_ids": [
+        "src-39396ab8bb"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-39396ab8bb",
+          "url": "https://www.rfc-editor.org/rfc/rfc9530.html",
+          "excerpt": "RFC 9530: Digest Fields RFC 9530 Digest Fields February 2024 Polli & Pardue Standards Track [Page] Stream: Internet Engineering Task Force (IETF) RFC: 9530 Obsoletes: 3230 Category: Standards Track Published: February 2024 ISSN: 2070-1721 Authors: R."
+        }
+      ]
+    },
+    {
+      "id": "claim-002",
+      "statement": "Polli Team Digitale, Italian Government L.",
+      "source_ids": [
+        "src-39396ab8bb"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-39396ab8bb",
+          "url": "https://www.rfc-editor.org/rfc/rfc9530.html",
+          "excerpt": "Polli Team Digitale, Italian Government L."
+        }
+      ]
+    },
+    {
+      "id": "claim-003",
+      "statement": "Pardue Cloudflare RFC 9530 Digest Fields Abstract This document defines HTTP fields that support integrity digests.",
+      "source_ids": [
+        "src-39396ab8bb"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-39396ab8bb",
+          "url": "https://www.rfc-editor.org/rfc/rfc9530.html",
+          "excerpt": "Pardue Cloudflare RFC 9530 Digest Fields Abstract This document defines HTTP fields that support integrity digests."
+        }
+      ]
+    },
+    {
+      "id": "claim-004",
+      "statement": "The Content-Digest field can be used for the integrity of HTTP message content.",
+      "source_ids": [
+        "src-39396ab8bb"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-39396ab8bb",
+          "url": "https://www.rfc-editor.org/rfc/rfc9530.html",
+          "excerpt": "The Content-Digest field can be used for the integrity of HTTP message content."
+        }
+      ]
+    },
+    {
+      "id": "claim-005",
+      "statement": "The Repr-Digest field can be used for the integrity of HTTP representations.",
+      "source_ids": [
+        "src-39396ab8bb"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-39396ab8bb",
+          "url": "https://www.rfc-editor.org/rfc/rfc9530.html",
+          "excerpt": "The Repr-Digest field can be used for the integrity of HTTP representations."
+        }
+      ]
+    },
+    {
+      "id": "claim-006",
+      "statement": "Want-Content-Digest and Want-Repr-Digest can be used to indicate a sender's interest and preferences for receiving the respective Integrity fields.",
+      "source_ids": [
+        "src-39396ab8bb"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-39396ab8bb",
+          "url": "https://www.rfc-editor.org/rfc/rfc9530.html",
+          "excerpt": "Want-Content-Digest and Want-Repr-Digest can be used to indicate a sender's interest and preferences for receiving the respective Integrity fields."
+        }
+      ]
+    },
+    {
+      "id": "claim-007",
+      "statement": "¶ This document obsoletes RFC 3230 and the Digest and Want-Digest HTTP fields.",
+      "source_ids": [
+        "src-39396ab8bb"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-39396ab8bb",
+          "url": "https://www.rfc-editor.org/rfc/rfc9530.html",
+          "excerpt": "¶ This document obsoletes RFC 3230 and the Digest and Want-Digest HTTP fields."
+        }
+      ]
+    },
+    {
+      "id": "claim-008",
+      "statement": "¶ Status of This Memo This is an Internet Standards Track document.",
+      "source_ids": [
+        "src-39396ab8bb"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-39396ab8bb",
+          "url": "https://www.rfc-editor.org/rfc/rfc9530.html",
+          "excerpt": "¶ Status of This Memo This is an Internet Standards Track document."
+        }
+      ]
+    },
+    {
+      "id": "claim-009",
+      "statement": "¶ This document is a product of the Internet Engineering Task Force (IETF).",
+      "source_ids": [
+        "src-39396ab8bb"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-39396ab8bb",
+          "url": "https://www.rfc-editor.org/rfc/rfc9530.html",
+          "excerpt": "¶ This document is a product of the Internet Engineering Task Force (IETF)."
+        }
+      ]
+    },
+    {
+      "id": "claim-010",
+      "statement": "It represents the consensus of the IETF community.",
+      "source_ids": [
+        "src-39396ab8bb"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-39396ab8bb",
+          "url": "https://www.rfc-editor.org/rfc/rfc9530.html",
+          "excerpt": "It represents the consensus of the IETF community."
+        }
+      ]
+    },
+    {
+      "id": "claim-011",
+      "statement": "It has received public review and has been approved for publication by the Internet Engineering Steering Group (IESG).",
+      "source_ids": [
+        "src-39396ab8bb"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-39396ab8bb",
+          "url": "https://www.rfc-editor.org/rfc/rfc9530.html",
+          "excerpt": "It has received public review and has been approved for publication by the Internet Engineering Steering Group (IESG)."
+        }
+      ]
+    },
+    {
+      "id": "claim-012",
+      "statement": "Further information on Internet Standards is available in Section 2 of RFC 7841.",
+      "source_ids": [
+        "src-39396ab8bb"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-39396ab8bb",
+          "url": "https://www.rfc-editor.org/rfc/rfc9530.html",
+          "excerpt": "Further information on Internet Standards is available in Section 2 of RFC 7841."
+        }
+      ]
+    }
+  ],
+  "instruction_filter": {
+    "judged": 12,
+    "dropped": 0,
+    "rules": [],
+    "dropped_claims": []
+  }
+}

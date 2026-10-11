@@ -183,3 +183,33 @@ export function evaluateProductionReviews(reviews, research, script) {
     errors,
   };
 }
+
+/**
+ * A persisted review gate proves nothing on its own: it must be bound to the
+ * exact research + script that were reviewed. Recompute the content fingerprints
+ * and coverage counts and report every mismatch. Returns [] when the gate is
+ * fresh and fully covering; otherwise a list of human-readable problems. This is
+ * the consumer-side "expired review" check (the producer writes the gate).
+ */
+export function evaluateReviewGateBinding(gate, research, script) {
+  const errors = [];
+  if (!gate || typeof gate !== "object" || Array.isArray(gate)) {
+    return ["review gate artifact is missing or malformed"];
+  }
+  const expected = productionContentFingerprints(research, script);
+  const projectId = research?.project_id ?? script?.project_id ?? null;
+  const claims = Array.isArray(research?.claims) ? research.claims : [];
+  const segments = Array.isArray(script?.segments) ? script.segments : [];
+  if (gate.status !== "PASS") errors.push("review gate status is not PASS");
+  if (Array.isArray(gate.errors) && gate.errors.length) errors.push("review gate carries unresolved errors");
+  if (gate.project_id !== projectId) errors.push("review gate project_id does not match current inputs");
+  if (gate.research_fingerprint !== expected.research_fingerprint) {
+    errors.push("review gate research fingerprint is stale (research changed since review)");
+  }
+  if (gate.script_fingerprint !== expected.script_fingerprint) {
+    errors.push("review gate script fingerprint is stale (script changed since review)");
+  }
+  if (gate.claim_count !== claims.length) errors.push("review gate claim coverage count is stale");
+  if (gate.segment_count !== segments.length) errors.push("review gate segment coverage count is stale");
+  return errors;
+}

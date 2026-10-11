@@ -6,13 +6,18 @@ import {requestApproval} from "../src/runtime/approval.mjs";
 
 const args=process.argv.slice(2);
 if(!args.length||args.includes("--help")){
-  console.log('Usage: npm run skill -- "TOPIC" --source URL [--source URL ...] [--duration 40] [--language en] [--ratio 16:9] [--auto-approve] [--resume]');
+  console.log('Usage: npm run skill -- "TOPIC" --source URL [--source URL ...] --duration SECONDS [--language en] [--ratio 16:9] [--auto-approve] [--resume]');
   process.exit(args.includes("--help")?0:2);
 }
 const topic=args.find(a=>!a.startsWith("--"));
 if(!topic) throw new Error("topic required");
 const values=flag=>{const out=[];for(let i=0;i<args.length;i++)if(args[i]===flag&&args[i+1])out.push(args[++i]);return out};
-const sources=values("--source").map(s=>s.trim()),language=values("--language")[0]||"en",duration=Number(values("--duration")[0]||40);
+const sources=values("--source").map(s=>s.trim()),language=values("--language")[0]||"en";
+// 目标时长由项目自己声明（长视频 ≈339s、短视频几十秒都走同一套门）。这里不再兜一个写死的 40 秒默认值：
+// 那个默认值会把任意新主题的目标压到 40 秒，然后在时长门里被判「成片时长超出目标区间」。
+const durationArg=values("--duration")[0];
+if(durationArg===undefined) throw new Error("--duration <seconds> is required: every project declares its own duration_target_s");
+const duration=Number(durationArg);
 const ratios=(values("--ratio")[0]||"16:9").split(",").map(s=>s.trim()).filter(Boolean);
 if(ratios.length!==1||ratios[0]!=="16:9") throw new Error("当前暂时只支持 --ratio 16:9；9:16 渲染已停用");
 const auto=args.includes("--auto-approve")||process.env.AUTO_APPROVE==="1",resume=args.includes("--resume");
@@ -50,7 +55,7 @@ function stop(stage,message){
   preserveWorkspace=true;
   console.log("SKILL STOP ["+stage+"]: "+message);
   console.log("批准后执行: npm run checkpoint -- "+stage+" approved");
-  console.log("然后继续: npm run skill -- \""+topic.replaceAll('"','\\\"')+"\""+(sources[0]?" --source "+sources[0]:"")+" --resume");
+  console.log("然后继续: npm run skill -- \""+topic.replaceAll('"','\\\"')+"\""+(sources[0]?" --source "+sources[0]:"")+" --duration "+duration+" --resume");
   return false;
 }
 function ensureCheckpoint(stage,payload={}){

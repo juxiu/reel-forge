@@ -85,7 +85,7 @@ fixtures/render-ir-16x9.json / 9x16.json + src/shots/Gn/SCnn.jsx
 
 音量侧唯一硬编码判据：`alimiter=limit=0.89`（`:79`，混音链 `adelay → amix(normalize=0) → apad → atrim → alimiter`）。上游同为 0.89。
 
-⚠ **没有任何门把成片时长和目标对齐**：`duration_target_s` 只被写进 `fixtures/project.json` 并由 `contracts/project.schema.json` 校验形状，**全仓库没有读者**（逐符号检索：`scripts/skill.mjs:22` 写、schema 声明、fixture 里存着，三处，零读者）。`speech_seconds` 与 `total_seconds` 只出现在 `tts_build.mjs:160` 的 PASS 行里，同样无人比较。**时长是不是超了，目前只能看那行输出。**
+✅ **目标时长门已存在**：`scripts/verify-duration-target.mjs`（`npm run verify:duration-target`，并由 `scripts/render.sh` 与一键链 `scripts/skill.mjs` 在 materialize-ir 之后调用）。它以**真实 TTS 时间线**（`script/timeline.json` 的 `total_frames / fps`，次选 Render IR 的 `ir.duration`）为准，与项目的 `duration_target_s` 比对：默认容差 ±20%，可用 `duration_tolerance_ratio`（0–0.5）按项目覆盖；没有全局固定时长（长视频 ≈339s 与短视频各有自己的目标）。时间线在盘上时还要求它与 Render IR 自洽 —— 只改 JSON 数值不足以过门。`speech_seconds` / `total_seconds` 仍只是 `tts_build.mjs:160` 的打印，不参与判定。
 
 ---
 
@@ -201,11 +201,11 @@ fixtures/render-ir-16x9.json / 9x16.json + src/shots/Gn/SCnn.jsx
 - 三处执行者钉的是「**一段 = 一镜**」而不是「一句 = 一镜」：`src/director/pipeline.mjs:58`（按 segment 下标生成 scene）、`src/visual/narrative.mjs`（`scenes.length !== segments.length` → `scene-narration-coverage-mismatch`，阻断门 `verify:narrative`）、`scripts/selfcheck.py:65-66`。
 - 所以「2–4 句合成一个镜头、长句用竖线分块」在本仓库**已经成立**；`≥120 帧/镜` 的判据正是靠「一段多句」才凑得出来。
 
-（唯一遗留的真实问题不是这条，而是 §6.2 的时长目标无执行者。）
+（唯一遗留的真实问题不是这条，而是 §6.2 的写作预算；时长目标本身已有门，见下。）
 
-### 6.2 时长目标没有任何执行者
+### 6.2 时长目标现在有执行者（写作字数预算仍无）
 
-`duration_target_s` 零读者、`speech_seconds` 零比较（§2）。校验一片 2–3 分钟中文时，唯一的机器反馈是那行 `TTS/TIMELINE PASS`。最小修法：`tts_build.mjs` 写出 manifest 时按 `project.duration_target_s` 判 ±15% 并打印一条 `warning`，或新增一道 `verify:duration`（纯本地、不渲染，符合当前约束）。未做。
+`duration_target_s` 的读者是 `scripts/verify-duration-target.mjs`（§2）：它用真实时间线/Render IR 时长按项目目标与容差判定，由 `render.sh` 与一键链在渲染前调用。仍然没有执行者的是 §3 的**写作字数预算**（每句 ≤35 字、每块 ≤16 字、章数/篇幅档位）——那些只写在本文档里。校验一片 2–3 分钟中文时，除时长的机器反馈，其余仍只能看 `tts_build.mjs` 那行 `TTS/TIMELINE PASS` 打印。
 
 ### 6.3 分镜表无法承载审美约束
 
@@ -241,7 +241,7 @@ fixtures/render-ir-16x9.json / 9x16.json + src/shots/Gn/SCnn.jsx
 6. 句帧号：`from = round((offset+首词.start)×30)+1`、`to = max(from, round((offset+末词.end)×30))`，1-based —— `scripts/tts_build.mjs:112-113`。
 7. 混音只有一处响度硬约束 `alimiter=limit=0.89` —— `scripts/tts_build.mjs:79`。
 8. 每句 ≤35 字、每块 ≤16 字、章名 ≤6 字、2–3 分钟 ≈650–880 字：本仓库**全部无执行者**；画面数字的出处是唯一有门的写作约束 —— 本文 §3 + `scripts/verify-text-provenance.mjs:50-54`。
-9. `duration_target_s` 零读者、`speech_seconds` 零比较，时长偏差目前只能看日志 —— 本文 §2 的检索结论。
+9. `duration_target_s` 现有执行者 `scripts/verify-duration-target.mjs`（按真实时间线/Render IR 时长、项目目标与 0–0.5 容差判定）；`speech_seconds` 仍零比较 —— 本文 §2。
 10. 分镜令牌只有 `{Sxx.from|to|cN}`、`{Cn}`、`{TOTAL}` 加 ±偏移，`.cN` 是 1-based 的 `subs` 索引 —— `scripts/render_storyboard.py:36-62`。
 11. 未解析花括号**先验后写**，且 `selfcheck` 再查一遍残留 —— `scripts/render_storyboard.py:68-71` + `scripts/selfcheck.py:43-44`。
 12. 分镜表是 5 列、区间用 en-dash；格式对不上时报「没有解析到任何 …表格行」而不是 coverage 假原因 —— `scripts/selfcheck.py:47`、`:60-62`。

@@ -145,9 +145,11 @@ npm run skill -- \
   "source_urls": [
     "https://www.rfc-editor.org/rfc/rfc9530.html"
   ],
-  "duration_target_s": 40
+  "duration_target_s": 339.3
 }
 ~~~
+
+`duration_target_s` 是**每个项目自己的目标时长**，长视频与短视频用同一个门校验（默认容差 ±20%，可用 `duration_tolerance_ratio` 设为 0–0.5）：上面的 `339.3` 对应被跟踪的长片样片（44 镜 / 时间线 10179 帧 @30fps），短视频项目则应写它自己的目标（例如 40）。
 
 生产输入应至少明确：
 

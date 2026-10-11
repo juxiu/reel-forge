@@ -90,7 +90,9 @@ npm run verify:shotcraft
 Agent 无法读取本地目录时必须明确说明，不能假称引用过卡片或源码。使用 Shotcraft 后依然执行单镜头预览、`debug:shot`、采样验证与 Pilot 人工审查。9:16 当前已暂停渲染；此前的居中适配不构成已验收的竖屏重排。
 
 ## 一键入口
-`npm run skill -- "TOPIC" --source URL --auto-approve`
+`npm run skill -- "TOPIC" --source URL --duration SECONDS --auto-approve`
+
+`--duration` 必填：它是该项目的 `duration_target_s`（长视频写长片时长、短视频写短片时长），不再有写死的默认值 —— 时长门按项目配置校验真实成片时长。
 
 非 auto 模式每到一个 checkpoint 都停，并输出：
 `npm run checkpoint -- <checkpoint> approved`

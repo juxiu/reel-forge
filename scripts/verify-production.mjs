@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import crypto from "node:crypto";
 import {releaseFingerprint} from "../src/release/fingerprint.mjs";
-import {productionContentFingerprints} from "../src/release/content-gates.mjs";
+import {evaluateReviewGateBinding} from "../src/release/content-gates.mjs";
 import {durationTargetReport} from "../src/release/duration-target.mjs";
 
 const project = JSON.parse(fs.readFileSync(process.env.PROJECT_FILE || "fixtures/project.json", "utf8"));
@@ -19,18 +19,11 @@ for (const file of required) {
 }
 // Research/Director Agent outputs must be complete, clean, and bound to this exact research + script.
 const reviewGate = JSON.parse(fs.readFileSync(root + "/agent-review-gate.json","utf8"));
-if (reviewGate.status !== "PASS" || !Array.isArray(reviewGate.errors) || reviewGate.errors.length) {
-  throw new Error("agent review gate not PASS");
-}
 const researchArtifact = JSON.parse(fs.readFileSync(root + "/research.json","utf8"));
 const scriptArtifact = JSON.parse(fs.readFileSync(root + "/script.json","utf8"));
-const reviewFingerprints = productionContentFingerprints(researchArtifact,scriptArtifact);
-if (reviewGate.project_id !== project.project_id
-  || reviewGate.research_fingerprint !== reviewFingerprints.research_fingerprint
-  || reviewGate.script_fingerprint !== reviewFingerprints.script_fingerprint
-  || reviewGate.claim_count !== (researchArtifact.claims || []).length
-  || reviewGate.segment_count !== (scriptArtifact.segments || []).length) {
-  throw new Error("agent review gate is stale or bound to different research/script inputs");
+const reviewBindingErrors = evaluateReviewGateBinding(reviewGate,researchArtifact,scriptArtifact);
+if (reviewBindingErrors.length) {
+  throw new Error("agent review gate is stale or invalid: " + reviewBindingErrors.join(" | "));
 }
 // 临时单画幅生产门：只要求与 16:9 输出对应的渲染和 QC 产物，9:16 不参与当前发布条件。
 const ACCEPT = new Set(["16x9"]);
@@ -56,11 +49,14 @@ for (const ratio of ["16x9"]) {
   const durationGate = durationTargetReport(project, ir.duration);
   if (durationGate.status !== "PASS") throw new Error("production duration target FAIL: " + durationGate.issues.join(" | "));
   const durationArtifact = JSON.parse(fs.readFileSync(root + "/duration-target.json","utf8"));
+  // 时长门的 actual 以真实时间线为准（verify-duration-target.mjs），可能与 IR 的 duration 有亚秒级差异，
+  // 所以这里按容差对账，而不是严格相等；目标/容差/项目身份仍必须完全一致。
   if (durationArtifact.status !== "PASS"
     || durationArtifact.project_id !== project.project_id
     || durationArtifact.target_seconds !== durationGate.target_seconds
-    || durationArtifact.actual_seconds !== durationGate.actual_seconds
-    || durationArtifact.tolerance_ratio !== durationGate.tolerance_ratio) {
+    || durationArtifact.tolerance_ratio !== durationGate.tolerance_ratio
+    || !Number.isFinite(Number(durationArtifact.actual_seconds))
+    || Math.abs(Number(durationArtifact.actual_seconds) - durationGate.actual_seconds) > 0.5) {
     throw new Error("duration target artifact is stale or does not match the active Render IR");
   }
   const fps = Number(ir.fps) || 30;

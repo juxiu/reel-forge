@@ -84,12 +84,13 @@ npm run materialize-ir # 按 script + timeline 重算活动的 render-ir-16x9.js
 npm run skill -- \\
   "Explain HTTP Digest Fields" \\
   --source https://www.rfc-editor.org/rfc/rfc9530.html \\
+  --duration 339 \\
   --auto-approve
 ~~~
 
 ⚠ 全新主题的解说稿由 agent 生成：这一链在 Research 之后会调 `createAgentProvider()`，
 没有配置 `AGENT_COMMAND`（外部 Agent 服务）时，若缺少匹配当前 `project_id` 的稿件会停在
-`script missing and no agent provider configured`。已有稿件可作为作者稿输入，但无 Agent 时 Research/Director review 会被发布门拒绝；离线稿件只适合开发/预览，不会被当作已审核交付。镜头画面（`src/shots/G*/SC*.jsx` 与 `reference-shot-blueprint.json`）是**按主题 authored** 的创作产物，没有确定性生成器。每镜以 `project_id`、`script_id` 和口播/字幕 SHA-256 绑定到具体输入；换主题或改稿后若镜头源未重做/重新绑定，`build-groups` 与 `materialize-shots` 会在渲染前阻断，而不再静默复用旧镜头。绑定不证明语义或审美合格，仍须检查真实 Pilot 与成片。 每段解说还必须通过 `claim_ids` 绑定调研证据；Research 与 Director review 必须完整覆盖 claims/segments 且 `verdict:"pass"`、`issues:[]`，否则生产阻断。最终 Render IR 时长默认必须落在 `duration_target_s` 的 ±20% 内；可用 `duration_tolerance_ratio`（0–0.5）显式调整。当前被跟踪的示例仍是 40 秒目标与约 339 秒 IR 的不一致样片，新的时长门会拒绝将其作为合格交付。
+`script missing and no agent provider configured`。已有稿件可作为作者稿输入，但无 Agent 时 Research/Director review 会被发布门拒绝；离线稿件只适合开发/预览，不会被当作已审核交付。镜头画面（`src/shots/G*/SC*.jsx` 与 `reference-shot-blueprint.json`）是**按主题 authored** 的创作产物，没有确定性生成器。每镜以 `project_id`、`script_id` 和口播/字幕 SHA-256 绑定到具体输入；换主题或改稿后若镜头源未重做/重新绑定，`build-groups` 与 `materialize-shots` 会在渲染前阻断，而不再静默复用旧镜头。绑定不证明语义或审美合格，仍须检查真实 Pilot 与成片。 每段解说还必须通过 `claim_ids` 绑定调研证据；Research 与 Director review 必须完整覆盖 claims/segments 且 `verdict:"pass"`、`issues:[]`，否则生产阻断。最终成片时长默认必须落在项目 `duration_target_s` 的 ±20% 内，可用 `duration_tolerance_ratio`（0–0.5）按项目覆盖。时长门校验的是**真实 TTS 时间线 / Render IR 时长**，长视频与短视频走同一逻辑；被跟踪的长片样片（44 镜 ≈339.3s）目标已对齐为 `339.3`，不再有写死的 40 秒默认值。
 
 非 auto 模式会在四个人工 checkpoint 停止：
 
