@@ -5,14 +5,15 @@ import {requestApproval} from "../src/runtime/approval.mjs";
 
 const args=process.argv.slice(2);
 if(!args.length||args.includes("--help")){
-  console.log('Usage: npm run skill -- "TOPIC" --source URL [--source URL ...] [--duration 40] [--language en] [--ratio 16:9,9:16] [--auto-approve] [--resume]');
+  console.log('Usage: npm run skill -- "TOPIC" --source URL [--source URL ...] [--duration 40] [--language en] [--ratio 16:9] [--auto-approve] [--resume]');
   process.exit(args.includes("--help")?0:2);
 }
 const topic=args.find(a=>!a.startsWith("--"));
 if(!topic) throw new Error("topic required");
 const values=flag=>{const out=[];for(let i=0;i<args.length;i++)if(args[i]===flag&&args[i+1])out.push(args[++i]);return out};
 const sources=values("--source"),language=values("--language")[0]||"en",duration=Number(values("--duration")[0]||40);
-const ratios=(values("--ratio")[0]||"16:9,9:16").split(",").filter(Boolean);
+const ratios=(values("--ratio")[0]||"16:9").split(",").map(s=>s.trim()).filter(Boolean);
+if(ratios.length!==1||ratios[0]!=="16:9") throw new Error("当前暂时只支持 --ratio 16:9；9:16 渲染已停用");
 const auto=args.includes("--auto-approve")||process.env.AUTO_APPROVE==="1",resume=args.includes("--resume");
 if(!Number.isFinite(duration)||duration<5) throw new Error("invalid duration");
 if(!sources.length&&!resume) throw new Error("--source is required on first run");
@@ -129,7 +130,7 @@ function pipeline(){
   }else requireCheckpoint(projectId,"pilot-preview","artifacts");
 
   run("sh",["scripts/render.sh"],env);
-  for(const ratio of ["16x9","9x16"]){
+  for(const ratio of ["16x9"]){
     run("python3",["scripts/frame_metrics.py","--frames","artifacts/frames/"+ratio,"--render-ir","fixtures/render-ir-"+ratio+".json","--out","artifacts/"+projectId+"/qc/frame_metrics_"+ratio+".json"],env);
     run("python3",["scripts/motion_check.py","--frames","artifacts/frames/"+ratio,"--render-ir","fixtures/render-ir-"+ratio+".json","--report","artifacts/"+projectId+"/qc/motion_"+ratio+".json"],env);
     run("python3",["scripts/visual_regression.py","--frames","artifacts/frames/"+ratio,"--render-ir","fixtures/render-ir-"+ratio+".json","--out","artifacts/"+projectId+"/qc/visual_regression_"+ratio+".json"],env);
