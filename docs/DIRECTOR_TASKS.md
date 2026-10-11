@@ -7,7 +7,7 @@ Execution state records the successful earlier GitHub Actions run for history, b
 | Task ID | Goal | Depends on | Files / outputs | Status | Latest result / blocker |
 |---|---|---|---|---|---|
 | DIRECTOR-AUDIT | Map source data, current branch and existing gates | — | README, package.json, ARCHITECTURE, SKILL, production IR, registry, verify-fast | PARTIAL | Main branch inspected; first CI run exposed the expected untracked runtime timeline boundary |
-| DIRECTOR-CONTRACT | Define STYLE_BIBLE and SHOTBOOK contract | DIRECTOR-AUDIT | docs/DIRECTOR_PLAN.md, docs/STYLE_BIBLE.md, schemas/shotbook.schema.json | PASS-FAST-CI | Contract/schema integration and negative cases pass in GitHub Actions run 47 |
+| DIRECTOR-CONTRACT | Define STYLE_BIBLE and SHOTBOOK contract | DIRECTOR-AUDIT | docs/DIRECTOR_PLAN.md, docs/STYLE_BIBLE.md, schemas/shotbook.schema.json | HISTORICAL-PASS | Contract/schema integration and negative cases passed in GitHub Actions run 47 before this branch disabled workflows |
 | DIRECTOR-PLANNING | Define story/visual decisions and unresolved-field policy | DIRECTOR-CONTRACT | director plan field mapping; IR adapter | PARTIAL | Current adapter derives fields from IR and labels unknown authorial decisions unresolved; no live Director Agent prompt change yet |
 | DIRECTOR-INTEGRATION | Connect SHOTBOOK to production identities | DIRECTOR-CONTRACT, DIRECTOR-AUDIT | scripts/preflight/validate-director.mjs | PARTIAL | Source-only CI mode passes; production-release mode still needs a real generated timeline and runtime acceptance |
 | PREFLIGHT-STATIC | Validate IDs, mapping, time, required data and structured findings | DIRECTOR-INTEGRATION | scripts/preflight/validate-director.mjs | IMPLEMENTED-TEST-PENDING | Source-only CI mode added after first run correctly exposed missing runtime timeline; second fast CI run is pending |
@@ -31,4 +31,4 @@ Execution state records the successful earlier GitHub Actions run for history, b
 - GitHub Actions workflow files `.github/workflows/verify-fast.yml` and `.github/workflows/verify.yml` are removed from this feature branch.
 - Active output ratio: `16:9` only. Remotion no longer registers `ReelForge9x16`; render, QC, repair, production verification and delivery require only 16:9 artifacts.
 - `fixtures/render-ir-9x16.json` and portrait-oriented design tests are retained as dormant assets. They do not imply that a 9:16 video is currently produced or quality-approved.
-- No fresh local test run has been performed through this GitHub file interface; prior GitHub Actions result is historical and will not rerun while workflow definitions are absent.
+- A local static regression test `npm run verify:render-mode` now guards the ratio switch and workflow removal, and is included in `npm run verify:fast`; it has not yet been run in a checkout. Prior GitHub Actions result is historical and will not rerun while workflow definitions are absent.
