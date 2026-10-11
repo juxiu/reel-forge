@@ -91,7 +91,8 @@
     "verify:shotcraft": "node scripts/verify-shotcraft.mjs",
     "storyboard:gen": "node scripts/storyboard-gen.mjs",
     "verify:director-preflight": "node scripts/preflight/validate-director.mjs",
-    "verify:director-contract": "node scripts/verify-director-contract.mjs"
+    "verify:director-contract": "node scripts/verify-director-contract.mjs",
+    "verify:director-preflight:static": "node scripts/preflight/validate-director.mjs --static-only"
   },
   "dependencies": {
     "@remotion/cli": "4.0.534",
