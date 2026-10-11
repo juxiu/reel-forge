@@ -88,10 +88,8 @@ npm run skill -- \\
 ~~~
 
 ⚠ 全新主题的解说稿由 agent 生成：这一链在 Research 之后会调 `createAgentProvider()`，
-没有配置 `AGENT_COMMAND`（外部 Agent 服务）时会停在
-`script missing and no agent provider configured`。要离线跑通，请先把属于该项目的
-`fixtures/script.json`（`project_id` 必须与 `fixtures/project.json` 一致）放在盘上，
-链会把它当作者稿直接消费。镜头画面（`src/shots/G*/SC*.jsx` 与 `reference-shot-blueprint.json`）是**按主题 authored** 的创作产物，没有确定性生成器。每镜以 `project_id`、`script_id` 和口播/字幕 SHA-256 绑定到具体输入；换主题或改稿后若镜头源未重做/重新绑定，`build-groups` 与 `materialize-shots` 会在渲染前阻断，而不再静默复用旧镜头。绑定不证明语义或审美合格，仍须检查真实 Pilot 与成片。 每段解说还必须通过 `claim_ids` 绑定调研证据；Research 与 Director review 必须完整覆盖 claims/segments 且 `verdict:"pass"`、`issues:[]`，否则生产阻断。最终 Render IR 时长默认必须落在 `duration_target_s` 的 ±20% 内；可用 `duration_tolerance_ratio`（0–0.5）显式调整。当前被跟踪的示例仍是 40 秒目标与约 339 秒 IR 的不一致样片，新的时长门会拒绝将其作为合格交付。
+没有配置 `AGENT_COMMAND`（外部 Agent 服务）时，若缺少匹配当前 `project_id` 的稿件会停在
+`script missing and no agent provider configured`。已有稿件可作为作者稿输入，但无 Agent 时 Research/Director review 会被发布门拒绝；离线稿件只适合开发/预览，不会被当作已审核交付。镜头画面（`src/shots/G*/SC*.jsx` 与 `reference-shot-blueprint.json`）是**按主题 authored** 的创作产物，没有确定性生成器。每镜以 `project_id`、`script_id` 和口播/字幕 SHA-256 绑定到具体输入；换主题或改稿后若镜头源未重做/重新绑定，`build-groups` 与 `materialize-shots` 会在渲染前阻断，而不再静默复用旧镜头。绑定不证明语义或审美合格，仍须检查真实 Pilot 与成片。 每段解说还必须通过 `claim_ids` 绑定调研证据；Research 与 Director review 必须完整覆盖 claims/segments 且 `verdict:"pass"`、`issues:[]`，否则生产阻断。最终 Render IR 时长默认必须落在 `duration_target_s` 的 ±20% 内；可用 `duration_tolerance_ratio`（0–0.5）显式调整。当前被跟踪的示例仍是 40 秒目标与约 339 秒 IR 的不一致样片，新的时长门会拒绝将其作为合格交付。
 
 非 auto 模式会在四个人工 checkpoint 停止：
 
@@ -231,7 +229,7 @@ Production PASS
 - [docs/knowledge/motion-vocabulary.md](docs/knowledge/motion-vocabulary.md) — **时间与动效**的真源：帧号口径、帧数预算、缓动、节拍窗口、运镜词表、效果开关与配额、修复路由、死表清单
 - [docs/knowledge/style-guide.md](docs/knowledge/style-guide.md) — **画风常量**的真源：调色板与每个色值的读取状态、字号阶梯、字体角色、画面文案准入与禁令
 - [docs/knowledge/narration-and-storyboard.md](docs/knowledge/narration-and-storyboard.md) — **解说词与分镜表**的真源：句法与停顿帧数、写作预算的执行状态、分镜令牌与表格格式、`selfcheck` 判据、句:镜 1:1 冲突
-- [docs/knowledge/agent-protocol.md](docs/knowledge/agent-protocol.md) — **agent 层**的真源：provider 形态与四个 `AGENT_*` 开关、三态信封、四个角色的输入输出、`only_paths` 的实际效力、a2e QC 维度对照
+- [docs/knowledge/agent-protocol.md](docs/knowledge/agent-protocol.md) — **agent 层**的真源：provider 形态与 `AGENT_*` 开关、三态信封、五个角色的输入输出、`only_paths` 的实际效力、a2e QC 维度对照
 - [docs/knowledge/research-brief.md](docs/knowledge/research-brief.md) — **事实层**的真源：本仓库的"调研"实际是什么、claims 的自证性质、画面文字出处门 A1/A2/B/C 判到哪、判不到哪
 - [docs/knowledge/lessons.md](docs/knowledge/lessons.md) — **上游教训对照**的真源：a2e 五部片 125 条返工逐条归属（六态口径）、本仓库独有的三类破口（死掉的修法 / 注释即执行者 / 半个修法）、结构上不可能犯的那一类
 - [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) — 实现计划与 Scoped Repair（与代码同源，由 `npm run verify:plan` 双向校验）
