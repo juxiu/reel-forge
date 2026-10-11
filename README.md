@@ -73,7 +73,7 @@ npm run verify:fast
 ~~~bash
 npm run tts            # 配音 + 帧级时间轴（需完整版 FFmpeg）
 npm run sync-script    # 按 timeline 重写 script.json 与 captions.json
-npm run materialize-ir # 按 script + timeline 重算 render-ir-*.json
+npm run materialize-ir # 按 script + timeline 重算活动的 render-ir-16x9.json
 ~~~
 
 ⚠ <code>sync-script</code> 不能省：<code>tts</code> 写出的 <code>captions.json</code> 是按词流**自动分组**的（会跨句界），只有 <code>sync-script</code> 把它按 <code>timeline.sentences[].subs</code> 重写成句内对齐的字幕块 —— 少了这步 <code>verify:timeline-source</code> 会红（报「字幕块不落在任何句子区间内」）。
