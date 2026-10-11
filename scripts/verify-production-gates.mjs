@@ -56,7 +56,7 @@ const fast = fs.readFileSync("scripts/verify-fast.mjs","utf8");
 const render = fs.readFileSync("scripts/render.sh","utf8");
 assert.match(pipeline,/validateScriptEvidence/);
 assert.match(runner,/evaluateProductionReviews/);
-assert.match(runner,/agent-review-gate\.json/);
+assert.match(runner,/\["agent-review-gate",reviewGate\]/);
 assert.match(render,/verify-duration-target\.mjs/);
 assert.match(fast,/"verify:production-gates"/);
 
