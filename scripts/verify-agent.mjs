@@ -161,10 +161,11 @@ const AGENT_OUTPUT_WRITERS = ["scripts/qc.mjs", "scripts/build-groups.mjs", "scr
 const shapeAware = fs.readFileSync("scripts/verify-contracts.mjs", "utf8");
 check("verify-contracts 只是按契约校验 agent 信封的形状（each:agent_reviews）", /each:\s*"agent_reviews"/.test(shapeAware));
 const SHAPE_AWARE = ["scripts/verify-contracts.mjs"];
+const TEST_SOURCES = ["scripts/verify-production-gates.mjs"];
 const sources = fs.readdirSync("scripts").filter((f) => /\.mjs$/.test(f)).map((f) => ["scripts/" + f, fs.readFileSync(path.join("scripts", f), "utf8")]);
 const consumers = [];
 for (const [file, src] of sources) {
-  if (AGENT_OUTPUT_WRITERS.includes(file) || SHAPE_AWARE.includes(file)) continue;
+  if (AGENT_OUTPUT_WRITERS.includes(file) || SHAPE_AWARE.includes(file) || TEST_SOURCES.includes(file)) continue;
   if (/agent_reviews|agent_status|agent-reviews|\.agent\b/.test(src)) consumers.push(file);
 }
 check("Research/Director 评审由唯一生产门消费", consumers.length === 1 && consumers[0] === "scripts/run-production.mjs", consumers.join(","));
