@@ -18,9 +18,10 @@ const authoredProject = fs.existsSync(authoredProjectFile)
 // Otherwise route to IR-driven fallback wrappers instead of silently importing a previous topic.
 const authoredPackMatches = Boolean(
   authoredProject &&
-  authoredProject.project_id === project.project_id &&
   authoredProject.request === project.request &&
-  JSON.stringify(authoredProject.source_urls || []) === JSON.stringify(project.source_urls || [])
+  JSON.stringify(authoredProject.source_urls || []) === JSON.stringify(project.source_urls || []) &&
+  (!authoredProject.language || authoredProject.language === project.language) &&
+  (!authoredProject.target_ratios || JSON.stringify(authoredProject.target_ratios) === JSON.stringify(project.target_ratios || []))
 );
 function explicitlyTaggedForProject(file) {
   if (!fs.existsSync(file)) return false;
