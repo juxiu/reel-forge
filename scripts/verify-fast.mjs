@@ -60,6 +60,8 @@ const checks = [
   // 或把取值函数换成常量就变红。它守着的是下面两道蓝图门的前提，所以必须在蓝图门之前跑。
   "verify:limits",
   "verify:reference-sample",
+  // Prevent a new IR from silently reusing topic-specific JSX authored for a different narration.
+  "verify:shot-source",
   // authored 合规此前只在 PR 上兜（verify-fast.yml 单独跑它，一键链和本地 fast 都不碰），
   // 于是「新增一镜不进蓝图就完全不过门」这件事在本地永远看不见。它只读 44 个 .jsx 文本，秒级。
   "verify:authored-shots",

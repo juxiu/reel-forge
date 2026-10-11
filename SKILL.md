@@ -7,7 +7,7 @@ description: 将任意知识或技术主题生产为原创代码动画讲解视�
 
 ## 目标
 
-> **临时运行模式**：当前仅注册、渲染、QC 与交付 16:9；9:16 渲染已停用。`fixtures/render-ir-9x16.json` 保留为休眠源文件，不作为当前生产放行条件。GitHub Actions CI 工作流已移除，本地仍可手动执行 `npm run verify:fast`。
+> **临时运行模式**：当前仅注册、渲染、QC 与交付 16:9；9:16 渲染已停用。`fixtures/render-ir-9x16.json` 保留为休眠源文件，不作为当前生产放行条件。GitHub Actions 已恢复 pull request/main 的 `npm run verify:fast` 检查；本地仍可手动执行同一门禁。
 
 按样片级生产流程生成原创 MG 讲解视频。参考 anything2explainer 的生产方法，但不复制其源码、镜头或样片内容。
 
@@ -44,7 +44,7 @@ description: 将任意知识或技术主题生产为原创代码动画讲解视�
 - ⚠ 与 `SemanticShots.jsx` 的 `Rail` 不是一回事：那个是**镜头内**的装饰轨；本节的 `Primitives.Rail` 是**片级**流程轨。
 
 ### Build Agent
-G1…Gn 为独立构建角色，Agent provider 配置后每组分别收到 Build Agent task；任务明确只修改 `src/shots/Gn/**`，并要求每镜至少 6 张 still（高光镜头 ≥10 张）+ 30 帧测渲。未配置 Agent 时使用 deterministic builder，但产物必须明确标注 agent_mode=deterministic。
+G1…Gn 为独立构建角色，Agent provider 配置后每组分别收到 Build Agent task；任务明确只修改 `src/shots/Gn/**`，并要求每镜至少 6 张 still（高光镜头 ≥10 张）+ 30 帧测渲。未配置 Agent 时只允许显式复用已绑定到同一 project_id + script SHA-256 的 authored source，manifest 必须标记 reused 而非 built；新主题/改稿造成身份不匹配时直接阻断。不存在确定性的任意主题镜头生成器。
 
 ### TTS
 支持 edge、kokoro、piper、kokoro_onnx 与用户 wav 能力；实际 production gate 仍以 tts-word-boundary 为唯一生产时间轴口径。无词边界引擎必须通过逐块/逐词适配层提供真实块边界，禁止伪装为 external ASR。

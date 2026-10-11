@@ -1,9 +1,20 @@
 import fs from "node:fs";
 import path from "node:path";
 import {maxShotsPerGroup} from "../src/build/limits.mjs";
+import {checkShotSourceIdentity,sourceIdentityForScene} from "../src/shots/source-identity.mjs";
 
 const ir = JSON.parse(fs.readFileSync("fixtures/render-ir-16x9.json", "utf8"));
+const project = JSON.parse(fs.readFileSync(process.env.PROJECT_FILE || "fixtures/project.json", "utf8"));
+const script = JSON.parse(fs.readFileSync("fixtures/script.json", "utf8"));
 const maxPerGroup = maxShotsPerGroup();
+if (ir.project_id !== project.project_id || script.project_id !== project.project_id) throw new Error("shot materialization blocked: project/script/IR identity mismatch");
+for (let index=0; index<ir.scenes.length; index++) {
+  const scene=ir.scenes[index],groupId="G"+String(Math.floor(index/maxPerGroup)+1),shotId="SC"+String(index+1).padStart(2,"0");
+  const file=path.join("src/shots",groupId,shotId+".jsx");
+  if (!fs.existsSync(file)) throw new Error("shot materialization blocked: missing authored source "+file+"; generic shells are not production shots");
+  const expected=sourceIdentityForScene(project,script,scene),checked=checkShotSourceIdentity(fs.readFileSync(file,"utf8"),expected);
+  if(!checked.ok) throw new Error("shot materialization blocked: stale/foreign source "+file+" ("+checked.reason+"); expected "+JSON.stringify(expected));
+}
 // 正整数校验原来在 :6（本地写的一份），现在由 limits.mjs 的 maxShotsPerGroup() 统一抛。
 
 const root = "src/shots";
@@ -23,19 +34,7 @@ for (let i = 0; i < ir.scenes.length; i += maxPerGroup) {
     const shotId = "SC" + String(i + j + 1).padStart(2, "0");
     const shotFile = path.join(dir, shotId + ".jsx");
 
-    if (!fs.existsSync(shotFile)) {
-      fs.writeFileSync(
-        shotFile,
-        [
-          'import React from "react";',
-          'import {ExplainerShot} from "../Shot.jsx";',
-          'export const SHOT_RECIPE = { shot_id: "' + shotId + '", variant: "' + (scene.variant || "generic") + '", settle_frames: 30 };',
-          'export function ' + shotId + '({scene}) { return <ExplainerShot scene={scene} recipe={SHOT_RECIPE} />; }',
-          "",
-        ].join("\n"),
-      );
-    }
-
+    if (!fs.existsSync(shotFile)) throw new Error("authored shot source disappeared during materialization: " + shotFile);
     imports.push('import {' + shotId + '} from "./' + shotId + '.jsx";');
     exports.push('export {' + shotId + '} from "./' + shotId + '.jsx";');
     entries.push('  "' + scene.id + '": ' + shotId + ',');

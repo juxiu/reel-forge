@@ -1,6 +1,6 @@
 # Director Plan Contract
 
-Status: **v1 adapter contract**. Temporary production mode uses `fixtures/render-ir-16x9.json` as the only active rendering source; `fixtures/render-ir-9x16.json` is retained but dormant. `script/timeline.json` remains the timing authority. GitHub Actions CI workflows are temporarily removed; validation commands remain available for local execution. This document does not declare the authored decisions below to be AI-reviewed: deterministic values are explicitly labeled as source-derived.
+Status: **v1 adapter contract**. Temporary production mode uses `fixtures/render-ir-16x9.json` as the only active rendering source; `fixtures/render-ir-9x16.json` is retained but dormant. `script/timeline.json` remains the timing authority. The audit-fix branch restores GitHub Actions fast verification on pull requests and main pushes; validation commands also remain available for local execution. This document does not declare the authored decisions below to be AI-reviewed: deterministic values are explicitly labeled as source-derived.
 
 ## Narrative freeze
 

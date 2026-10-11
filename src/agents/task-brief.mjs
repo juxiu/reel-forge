@@ -31,6 +31,7 @@ export const ROLE_RULES = {
   "build-agent": [
     {rule: `只修改 src/shots/<你那一组>/**。其余路径（index.jsx、registry.jsx、视觉常量）由脚本重写，你改了也不会留下。`, executor: "scripts/materialize-shots.mjs:26,43-47,82-86（写盘顺序才是真保护，only_paths 只是任务书里的一句话）"},
     {rule: "每个镜头源文件必须导出 SHOT_RECIPE，且 shot_id / variant / hero_size / camera / settle_frames 与 fixtures/reference-shot-blueprint.json 一致。", executor: "npm run verify:authored-shots（scripts/verify-authored-shots.mjs）"},
+    {rule: "每一镜都必须针对 input.shots[].source_identity 指向的当前 narration 重新决策；在对应 SCnn.jsx 顶部写入 reel-forge-source JSON 标记，并原样使用输入中的 source_identity。不得只改标记而保留与旁白不匹配的画面；缺失或哈希不匹配会阻断渲染。", executor: "scripts/build-groups.mjs 与 npm run verify:shot-source"},
     {rule: `hero_size ≥ 170、settle_frames ≥ 相机最短让位帧、variant 必须是渲染层 switch 认识的语义变体（不许退回 generic）。`, executor: "同上 + npm run verify:shots"},
     {rule: `每镜 still 采样点 ≥${STILL_FRAMES_PER_SCENE}；画面确实是高光（扫光 / 白闪 / glitch 三段）的镜头把 SHOT_RECIPE.highlight 设为 true，那样下限是 ≥${STILL_FRAMES_HIGHLIGHT_MIN}。没有上限。`, executor: "src/build/limits.mjs:27,38 + npm run verify:still-benchmark（判下限，不判恰好）"},
     {rule: `每组最多 ${DEFAULT_MAX_SHOTS_PER_GROUP} 镜由分组公式定，不要自己重排镜头编号；组目录名必须等于 groupIdOf(镜头号)。`, executor: "src/build/limits.mjs:44,59 + npm run verify:limits C 段"},

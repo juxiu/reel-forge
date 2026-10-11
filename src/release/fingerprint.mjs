@@ -54,6 +54,17 @@ const sha = (text) => crypto.createHash("sha256").update(text).digest("hex");
 export function releaseFingerprint() {
   const inputs = {};
 
+  // Project configuration, research/script and generated timing/audio can change the release without changing the visible narration text.
+  for (const f of ["fixtures/project.json", "fixtures/script.json", "script/timeline.json", "public/audio.wav"]) {
+    if (fs.existsSync(f)) inputs[f] = sha(fs.readFileSync(f));
+  }
+  try {
+    const project = JSON.parse(fs.readFileSync("fixtures/project.json", "utf8"));
+    for (const f of ["artifacts/" + project.project_id + "/research.json", "artifacts/" + project.project_id + "/script.json"]) {
+      if (fs.existsSync(f)) inputs[f] = sha(fs.readFileSync(f));
+    }
+  } catch {}
+
   // 1) 当前启用的 16:9 IR；9:16 暂停渲染，不作为当前发布指纹输入。
   for (const f of ["fixtures/render-ir-16x9.json"]) {
     if (fs.existsSync(f)) inputs[f] = sha(irEssence(f));
