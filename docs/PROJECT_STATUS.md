@@ -6,7 +6,7 @@
 
 ## 总体状态
 
-**状态：16:9 生产链已实测端到端 PASS（2026-10-11 终验）：全量重渲 10179 帧 ×2 → 六项测量（motion_16x9 blocking 0 / 44 镜）→ QC → repair(not-needed) → deliver(v0.3, 29 文件, 含 render_hashes 打包对账) → `verify:production` PASS（`ACCEPT_RATIOS=16x9`）。`verify:fast` 36/36 PASS。当前主要差距（均在验收范围外或已声明边界）：9:16 画面质量（motion 18 条 blocking，按用户决策出界）、authored 镜头无生成器（换主题必须重做镜头）、净室 SKILL COMPLETE 未达成、画面审美依赖人工复核。详见 [ACCEPTANCE_REPORT](ACCEPTANCE_REPORT.md)（实测 PASS 版）。**
+**状态：此前的 2026-10-11 终验记录属于历史代码版本，不能当作本分支最新代码的验证结果。当前分支临时只启用 16:9；9:16 Composition 已移除，Render/QC/Repair/Delivery 均只处理 16:9。由于 GitHub Actions 工作流已移除，本分支的最新修改尚未完成新一轮运行时测试。`npm run verify:fast` 仍是可手动执行的本地检查入口。此前测得的 9:16 画面质量问题与历史产物继续保留在下方记录，仅作历史背景。**
 
 ## 终验轮（2026-10-11）做的事
 
