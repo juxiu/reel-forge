@@ -72,6 +72,8 @@
     "verify:shot-score": "node scripts/verify-shot-score.mjs",
     "verify:semantic-director": "node scripts/verify-semantic-director.mjs",
     "verify:production": "node scripts/verify-production.mjs",
+    "verify:production-gates": "node scripts/verify-production-gates.mjs",
+    "verify:duration-target": "node scripts/verify-duration-target.mjs",
     "verify:env": "node scripts/verify-env.mjs",
     "verify:measure": "node scripts/verify-measure.mjs",
     "verify:measure:quick": "node scripts/verify-measure.mjs --quick",
