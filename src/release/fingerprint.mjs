@@ -14,7 +14,7 @@ import crypto from "node:crypto";
  *
  * 这和本仓库反复记过的「假开关」是同一类：门在查「东西存不存在」，没在查「东西对不对」。
  *
- * 指纹覆盖「决定画面的那几样」：双比例 IR（只取与画面有关的字段）、镜头源（44 个 SC*.jsx +
+ * 指纹覆盖「决定画面的那几样」：当前启用的 16:9 IR（只取与画面有关的字段）、镜头源（44 个 SC*.jsx +
  * 组私有 stage.jsx + 共用 stage-kit.jsx/plan.mjs/registry 等）、通用渲染层（src/remotion）、
  * 视觉真源（src/visual）、解说词、字幕块、画面字面量白名单。**不覆盖** artifacts/ 自身（否则自我循环）。
  *
@@ -54,8 +54,8 @@ const sha = (text) => crypto.createHash("sha256").update(text).digest("hex");
 export function releaseFingerprint() {
   const inputs = {};
 
-  // 1) 双比例 IR 的画面相关字段
-  for (const f of ["fixtures/render-ir-16x9.json", "fixtures/render-ir-9x16.json"]) {
+  // 1) 当前启用的 16:9 IR；9:16 暂停渲染，不作为当前发布指纹输入。
+  for (const f of ["fixtures/render-ir-16x9.json"]) {
     if (fs.existsSync(f)) inputs[f] = sha(irEssence(f));
   }
 
