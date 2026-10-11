@@ -1,26 +1,143 @@
 {
   "project_id": "digest-explainer",
   "rails": [
-    {"steps": ["角色", "摘要构成", "三步认证"], "switchS": ["S01", "S04", "S07"], "fromS": "S01", "toS": "S12"},
-    {"steps": ["算法三档", "规范化", "顺序取法"], "switchS": ["S13", "S20", "S23"], "fromS": "S13", "toS": "S24"},
-    {"steps": ["重放窗口", "时钟", "代理链路"], "switchS": ["S25", "S28", "S31"], "fromS": "S25", "toS": "S36"},
-    {"steps": ["改动三处", "代价", "场景判断"], "switchS": ["S37", "S38", "S43"], "fromS": "S37", "toS": "S44"}
+    {
+      "steps": [
+        "角色",
+        "摘要构成",
+        "三步认证"
+      ],
+      "switchS": [
+        "S01",
+        "S04",
+        "S07"
+      ],
+      "fromS": "S01",
+      "toS": "S12"
+    },
+    {
+      "steps": [
+        "算法三档",
+        "规范化",
+        "顺序取法"
+      ],
+      "switchS": [
+        "S13",
+        "S20",
+        "S23"
+      ],
+      "fromS": "S13",
+      "toS": "S24"
+    },
+    {
+      "steps": [
+        "重放窗口",
+        "时钟",
+        "代理链路"
+      ],
+      "switchS": [
+        "S25",
+        "S28",
+        "S31"
+      ],
+      "fromS": "S25",
+      "toS": "S36"
+    },
+    {
+      "steps": [
+        "改动三处",
+        "代价",
+        "场景判断"
+      ],
+      "switchS": [
+        "S37",
+        "S38",
+        "S43"
+      ],
+      "fromS": "S37",
+      "toS": "S44"
+    }
   ],
   "hud": [
-    {"fromS": "S01", "toS": "S03", "text": "角色", "tech": "Roles"},
-    {"fromS": "S04", "toS": "S06", "text": "摘要构成", "tech": "Digest"},
-    {"fromS": "S07", "toS": "S11", "text": "三步认证", "tech": "Auth"},
-    {"fromS": "S13", "toS": "S19", "text": "算法三档", "tech": "Algorithms"},
-    {"fromS": "S20", "toS": "S22", "text": "规范化", "tech": "Canonical"},
-    {"fromS": "S23", "toS": "S24", "text": "顺序取法", "tech": "Ordering"},
-    {"fromS": "S25", "toS": "S27", "text": "重放窗口", "tech": "Replay"},
-    {"fromS": "S28", "toS": "S30", "text": "时钟", "tech": "Clock"},
-    {"fromS": "S31", "toS": "S36", "text": "代理链路", "tech": "Proxies"},
-    {"fromS": "S37", "toS": "S37", "text": "改动三处", "tech": "Changes"},
-    {"fromS": "S38", "toS": "S42", "text": "代价", "tech": "Costs"},
-    {"fromS": "S43", "toS": "S44", "text": "场景判断", "tech": "Choice"}
+    {
+      "fromS": "S01",
+      "toS": "S03",
+      "text": "角色",
+      "tech": "Roles"
+    },
+    {
+      "fromS": "S04",
+      "toS": "S06",
+      "text": "摘要构成",
+      "tech": "Digest"
+    },
+    {
+      "fromS": "S07",
+      "toS": "S11",
+      "text": "三步认证",
+      "tech": "Auth"
+    },
+    {
+      "fromS": "S13",
+      "toS": "S19",
+      "text": "算法三档",
+      "tech": "Algorithms"
+    },
+    {
+      "fromS": "S20",
+      "toS": "S22",
+      "text": "规范化",
+      "tech": "Canonical"
+    },
+    {
+      "fromS": "S23",
+      "toS": "S24",
+      "text": "顺序取法",
+      "tech": "Ordering"
+    },
+    {
+      "fromS": "S25",
+      "toS": "S27",
+      "text": "重放窗口",
+      "tech": "Replay"
+    },
+    {
+      "fromS": "S28",
+      "toS": "S30",
+      "text": "时钟",
+      "tech": "Clock"
+    },
+    {
+      "fromS": "S31",
+      "toS": "S36",
+      "text": "代理链路",
+      "tech": "Proxies"
+    },
+    {
+      "fromS": "S37",
+      "toS": "S37",
+      "text": "改动三处",
+      "tech": "Changes"
+    },
+    {
+      "fromS": "S38",
+      "toS": "S42",
+      "text": "代价",
+      "tech": "Costs"
+    },
+    {
+      "fromS": "S43",
+      "toS": "S44",
+      "text": "场景判断",
+      "tech": "Choice"
+    }
   ],
-  "chapterTech": ["Digest Handshake", "Algorithm & Fields", "Replay & Proxies", "Adoption & Trade-offs"],
+  "chapterTech": [
+    "Digest Handshake",
+    "Algorithm & Fields",
+    "Replay & Proxies",
+    "Adoption & Trade-offs"
+  ],
   "title": {
     "big": "DIGEST",
     "rest": "摘要握手",
@@ -36,8 +153,7 @@
   "request": "Explain how HTTP Digest Fields protect message integrity.",
   "language": "zh",
   "target_ratios": [
-    "16:9",
-    "9:16"
+    "16:9"
   ],
   "source_urls": [
     "https://www.rfc-editor.org/rfc/rfc9530.html"
