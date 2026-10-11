@@ -47,3 +47,25 @@ The adapter must report unresolved fields instead of fabricating director decisi
 - **PASS**: only the checks listed in the report passed; it is not a global production approval.
 
 Run `npm run verify:director-preflight`. The report is written under `artifacts/<project_id>/preflight/director-report.json`; no complete video render is performed.
+
+## High-risk review evidence
+
+The preflight report includes `sourceFingerprint`, a SHA-256 over the active 16:9 IR, 9:16 IR, script, timeline and shot registry. A high-risk shot is not cleared by a verbal claim or by an old report. After producing evidence with the existing single-shot preview/debug workflow, an independent reviewer must write `artifacts/<project_id>/preflight/visual-review.json` in this shape:
+
+```json
+{
+  "status": "approved",
+  "sourceFingerprint": "<exact sourceFingerprint from the latest director-report.json>",
+  "reviewedShots": [
+    {
+      "shotId": "scene-001",
+      "status": "approved",
+      "evidence": "artifacts/debug/16x9/scene-001/contact-sheet.png",
+      "reviewer": "independent-director-agent",
+      "findings": []
+    }
+  ]
+}
+```
+
+The evidence path must point to an actual artifact and the reviewer must not be the implementation agent. This initial adapter validates the review record and fingerprint, but it does not yet generate previews automatically or verify the visual contents of the referenced image; acceptance remains incomplete until that workflow is automated and independently tested.
