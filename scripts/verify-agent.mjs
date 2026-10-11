@@ -167,7 +167,7 @@ for (const [file, src] of sources) {
   if (AGENT_OUTPUT_WRITERS.includes(file) || SHAPE_AWARE.includes(file)) continue;
   if (/agent_reviews|agent_status|agent-reviews|\.agent\b/.test(src)) consumers.push(file);
 }
-check("agent 输出没有任何下游消费者（本文 §2 的一句话结论）", consumers.length === 0, consumers.join(","));
+check("Research/Director 评审由唯一生产门消费", consumers.length === 1 && consumers[0] === "scripts/run-production.mjs", consumers.join(","));
 
 const qcSrc = fs.readFileSync("scripts/qc.mjs", "utf8");
 check("qc 的 PASS/FAIL 只由 issues.length 决定，不含 agent 结果", /status:issues\.length\?"FAIL":"PASS"/.test(qcSrc) && !/status:[^n]*reviews/.test(qcSrc));
