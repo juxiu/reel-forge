@@ -30,6 +30,7 @@ const checks = [
   // agent 层此前完全无测：三态信封、契约里那条「skipped 不许带结论」、超时会不会真断，
   // 都只能靠读代码相信。它跑的是本地临时脚本当真 provider，不联网、不渲染。
   "verify:agent",
+  "verify:production-gates",
   "verify:approval",
   "verify:build",
   "verify:scheduler",
