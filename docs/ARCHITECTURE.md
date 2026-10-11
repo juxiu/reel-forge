@@ -57,7 +57,7 @@ fixtures/project.json            ← 作者源（含 hud / credit / chapterTech 
         │              fixtures/script.json   ← segments（句/段，1:1 于镜头）
         │                    │  materialize-ir.mjs（buildBeatGraph + beatToScene + toRenderIR）
         │                    ▼
-        │              fixtures/render-ir-16x9.json / render-ir-9x16.json
+        │              fixtures/render-ir-16x9.json（活动）；旧 render-ir-9x16.json 仅保留作休眠 fixture
         │                    │  每 scene 声明 variant / topology / composition / light / motion
         │                    ▼
         │              src/shots/registry.jsx ← scene-001…scene-044 → SCxx.jsx
@@ -91,7 +91,7 @@ fixtures/project.json            ← 作者源（含 hud / credit / chapterTech 
 | `artifacts/<pid>/research.json` / `research.md` | `run-production.mjs` / `research-md.mjs` | 溯源门、QC、交付 |
 | `script/timeline.json` | `tts_build.mjs` | `sync-script`、`materialize-ir`、`verify-timeline*`、Root 装配 |
 | `fixtures/script.json` | `sync-script.mjs` | `materialize-ir`、beat graph、语义导演 |
-| `fixtures/render-ir-*.json` | `materialize-ir.mjs` | 渲染层、`plan-audit`、`verify-*` |
+| `fixtures/render-ir-16x9.json` | `materialize-ir.mjs` | 当前渲染层、`plan-audit`、`verify-*` |
 | `artifacts/<pid>/beats.json` / `scenes.json` | `materialize-ir.mjs` | QC、分镜生成、审计 |
 | `artifacts/<pid>/qc/plan_audit.json` | `plan-audit.mjs` | `qc.mjs`（缺失即阻断） |
 | `artifacts/<pid>/qc/{frame_metrics,motion,visual_regression,text_provenance}_*.json` | python 测量层 | `qc.mjs`、`verify-production` |
