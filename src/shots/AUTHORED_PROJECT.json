@@ -1,0 +1,8 @@
+{
+  "project_id": "digest-explainer",
+  "request": "Explain how HTTP Digest Fields protect message integrity.",
+  "source_urls": [
+    "https://www.rfc-editor.org/rfc/rfc9530.html"
+  ],
+  "note": "The checked-in src/shots/G*/SC*.jsx and group stage modules are curated for this exact sample only."
+}
