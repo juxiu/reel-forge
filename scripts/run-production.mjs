@@ -5,6 +5,7 @@ import {runNamedAgents} from "../src/agents/orchestrator.mjs";
 import {FileLock} from "../src/runtime/lock.mjs";
 import {initCheckpoints} from "../src/runtime/checkpoints.mjs";
 import {buildResearchMarkdown} from "../src/research/research-md.mjs";
+import {evaluateProductionReviews} from "../src/release/content-gates.mjs";
 
 const project=JSON.parse(fs.readFileSync(process.argv[2]||"fixtures/project.json","utf8"));
 const scriptFile=process.argv[3]||"fixtures/script.json";
@@ -30,6 +31,7 @@ try {
     {role:"director-agent",input:{project,research:result.research,script:result.script,beats:result.beats,deliverable:"shot-by-shot visual audit; do not mutate source"}},
   ],{concurrency:2,strict});
   result.agent_reviews=advisor;
+  const reviewGate=evaluateProductionReviews(advisor,result.research,result.script);
 
   const rootDir=root+"/"+project.project_id;
   fs.mkdirSync(rootDir,{recursive:true});
@@ -39,7 +41,11 @@ try {
   for(const [name,value] of [
     ["research",result.research],["script",result.script],["beats",result.beats],
     ["scene",{project_id:project.project_id,scenes:result.scenes}],["render-ir",result.renderIR],
-    ["agent-reviews",advisor],
+    ["agent-reviews",advisor],["agent-review-gate",reviewGate],
   ]) fs.writeFileSync(rootDir+"/"+name+".json",JSON.stringify(value,null,2));
-  console.log("production PASS",result.execution.id,"agents="+advisor.filter(x=>x.status==="completed").length);
+  if(reviewGate.status!=="PASS"){
+    console.error("production review gate FAIL",JSON.stringify(reviewGate));
+    throw new Error("production review gate FAIL: "+reviewGate.errors.join(" | "));
+  }
+  console.log("production PASS",result.execution.id,"agents="+advisor.filter(x=>x.status==="completed").length,"review_gate="+reviewGate.status);
 } finally { lock.release(); }
