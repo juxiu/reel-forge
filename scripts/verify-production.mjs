@@ -7,7 +7,7 @@ import {durationTargetReport} from "../src/release/duration-target.mjs";
 const project = JSON.parse(fs.readFileSync(process.env.PROJECT_FILE || "fixtures/project.json", "utf8"));
 const root = "artifacts/" + project.project_id;
 const required = [
-  "research.json","research.md","script.json","agent-review-gate.json","qc/report.json","qc/report.md",
+  "research.json","research.md","script.json","agent-review-gate.json","duration-target.json","qc/report.json","qc/report.md",
   "qc/frame_metrics_16x9.json",
   "qc/motion_16x9.json",
   "qc/visual_regression_16x9.json","qc/text_provenance.json",
@@ -55,6 +55,14 @@ for (const ratio of ["16x9"]) {
   if (ir.project_id !== project.project_id) throw new Error("production project/IR identity mismatch: " + ir.project_id + " != " + project.project_id);
   const durationGate = durationTargetReport(project, ir.duration);
   if (durationGate.status !== "PASS") throw new Error("production duration target FAIL: " + durationGate.issues.join(" | "));
+  const durationArtifact = JSON.parse(fs.readFileSync(root + "/duration-target.json","utf8"));
+  if (durationArtifact.status !== "PASS"
+    || durationArtifact.project_id !== project.project_id
+    || durationArtifact.target_seconds !== durationGate.target_seconds
+    || durationArtifact.actual_seconds !== durationGate.actual_seconds
+    || durationArtifact.tolerance_ratio !== durationGate.tolerance_ratio) {
+    throw new Error("duration target artifact is stale or does not match the active Render IR");
+  }
   const fps = Number(ir.fps) || 30;
   const want = new Map((ir.scenes || []).map((s) => {
     const from = Math.round(Number(s.start) * fps);
