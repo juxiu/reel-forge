@@ -7,7 +7,7 @@ description: 将任意知识或技术主题生产为原创代码动画讲解视�
 
 ## 目标
 
-> **临时运行模式**：当前仅注册、渲染、QC 与交付 16:9；9:16 渲染已停用。`fixtures/render-ir-9x16.json` 保留为休眠源文件，不作为当前生产放行条件。GitHub Actions CI 工作流已移除，本地仍可手动执行 `npm run verify:fast`。
+> **临时运行模式**：当前仅注册、渲染、QC 与交付 16:9；9:16 渲染已停用。`fixtures/render-ir-9x16.json` 保留为休眠源文件，不作为当前生产放行条件。GitHub Actions 已恢复 pull request/main 的 `npm run verify:fast` 检查；本地仍可手动执行同一门禁。
 
 按样片级生产流程生成原创 MG 讲解视频。参考 anything2explainer 的生产方法，但不复制其源码、镜头或样片内容。
 
