@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import crypto from "node:crypto";
 import {run as spawn} from "../src/runtime/spawn.mjs";
 import {initCheckpoints, readCheckpoints, requireCheckpoint, resolveCheckpoint} from "../src/runtime/checkpoints.mjs";
 import {requestApproval} from "../src/runtime/approval.mjs";
@@ -18,8 +19,15 @@ const auto=args.includes("--auto-approve")||process.env.AUTO_APPROVE==="1",resum
 if(!Number.isFinite(duration)||duration<5) throw new Error("invalid duration");
 if(!sources.length&&!resume) throw new Error("--source is required on first run");
 
-const slug=topic.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,48)||"project";
-const projectId="skill-"+slug;
+const normalizedSlug=topic.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,35);
+const hasNonAscii=/[^\x00-\x7F]/.test(topic);
+const topicHash=crypto.createHash("sha256").update(topic).digest("hex").slice(0,12);
+const slug=hasNonAscii ? (normalizedSlug||"topic")+"-"+topicHash : (normalizedSlug||"project");
+let projectId="skill-"+slug;
+if(resume&&fs.existsSync("fixtures/project.json")){
+  const preserved=JSON.parse(fs.readFileSync("fixtures/project.json","utf8"));
+  if(preserved.request===topic&&typeof preserved.project_id==="string") projectId=preserved.project_id;
+}
 const requestedProject={project_id:projectId,request:topic,language,target_ratios:ratios,source_urls:sources,duration_target_s:duration};
 const backups=[];
 let preserveWorkspace=false;
