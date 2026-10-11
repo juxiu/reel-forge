@@ -15,9 +15,10 @@ assert.deepEqual(schema.$defs.shot.required, required);
 assert.equal(schema.$defs.shot.properties.visualRelationship.enum.length, 13);
 assert.deepEqual(schema.$defs.shot.properties.riskLevel.enum, ["low","medium","high"]);
 assert.equal(pkg.scripts["verify:director-preflight"], "node scripts/preflight/validate-director.mjs");
+assert.equal(pkg.scripts["verify:director-preflight:static"], "node scripts/preflight/validate-director.mjs --static-only");
 assert.equal(pkg.scripts["verify:director-contract"], "node scripts/verify-director-contract.mjs");
 assert.match(fast, /"verify:director-contract"/);
-assert.match(fast, /"verify:director-preflight"/);
+assert.match(fast, /"verify:director-preflight:static"/);
 for (const rule of ["duplicate-shot-id","registry-mapping-missing","script-segment-mapping","invalid-timing","scene-overlap","cross-ratio-scene-identity","high-risk-shot-review"]) {
   assert.ok(validator.includes(rule), `missing production preflight rule: ${rule}`);
 }
