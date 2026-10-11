@@ -19,7 +19,7 @@ assert.equal(pkg.scripts["verify:director-preflight:static"], "node scripts/pref
 assert.equal(pkg.scripts["verify:director-contract"], "node scripts/verify-director-contract.mjs");
 assert.match(fast, /"verify:director-contract"/);
 assert.match(fast, /"verify:director-preflight:static"/);
-for (const rule of ["duplicate-shot-id","registry-mapping-missing","script-segment-mapping","invalid-timing","scene-overlap","cross-ratio-scene-identity","high-risk-shot-review"]) {
+for (const rule of ["duplicate-shot-id","registry-mapping-missing","script-segment-mapping","invalid-timing","scene-overlap","high-risk-shot-review","disabledRatios"]) {
   assert.ok(validator.includes(rule), `missing production preflight rule: ${rule}`);
 }
 
