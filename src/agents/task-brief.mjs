@@ -56,7 +56,7 @@ export const ROLE_RULES = {
 /**
  * 组装某一次调用的任务书。
  * @param role 四个角色之一
- * @param {{deliverable?: string, group?: {id?: string, scene_ids?: string[]}, ratio?: string}} [context]
+ * @param {{deliverable?: string, group?: {id?: string, scene_ids?: string[]}, ratio?: string, projectId?: string|null}} [context]
  * @returns {{role: string, deliverable: string|null, scope: string|null, rules: string[], provenance: string}}
  */
 export function buildTaskBrief(role, context = {}) {
@@ -65,6 +65,9 @@ export function buildTaskBrief(role, context = {}) {
   const scope = role === "build-agent"
     ? (context.group ? `本组：${context.group.id || "?"}，镜头：${(context.group.scene_ids || []).join(", ") || "（未给）"}` : null)
     : context.ratio ? `画幅：${context.ratio}` : null;
+  const projectIdentityRule = role === "build-agent" && context.projectId
+    ? ["当前项目 id 为 " + context.projectId + "。每个新建或修改的 SCxx.jsx 前 8 行必须包含精确标记 `// @reel-forge-project: " + context.projectId + "`。没有该标记的旧主题镜头不会被复用。"]
+    : [];
   const shotcraftRules = role === "build-agent"
     ? (context.videoShotcraftDir
       ? [
@@ -80,7 +83,7 @@ export function buildTaskBrief(role, context = {}) {
     role,
     deliverable: context.deliverable || null,
     scope,
-    rules: [...SHARED_RULES, ...own.map((item) => item.rule), ...shotcraftRules],
+    rules: [...SHARED_RULES, ...own.map((item) => item.rule), ...projectIdentityRule, ...shotcraftRules],
     // 让读的人能回到本仓库核对每条规则的出处，而不是把任务书当无源的口号。
     provenance: "docs/knowledge/agent-protocol.md §0/§2/§4/§5/§6；可选镜头参考库见 docs/integrations/video-shotcraft.md；数字真源 src/build/limits.mjs",
   };
