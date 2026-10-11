@@ -93,7 +93,8 @@
     "verify:director-preflight": "node scripts/preflight/validate-director.mjs",
     "verify:director-contract": "node scripts/verify-director-contract.mjs",
     "verify:director-preflight:static": "node scripts/preflight/validate-director.mjs --static-only",
-    "verify:render-mode": "node scripts/verify-render-mode.mjs"
+    "verify:render-mode": "node scripts/verify-render-mode.mjs",
+    "verify:shot-source": "node scripts/verify-shot-source.mjs"
   },
   "dependencies": {
     "@remotion/cli": "4.0.534",
