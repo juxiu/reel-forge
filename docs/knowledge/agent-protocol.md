@@ -2,7 +2,7 @@
 
 这份文件只管**外部 agent 这一层**：provider 的输入输出形态、信封的三态与 `AGENT_STRICT`、四个角色各自真正拿到什么 payload、payload 里的约束哪几条有执行者哪几条只是礼节、构建组的分组与可改范围、"每镜至少 6 张 still（高光 ≥10）+ 30 帧测渲"是计划还是证明，以及 a2e 的 11 个 QC 维度在本仓库分别由谁接手。每条规则后面跟着它的执行者（代码路径 + 行号，或某道门）；没有执行者的标「⚠ 无执行者」。
 
-一句话结论先给：**在本仓库里，agent 的输出没有任何下游消费者。** 它会被写进 JSON、会被打印一行状态，但不参与任何判定。所有阻断都来自确定性测量层。这是与 a2e（agent 看图判 QC）最大的架构差别，也是本文大部分「⚠」的来源。
+一句话结论先给：**Research/Director 内容评审现由 `scripts/run-production.mjs` 的确定性门消费**：必须完整覆盖所有 claim/解说段、明确给出 `verdict:"pass"` 且 `issues:[]`，跳过、失败、覆盖不全或有未解决 issue 均阻断。此门检查评审信封、覆盖与结论，不会自动证明 Agent 判断为真，也不代替人实际观看/听审；Build/QC 的评审仍不应被误称为人工视觉签字。
 
 分工（一条规则只有一个真源，其余只链接）：
 
@@ -84,7 +84,7 @@
 | 谁真校验 | `npm run verify:contracts` 把 `artifacts/<pid>/qc/report.json` 的 `agent_reviews` 数组逐条按 `agent` 契约校验 | `scripts/verify-contracts.mjs:183` |
 | 校验的时机 | 只在 `qc` 产物存在以后；`stage` 字段写明「信封在 `report.agent_reviews` 里」，产物没生成时打 `skip` 而不是算通过 | `verify-contracts.mjs:183`（+ 表头说明 `:163`） |
 
-⚠ **`run-production` 产出的两个角色（research-agent / director-agent）没有任何门校验。** 它们写到 `artifacts/<pid>/agent-reviews.json`（`scripts/run-production.mjs:38-39`），而这个文件在全仓零读者（grep `agent-reviews` 只有这一处写入）。于是 `agent.schema.json` 只覆盖了四个角色里的两个。
+✅ **`research-agent` / `director-agent` 现有确定性消费门。** `run-production.mjs` 写出 `agent-reviews.json` 与 `agent-review-gate.json`；`src/release/content-gates.mjs` 要求两个 review 都是 completed、verdict 为 pass、issues 为空，并逐项覆盖 research claims 与 script segment IDs。`verify:production` 重新核对 review gate 的内容指纹，防止把旧评审配给新稿。该设计不证明 Agent 的语义判断一定正确，因此实际画面仍需看真实帧和成片。
 
 ✅ 上面这张表里"形状"那一列现在有执行者了：`scripts/verify-agent.mjs`（`npm run verify:agent`，已进 `scripts/verify-fast.mjs:22`）第 2 节用本地临时脚本当真 provider，把三态、两条 strict 路径、`skipped` 不许带结论这三件事**真跑**出来。它做过变异：把 `contracts/agent.schema.json` 的 `then.properties` 放宽成允许 `verdict`，对应断言立刻变红；把 `orchestrator.mjs:28` 的抛错去掉，四条批量断言变红；把 `spawn.mjs` 的 `timedOut = true` 改成 `false`，两条超时断言变红。
 
@@ -94,8 +94,8 @@
 
 | 角色 | 调用点与并发 | 输入 payload | 输出归属 | 输出被谁读 |
 |---|---|---|---|---|
-| `research-agent` | `run-production.mjs:20-23`，`runNamedAgents` concurrency **2**（`:23`） | `{project, research, deliverable:"claim/evidence audit only"}` | `artifacts/<pid>/agent-reviews.json`（`:38-39`） | ⚠ **无人读** |
-| `director-agent` | 同上 | `{project, research, script, beats, deliverable:"shot-by-shot visual audit; do not mutate source"}` | 同上 | ⚠ **无人读** |
+| `research-agent` | `run-production.mjs`，并发评审 | `{project, research, task, deliverable}` | `artifacts/<pid>/agent-reviews.json` 与 `agent-review-gate.json` | `src/release/content-gates.mjs`：verdict、issues、claim 全覆盖；未通过阻断 |
+| `director-agent` | 同上 | `{project, research, script, beats, task, deliverable}` | 同上 | `src/release/content-gates.mjs`：verdict、issues、解说段全覆盖；未通过阻断 |
 | `build-agent` | `build-groups.mjs:24-35`，**每个构建组一次**，并发 `BUILD_CONCURRENCY` 默认 4（`:11`） | `{project, group:{id, scene_ids}, constraints:{only_paths, six_stills_per_shot, test_render_frames, semantic_renderer_required, settle_frames_min}, shots:[{scene_id,from,to,variant}]}`（`:25-34`） | `artifacts/<pid>/build-groups/<Gn>.json` 的 `agent` 字段（`:36,:41`）+ `fixtures/build-groups.json` 的 `agent_status`（`:46`） | ⚠ **无人读**（`src/remotion/index.jsx:6,65` 只读 `groups` 的镜头归属来生成 `<Composition>`，不碰 `agent_status`） |
 | `qc-agent` | `qc.mjs:67-70`，**每个比例一次**（16x9 / 9x16），concurrency 2（`:70`） | `{project, ratio, issues(该比例), warnings(该比例), reports(该比例文件)}` | `artifacts/<pid>/qc/report.json` 的 `agent_reviews`（`qc.mjs:75`）；`report.md` 里只有一行状态（`:98`） | 形状被 `verify:contracts` 校验；**内容无人读**：`report.status = issues.length ? "FAIL" : "PASS"`（`:73`），而 `issues` 早在 agent 之前就算完了（`:15-64`），`if(result.status!=="PASS") process.exit(1)`（`:111`） |
 
