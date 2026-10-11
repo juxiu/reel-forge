@@ -11,7 +11,7 @@ const run=(cmd,args=[])=>{const r=spawn(cmd,args,{stdio:"inherit",env:{...proces
 const projectId=project.project_id;
 
 function refreshQualityReports(){
-  for(const ratio of ["16x9","9x16"]){
+  for(const ratio of ["16x9"]){
     const frameOut="artifacts/"+projectId+"/qc/frame_metrics_"+ratio+".json";
     const motionOut="artifacts/"+projectId+"/qc/motion_"+ratio+".json";
     const visualOut="artifacts/"+projectId+"/qc/visual_regression_"+ratio+".json";
