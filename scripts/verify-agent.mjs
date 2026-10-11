@@ -179,6 +179,7 @@ for (const key of ["only_paths", "six_stills_per_shot", "test_render_frames", "s
 
 // ---- 6) 四个角色的调用点必须还在（角色名改了，文档与 provider 都会对不上） ----
 const roleSites = {
+  "script-agent": "src/director/pipeline.mjs",
   "research-agent": "scripts/run-production.mjs",
   "director-agent": "scripts/run-production.mjs",
   "build-agent": "scripts/build-groups.mjs",
