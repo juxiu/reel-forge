@@ -150,7 +150,8 @@ function writeReport(ir, scenes, stats) {
     findings,
     limitations: ["This report validates source data and deterministic contracts only.", "No pixel geometry, font measurement, animation playback, or complete-video render was performed.", "A PASS here is not a full production PASS."]
   };
+  if (generatedShotbook) fs.writeFileSync(path.join(outDir, "shotbook.json"), JSON.stringify(generatedShotbook, null, 2) + "\n");
   fs.writeFileSync(path.join(outDir, "director-report.json"), JSON.stringify(report, null, 2) + "\n");
   console.log(`director preflight ${report.status}: ${scenes?.length || 0} scenes, ${blockers.length} blockers, ${findings.length} findings`);
-  if (blockers.length) process.exitCode = 1;
+  if (blockers.length || report.status === "REVIEW_REQUIRED") process.exitCode = 1;
 }
