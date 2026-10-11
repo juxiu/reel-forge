@@ -23,7 +23,6 @@
       "additionalProperties": false,
       "required": [
         "ir16x9",
-        "ir9x16",
         "timeline"
       ],
       "properties": {
@@ -38,6 +37,14 @@
         "timeline": {
           "type": "string",
           "minLength": 1
+        },
+        "disabledRatios": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "9x16"
+            ]
+          }
         }
       }
     },
