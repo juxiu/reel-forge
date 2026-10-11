@@ -3,6 +3,8 @@ import {fetchSource} from "../providers/research/web.mjs";
 import {buildClaimGraph} from "../research/claim-graph.mjs";
 import {buildBeatGraph, beatToScene} from "./beat-graph.mjs";
 import {toRenderIR} from "../backends/render-ir.mjs";
+import {buildTaskBrief} from "../agents/task-brief.mjs";
+import {validateScriptEvidence} from "../release/content-gates.mjs";
 
 export async function runProduction(project, {script, agent = null, root = "artifacts"} = {}) {
   const ex = new Execution(project, root);
@@ -32,7 +34,10 @@ export async function runProduction(project, {script, agent = null, root = "arti
         throw new Error("script missing and no agent provider configured");
       }
       ex.emit("script.started");
-      script = await agent.run({project, research});
+      script = await agent.run({
+        role: "script-agent", project, research,
+        task: buildTaskBrief("script-agent", {deliverable:"source-grounded narration script"}),
+      });
       ex.emit("script.completed", {segments: script.segments?.length || 0});
     }
 
@@ -43,13 +48,9 @@ export async function runProduction(project, {script, agent = null, root = "arti
       throw new Error("script requires at least one segment");
     }
 
-    const claimIds = new Set(research.claims.map((claim) => claim.id));
-    for (const segment of script.segments) {
-      for (const claimId of segment.claim_ids || []) {
-        if (!claimIds.has(claimId)) {
-          throw new Error("script claim has no research evidence: " + claimId);
-        }
-      }
+    const evidenceGate = validateScriptEvidence(script, research);
+    if (evidenceGate.status !== "PASS") {
+      throw new Error("script evidence gate FAIL: " + evidenceGate.issues.join(" | "));
     }
 
     const graph = buildBeatGraph(script);
