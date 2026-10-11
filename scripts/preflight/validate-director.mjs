@@ -5,6 +5,8 @@ import path from "node:path";
 const root = process.cwd();
 const readJson = (file) => JSON.parse(fs.readFileSync(path.join(root, file), "utf8"));
 const findings = [];
+const staticOnly = process.argv.includes("--static-only");
+const skippedChecks = [];
 let generatedShotbook = null;
 let sourceFingerprint = null;
 let reviewEvidence = null;
@@ -21,6 +23,10 @@ const scriptPath = "fixtures/script.json";
 const timelinePath = "script/timeline.json";
 const registryPath = "src/shots/registry.jsx";
 for (const p of [irPath, portraitPath, scriptPath, timelinePath, registryPath]) {
+  if (staticOnly && p === timelinePath && !exists(p)) {
+    skippedChecks.push({check:"timeline-presence-and-frame-alignment", reason:"runtime TTS timeline is generated during production and is not tracked in a clean checkout"});
+    continue;
+  }
   if (!exists(p)) add("BLOCKER", "GATE-3", "required-production-input", null, `Missing ${p}`, `Restore or generate ${p} from the existing production pipeline`);
 }
 if (findings.some((f) => f.severity === "BLOCKER")) {
@@ -31,8 +37,8 @@ if (findings.some((f) => f.severity === "BLOCKER")) {
     const ir = readJson(irPath);
     const portrait = readJson(portraitPath);
     const script = readJson(scriptPath);
-    const timeline = readJson(timelinePath);
-    sourceFingerprint = crypto.createHash("sha256").update([irPath, portraitPath, scriptPath, timelinePath, registryPath].map((p) => p + "\\0" + fs.readFileSync(path.join(root, p))).join("\\0")).digest("hex");
+    const timeline = exists(timelinePath) ? readJson(timelinePath) : {sentences: []};
+    sourceFingerprint = crypto.createHash("sha256").update([irPath, portraitPath, scriptPath, timelinePath, registryPath].map((p) => p + "\\0" + (exists(p) ? fs.readFileSync(path.join(root, p)) : "<missing-runtime-input>")).join("\\0")).digest("hex");
     const reviewPath = path.join(root, "artifacts", ir.project_id || "unknown-project", "preflight", "visual-review.json");
     if (fs.existsSync(reviewPath)) {
       try { reviewEvidence = JSON.parse(fs.readFileSync(reviewPath, "utf8")); }
@@ -135,7 +141,10 @@ if (findings.some((f) => f.severity === "BLOCKER")) {
       const prevEnd = Number(prev.start) + Number(prev.duration);
       if (Number(cur.start) < prevEnd - (1 / fps)) add("BLOCKER", "GATE-2", "scene-overlap", cur.id, `${prev.id} ends at ${prevEnd.toFixed(3)}s; ${cur.id} starts at ${Number(cur.start).toFixed(3)}s`, "Reconcile segment timing with the authoritative TTS timeline");
     }
-    if (!timelineSentences.length) add("BLOCKER", "GATE-0", "timeline-empty", null, "timeline.json has no sentences", "Generate a real word-boundary timeline; estimated timing is not locked timing");
+    if (!timelineSentences.length) {
+      if (staticOnly) skippedChecks.push({check:"timeline-sentence-coverage", reason:"runtime timeline absent; full production preflight will block until real word-boundary timing exists"});
+      else add("BLOCKER", "GATE-0", "timeline-empty", null, "timeline.json has no sentences", "Generate a real word-boundary timeline; estimated timing is not locked timing");
+    }
     const orphanRegistryIds = [...registryIds].filter((id) => !sceneIds.has(id));
     for (const id of orphanRegistryIds) add("WARN", "GATE-3", "orphan-registry-entry", id, "Registry contains a scene absent from current IR", "Confirm intentional removal or regenerate the registry");
     generatedShotbook = {version:"1.0", projectId:ir.project_id || "unknown-project", source:{ir16x9:irPath,ir9x16:portraitPath,timeline:timelinePath}, shots:shotbookShots};
@@ -155,9 +164,11 @@ function writeReport(ir, scenes, stats) {
   const report = {
     version: "1.0",
     gate: "director-preflight",
+    mode: staticOnly ? "static-ci" : "production-release",
+    checksSkipped: skippedChecks,
     status: blockers.length ? "BLOCKED" : findings.some((f) => f.severity === "REVIEW") ? "REVIEW_REQUIRED" : findings.some((f) => f.severity === "WARN") ? "PASS_WITH_WARNINGS" : "PASS",
     sourceOfTruth: ["fixtures/render-ir-16x9.json", "fixtures/render-ir-9x16.json", "fixtures/script.json", "script/timeline.json", "src/shots/registry.jsx"],
-    checksExecuted: ["required-inputs", "scene-id-uniqueness", "registry-mapping", "script-segment-mapping", "story-purpose", "visual-recipe", "element-presence", "timing-bounds", "scene-overlap", "timeline-presence", "cross-ratio-identity", "risk-scoring"],
+    checksExecuted: ["required-inputs", "scene-id-uniqueness", "registry-mapping", "script-segment-mapping", "story-purpose", "visual-recipe", "element-presence", "timing-bounds", "scene-overlap", ...(staticOnly ? [] : ["timeline-presence"]), "cross-ratio-identity", "risk-scoring"],
     fullRenderExecuted: false,
     sourceFingerprint,
     visualReviewEvidence: "artifacts/<project_id>/preflight/visual-review.json; approvals expire whenever any source input fingerprint changes",
