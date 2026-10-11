@@ -6,6 +6,9 @@ description: 将任意知识或技术主题生产为原创代码动画讲解视�
 # reel-forge Skill
 
 ## 目标
+
+> **临时运行模式**：当前仅注册、渲染、QC 与交付 16:9；9:16 渲染已停用。`fixtures/render-ir-9x16.json` 保留为休眠源文件，不作为当前生产放行条件。GitHub Actions CI 工作流已移除，本地仍可手动执行 `npm run verify:fast`。
+
 按样片级生产流程生成原创 MG 讲解视频。参考 anything2explainer 的生产方法，但不复制其源码、镜头或样片内容。
 
 ## 四个人工确认点
@@ -41,7 +44,7 @@ description: 将任意知识或技术主题生产为原创代码动画讲解视�
 - ⚠ 与 `SemanticShots.jsx` 的 `Rail` 不是一回事：那个是**镜头内**的装饰轨；本节的 `Primitives.Rail` 是**片级**流程轨。
 
 ### Build Agent
-G1…Gn 为独立构建角色，Agent provider 配置后每组分别收到 Build Agent task；任务明确只修改 `src/shots/Gn/**`，并要求每镜至少 6 张 still（高光镜头 ≥10 张）+ 30 帧测渲。CI 无 Agent 时使用 deterministic builder，但产物必须明确标注 agent_mode=deterministic。
+G1…Gn 为独立构建角色，Agent provider 配置后每组分别收到 Build Agent task；任务明确只修改 `src/shots/Gn/**`，并要求每镜至少 6 张 still（高光镜头 ≥10 张）+ 30 帧测渲。未配置 Agent 时使用 deterministic builder，但产物必须明确标注 agent_mode=deterministic。
 
 ### TTS
 支持 edge、kokoro、piper、kokoro_onnx 与用户 wav 能力；实际 production gate 仍以 tts-word-boundary 为唯一生产时间轴口径。无词边界引擎必须通过逐块/逐词适配层提供真实块边界，禁止伪装为 external ASR。
@@ -59,11 +62,11 @@ Render → Frame Metrics → Motion →画面文字出处（阻断）→ Agent Q
 
 分镜合规审计必须先于 QC 落盘：`npm run plan-audit`（`scripts/plan-audit.mjs`）写出 `artifacts/<pid>/qc/plan_audit.json`，而 `scripts/qc.mjs` 在它缺失时把 `plan_audit_missing` 记成**阻断**项。一键链里它排在 `npm run qc` 之前、以容忍方式调用 —— 审计自己在「分镜矛盾」时非零退出，那是留给 `npm run repair-cycle` 消化的输入，不是把链掐死在中途的理由。执行者：`scripts/verify-skill.mjs` 第 4 节，断言顺序（plan-audit 在 qc 之前）、调用形态（必须 runSoft）与 repair-cycle 仍在链上。
 
-阻断项：双比例 Frame Metrics、Motion、**画面文字出处**、QC、Repair / Recheck、tts-word-boundary、Delivery checksum、still manifest 与 `verify:production`。
+阻断项：16:9 Frame Metrics、Motion、**画面文字出处**、QC、Repair / Recheck、tts-word-boundary、Delivery checksum、still manifest 与 `verify:production`。
 
 非阻断项：`visual-pixel-v1` Visual Regression。它的参考资产是 64×36 合成图、embedding 是确定性像素描述子而非语义模型，实测与画面质量反向相关（画面更密更实则分数更低），因此只作为 run-to-run 回归记录，**不参与交付判定**。它的通过不代表质量，只代表没有异常漂移。
 
-调单个镜头不必跑全片：`npm run debug:shot -- <scene-id> [--ratio 16x9|9x16]` 只渲染该镜头片段、抽成 PNG 帧，并只对这个区间跑 `frame_metrics` / `motion_check`（判据与全片同源，只是把输入裁到单镜头，输出落在 `artifacts/debug/<ratio>/<scene-id>/`）。全片渲染留给最终交付。
+调单个镜头不必跑全片：`npm run debug:shot -- <scene-id> [--ratio 16x9]` 只渲染该镜头片段、抽成 PNG 帧，并只对这个区间跑 `frame_metrics` / `motion_check`（判据与全片同源，只是把输入裁到单镜头，输出落在 `artifacts/debug/<ratio>/<scene-id>/`）。全片渲染留给最终交付。
 
 ## Video Shotcraft 接入（可选）
 
@@ -82,7 +85,7 @@ npm run verify:shotcraft
 4. 不复制参考宣传片的画面、品牌或未核验授权的素材；默认不复制 Shotcraft 音频。未经评估不得增加依赖；
 5. 在实际使用的 `SCxx.jsx` 注释和组内 `BUILD_NOTES.md` 记录卡名、demo 路径、上游 revision、改编内容与复用素材。
 
-Agent 无法读取本地目录时必须明确说明，不能假称引用过卡片或源码。使用 Shotcraft 后依然执行单镜头预览、`debug:shot`、采样验证与 Pilot 人工审查。当前 9:16 仍是居中适配，不等于完成纵向重排。
+Agent 无法读取本地目录时必须明确说明，不能假称引用过卡片或源码。使用 Shotcraft 后依然执行单镜头预览、`debug:shot`、采样验证与 Pilot 人工审查。9:16 当前已暂停渲染；此前的居中适配不构成已验收的竖屏重排。
 
 ## 一键入口
 `npm run skill -- "TOPIC" --source URL --auto-approve`
@@ -99,13 +102,13 @@ Agent 无法读取本地目录时必须明确说明，不能假称引用过卡�
 否则会静默沿用旧主题画面。净室实测见 [docs/ACCEPTANCE_REPORT.md](docs/ACCEPTANCE_REPORT.md)。
 
 ## 完成定义
-双比例成片、Frame Metrics、Motion、画面文字出处（text provenance）、QC、Repair、tts-word-boundary、Delivery checksum、still manifest 与 `verify:production` 全部通过。
+16:9 成片、Frame Metrics、Motion、画面文字出处（text provenance）、QC、Repair、tts-word-boundary、Delivery checksum、still manifest 与 `verify:production` 全部通过。
 
 Visual Regression 不在完成定义内，它是非阻断回归记录。
 
-## 双比例与竖屏边界
+## 临时单画幅模式
 
-16:9 是设计基准（逻辑像素 = 实际像素，可与参照片逐像素对齐）。9:16 保证**时长 / 镜头顺序 / 拓扑 / 画面文案完全一致**，画面是**同一块 16:9 构图居中**到竖屏内容区；真正的纵向重排（双栏改单栏、字号按设备像素下限重算）**尚未实现**，不要按已达标对待。`cameraSafe` 按画幅推导：16:9 仍是 x89–1191 / y122–607，9:16 是 y122–2163。
+当前只有 `ReelForge16x9` Composition 处于启用状态；`ReelForge9x16` 未注册，生产渲染、QC、Repair 与交付只处理 16:9。`fixtures/render-ir-9x16.json` 与竖屏相关测试暂时保留，但它们不是当前生产链的输出或放行条件。恢复竖屏前，必须同时恢复 Composition、渲染与抽帧、QC/Repair、交付与生产门禁，并重新执行相关测试。
 
 ### 画面文字出处（阻断）
 对应 anything2explainer 的硬性原则 2「事实有出处」与样片 QC「画面英文/数字逐个核对调研文档」：
@@ -116,7 +119,7 @@ A2 画面真文案   —— 经 src/shots/plan.mjs 归一后真会上画面的 h
                   非数字又没出处的（如 hero-overlong 兜底把 narrative_job 的 explain/hook 画上主角位）出声不阻断
 B  字面量白名单 —— 渲染源码里所有会上画面的硬编码文案必须登记在 fixtures/visual-literals.json；
                   扫描器自带 7 条通道自检，一条都扫不到时本门直接 FAIL（防"扫不到东西所以全绿"）
-C  双比例一致  —— 同一 scene 在 16:9 / 9:16 的时长、顺序、变体必须一致
+C 生产画幅  —— 当前仅检查 16:9；9:16 重新启用前再恢复跨画幅一致性检查
 ```
 
 命令：`npm run verify:text-provenance`（新增白名单用 `-- --write`，`--write` 只写现在真扫到的，历史幽灵条目会被剪掉）。
