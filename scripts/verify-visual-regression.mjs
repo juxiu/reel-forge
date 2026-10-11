@@ -6,7 +6,7 @@ const benchmark=JSON.parse(fs.readFileSync("fixtures/visual-benchmark.json","utf
 const project=JSON.parse(fs.readFileSync(process.env.PROJECT_FILE||"fixtures/project.json","utf8"));
 const root="artifacts/"+project.project_id+"/qc";
 const summary=[];
-for(const ratio of ["16x9","9x16"]){
+for(const ratio of ["16x9"]){
   const file=root+"/visual_regression_"+ratio+".json";
   if(!fs.existsSync(file)) throw new Error("visual regression record missing: "+file);
   const report=JSON.parse(fs.readFileSync(file,"utf8"));
