@@ -1,6 +1,6 @@
 # Director Plan Contract
 
-Status: **v1 adapter contract**. The current production source remains `fixtures/render-ir-16x9.json` plus its paired `fixtures/render-ir-9x16.json`; `script/timeline.json` remains the timing authority. This document does not declare the authored decisions below to be AI-reviewed: deterministic values are explicitly labeled as source-derived.
+Status: **v1 adapter contract**. Temporary production mode uses `fixtures/render-ir-16x9.json` as the only active rendering source; `fixtures/render-ir-9x16.json` is retained but dormant. `script/timeline.json` remains the timing authority. GitHub Actions CI workflows are temporarily removed; validation commands remain available for local execution. This document does not declare the authored decisions below to be AI-reviewed: deterministic values are explicitly labeled as source-derived.
 
 ## Narrative freeze
 
@@ -15,7 +15,7 @@ Each chapter/segment should answer: what question is being resolved, what the au
 
 ## Production identity
 
-`scene.id` is the stable identity. `source_ref.script_id` maps it to the script segment; `source_ref.segment_index` must agree with the segment order. The 16:9 IR is the current adapter input and the 9:16 IR must preserve scene IDs, order and duration. Registry entries in `src/shots/registry.jsx` are checked against those IDs.
+`scene.id` is the stable identity. `source_ref.script_id` maps it to the script segment; `source_ref.segment_index` must agree with the segment order. The 16:9 IR is the only active adapter input. Registry entries in `src/shots/registry.jsx` are checked against those IDs. 9:16 cross-ratio identity is not checked while that ratio is disabled; restore the check before re-enabling portrait rendering.
 
 ## Field mapping for the current IR
 
@@ -50,7 +50,7 @@ Run `npm run verify:director-preflight`. The report is written under `artifacts/
 
 ## High-risk review evidence
 
-The preflight report includes `sourceFingerprint`, a SHA-256 over the active 16:9 IR, 9:16 IR, script, timeline and shot registry. A high-risk shot is not cleared by a verbal claim or by an old report. After producing evidence with the existing single-shot preview/debug workflow, an independent reviewer must write `artifacts/<project_id>/preflight/visual-review.json` in this shape:
+The preflight report includes `sourceFingerprint`, a SHA-256 over the active 16:9 IR, script, timeline and shot registry. A high-risk shot is not cleared by a verbal claim or by an old report. After producing evidence with the existing single-shot preview/debug workflow, an independent reviewer must write `artifacts/<project_id>/preflight/visual-review.json` in this shape:
 
 ```json
 {
