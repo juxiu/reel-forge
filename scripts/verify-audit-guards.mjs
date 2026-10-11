@@ -19,6 +19,7 @@ requireText(/project identity mismatch/.test(materializer), "project and render 
 requireText(/active shot import missing/.test(verifyShots) && /fallback-SCxx/.test(verifyShots), "shot verification must validate the component selected by the group index");
 requireText(/AUTHORED_PROJECT\.json/.test(materializer), "authored shot pack must declare its topic identity");
 requireText(/authoredPackMatches/.test(materializer) && /source_urls/.test(materializer), "authored pack reuse must be bound to topic and sources");
+requireText(/authoredProject\.language/.test(materializer) && /authoredProject\.target_ratios/.test(materializer), "authored pack reuse must match language and aspect ratio");
 requireText(/@reel-forge-project/.test(materializer) && /fallback-/.test(materializer), "unmatched authored shots must route through isolated fallback components");
 requireText(/fixtures\/project\.json/.test(fingerprint) && /fixtures\/script\.json/.test(fingerprint) && /research\.json/.test(fingerprint), "release fingerprint must cover project, script, and research inputs");
 requireText(/createHash\("sha256"\)/.test(skill) && /hasNonAscii/.test(skill), "non-ASCII topic slugs must receive collision-resistant identity");
@@ -29,6 +30,6 @@ requireText(Boolean(manifest.project_id && manifest.request && Array.isArray(man
 
 console.log("audit guards PASS", JSON.stringify({
   authored_pack: manifest.project_id,
-  guards: 11,
+  guards: 12,
   test_scope: "source-level contracts only; not a render or pixel acceptance test",
 }));
