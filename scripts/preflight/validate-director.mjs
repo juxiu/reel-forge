@@ -18,11 +18,10 @@ const add = (severity, gate, rule, shotId, evidence, suggestedFix) => findings.p
 });
 const exists = (p) => fs.existsSync(path.join(root, p));
 const irPath = "fixtures/render-ir-16x9.json";
-const portraitPath = "fixtures/render-ir-9x16.json";
 const scriptPath = "fixtures/script.json";
 const timelinePath = "script/timeline.json";
 const registryPath = "src/shots/registry.jsx";
-for (const p of [irPath, portraitPath, scriptPath, timelinePath, registryPath]) {
+for (const p of [irPath, scriptPath, timelinePath, registryPath]) {
   if (staticOnly && p === timelinePath && !exists(p)) {
     skippedChecks.push({check:"timeline-presence-and-frame-alignment", reason:"runtime TTS timeline is generated during production and is not tracked in a clean checkout"});
     continue;
@@ -35,10 +34,9 @@ if (findings.some((f) => f.severity === "BLOCKER")) {
 } else {
   try {
     const ir = readJson(irPath);
-    const portrait = readJson(portraitPath);
     const script = readJson(scriptPath);
     const timeline = exists(timelinePath) ? readJson(timelinePath) : {sentences: []};
-    sourceFingerprint = crypto.createHash("sha256").update([irPath, portraitPath, scriptPath, timelinePath, registryPath].map((p) => p + "\\0" + (exists(p) ? fs.readFileSync(path.join(root, p)) : "<missing-runtime-input>")).join("\\0")).digest("hex");
+    sourceFingerprint = crypto.createHash("sha256").update([irPath, scriptPath, timelinePath, registryPath].map((p) => p + "\\0" + (exists(p) ? fs.readFileSync(path.join(root, p)) : "<missing-runtime-input>")).join("\\0")).digest("hex");
     const reviewPath = path.join(root, "artifacts", ir.project_id || "unknown-project", "preflight", "visual-review.json");
     if (fs.existsSync(reviewPath)) {
       try { reviewEvidence = JSON.parse(fs.readFileSync(reviewPath, "utf8")); }
@@ -46,7 +44,6 @@ if (findings.some((f) => f.severity === "BLOCKER")) {
     }
     const registryText = fs.readFileSync(path.join(root, registryPath), "utf8");
     const scenes = ir.scenes;
-    const portraitScenes = portrait.scenes;
     if (!Array.isArray(scenes) || !scenes.length) add("BLOCKER", "GATE-2", "empty-production-ir", null, "16:9 IR has no scenes", "Materialize IR from the locked script and timeline");
     const sceneIds = new Set();
     const registryIds = new Set([...registryText.matchAll(/["'](scene-[^"']+)["']\s*:/g)].map((m) => m[1]));
@@ -132,10 +129,6 @@ if (findings.some((f) => f.severity === "BLOCKER")) {
         validationPlan: level === "high" ? ["static-contracts","entry-keyframe","reveal-keyframe","exit-keyframe","independent-review"] : level === "medium" ? ["static-contracts","entry-keyframe","reveal-keyframe","exit-keyframe"] : ["static-contracts"]
       });
     }
-    const portraitIds = portraitScenes.map((s) => s.id);
-    if (portraitIds.length !== scenes.length || portraitIds.some((id, i) => id !== scenes[i]?.id)) {
-      add("BLOCKER", "GATE-3", "cross-ratio-scene-identity", null, "9:16 scene IDs/order differ from 16:9", "Re-materialize both IRs from the same script and timeline");
-    }
     for (let i = 1; i < scenes.length; i += 1) {
       const prev = scenes[i - 1], cur = scenes[i];
       const prevEnd = Number(prev.start) + Number(prev.duration);
@@ -147,7 +140,7 @@ if (findings.some((f) => f.severity === "BLOCKER")) {
     }
     const orphanRegistryIds = [...registryIds].filter((id) => !sceneIds.has(id));
     for (const id of orphanRegistryIds) add("WARN", "GATE-3", "orphan-registry-entry", id, "Registry contains a scene absent from current IR", "Confirm intentional removal or regenerate the registry");
-    generatedShotbook = {version:"1.0", projectId:ir.project_id || "unknown-project", source:{ir16x9:irPath,ir9x16:portraitPath,timeline:timelinePath}, shots:shotbookShots};
+    generatedShotbook = {version:"1.0", projectId:ir.project_id || "unknown-project", source:{ir16x9:irPath,timeline:timelinePath,disabledRatios:["9x16"]}, shots:shotbookShots};
     writeReport(ir, scenes, {fps, durationFrames, mappedCount, registryCount: registryIds.size, scriptSegments: scriptSegments.length, timelineSentences: timelineSentences.length});
   } catch (error) {
     add("BLOCKER", "GATE-3", "preflight-exception", null, String(error?.stack || error), "Fix malformed input or validator assumptions before allowing rendering");
@@ -167,8 +160,9 @@ function writeReport(ir, scenes, stats) {
     mode: staticOnly ? "static-ci" : "production-release",
     checksSkipped: skippedChecks,
     status: blockers.length ? "BLOCKED" : findings.some((f) => f.severity === "REVIEW") ? "REVIEW_REQUIRED" : findings.some((f) => f.severity === "WARN") ? "PASS_WITH_WARNINGS" : "PASS",
-    sourceOfTruth: ["fixtures/render-ir-16x9.json", "fixtures/render-ir-9x16.json", "fixtures/script.json", "script/timeline.json", "src/shots/registry.jsx"],
-    checksExecuted: ["required-inputs", "scene-id-uniqueness", "registry-mapping", "script-segment-mapping", "story-purpose", "visual-recipe", "element-presence", "timing-bounds", "scene-overlap", ...(staticOnly ? [] : ["timeline-presence"]), "cross-ratio-identity", "risk-scoring"],
+    sourceOfTruth: ["fixtures/render-ir-16x9.json", "fixtures/script.json", "script/timeline.json", "src/shots/registry.jsx"],
+    renderingRatios: ["16x9"], disabledRatios: ["9x16"],
+    checksExecuted: ["required-inputs", "scene-id-uniqueness", "registry-mapping", "script-segment-mapping", "story-purpose", "visual-recipe", "element-presence", "timing-bounds", "scene-overlap", ...(staticOnly ? [] : ["timeline-presence"]), "risk-scoring"],
     fullRenderExecuted: false,
     sourceFingerprint,
     visualReviewEvidence: "artifacts/<project_id>/preflight/visual-review.json; approvals expire whenever any source input fingerprint changes",
