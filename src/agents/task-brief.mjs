@@ -29,7 +29,7 @@ export const SHARED_RULES = [
 /** 每个角色的专属规则；`rule` 会进任务书，`executor` 是它在本仓库的执行者（门或常量）。 */
 export const ROLE_RULES = {
   "script-agent": [
-    {rule: "输出可直接用于生产的 JSON 对象：顶层包含 project_id 与非空 segments；每段都必须有唯一稳定 id、非空 text，以及至少一个 claim_ids（只引用 input.research.claims 中真实存在的 claim id）。不得把无来源事实写成已核实陈述；来源不足时在 script.notes 中标记，并让 research-agent 评审阻断。", executor: "src/director/pipeline.mjs + src/release/content-gates.mjs"},
+    {rule: "输出可直接用于生产的 JSON 对象：顶层包含 project_id 与非空 segments；每段都必须有唯一稳定 id、非空 text，以及至少一个 claim_ids（只引用 input.research.claims 中真实存在的 claim id）。不得把无来源事实写成已核实陈述；来源不足时不得伪造 claim 或增加 schema 外字段，让 evidence gate / review gate 阻断。", executor: "src/director/pipeline.mjs + src/release/content-gates.mjs"},
   ],
   "build-agent": [
     {rule: `只修改 src/shots/<你那一组>/**。其余路径（index.jsx、registry.jsx、视觉常量）由脚本重写，你改了也不会留下。`, executor: "scripts/materialize-shots.mjs:26,43-47,82-86（写盘顺序才是真保护，only_paths 只是任务书里的一句话）"},
@@ -61,7 +61,7 @@ export const ROLE_RULES = {
 
 /**
  * 组装某一次调用的任务书。
- * @param role 四个角色之一
+ * @param role 五个角色之一
  * @param {{deliverable?: string, group?: {id?: string, scene_ids?: string[]}, ratio?: string}} [context]
  * @returns {{role: string, deliverable: string|null, scope: string|null, rules: string[], provenance: string}}
  */
