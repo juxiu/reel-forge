@@ -4,6 +4,7 @@ import path from "node:path";
 const root = process.cwd();
 const readJson = (file) => JSON.parse(fs.readFileSync(path.join(root, file), "utf8"));
 const findings = [];
+let generatedShotbook = null;
 const add = (severity, gate, rule, shotId, evidence, suggestedFix) => findings.push({
   findingId: `DIR-${String(findings.length + 1).padStart(4, "0")}`,
   shotId: shotId ?? null, severity, gate, rule, evidence, suggestedFix,
@@ -39,6 +40,7 @@ if (findings.some((f) => f.severity === "BLOCKER")) {
     const fps = Number(ir.fps || 30);
     const durationFrames = Math.round(Number(ir.duration || 0) * fps);
     let mappedCount = 0;
+    const shotbookShots = [];
     const risk = (scene) => {
       let score = 0;
       const motion = Array.isArray(scene.motion) ? scene.motion : [];
@@ -82,6 +84,33 @@ if (findings.some((f) => f.severity === "BLOCKER")) {
       if (level === "high") add("REVIEW", "GATE-5", "high-risk-shot-review", id, `Risk score ${score}/100; static checks cannot prove motion/layout quality`, "Generate entry/reveal/exit keyframes or a short preview and request independent director review");
       else if (level === "medium") add("WARN", "GATE-5", "medium-risk-shot-review", id, `Risk score ${score}/100`, "Review entry, reveal and exit states with low-cost keyframes");
       if (!s.continuityIds && !s.transitionIntent) add("WARN", "GATE-1", "continuity-intent-unresolved", id, "No explicit continuity/transition contract in current IR", "Add continuity metadata to authored director decisions; do not infer visual continuity from adjacency");
+      const segment = Number.isInteger(s.source_ref?.segment_index) ? scriptSegments[s.source_ref.segment_index] : null;
+      const startFrame = Math.round(Number(s.start || 0) * fps);
+      const endFrame = startFrame + Math.round(Number(s.duration || 0) * fps);
+      const textElements = (s.elements || []).filter((e) => e.text);
+      const hero = (s.elements || []).find((e) => e.id === "hero") || null;
+      shotbookShots.push({
+        shotId: id,
+        narrationBeat: {scriptId: s.source_ref?.script_id || segment?.id || "", text: segment?.text || "", status: timelineSentences.length ? "locked" : "estimated"},
+        storyPurpose: String(s.narrative_job || "unresolved"),
+        visualRelationship: s.visualRelationship || "unclassified",
+        visualMetaphor: s.visualMetaphor || {status:"unresolved"},
+        heroElement: hero?.id || null,
+        layerPlan: {background: s.background ? [s.background] : [], subject: (s.elements || []).filter((e) => e.type !== "narration"), text: textElements, additional: []},
+        entryState: s.entryState || {status:"unresolved"},
+        keyAction: s.keyAction || {motion: s.motion || []},
+        holdState: s.holdState || {status:"unresolved"},
+        exitState: s.exitState || {status:"unresolved"},
+        transitionIntent: s.transitionIntent || {status:"unresolved"},
+        continuityIds: s.continuityIds || [],
+        timing: {startFrame, endFrame, fps, status: timelineSentences.length ? "locked" : "estimated"},
+        layoutBudget: {composition: s.composition || {}, textChars: textElements.reduce((n,e)=>n+String(e.text||"").length,0), status:"source-derived; pixel bounds unverified"},
+        assetManifest: s.assetManifest || [],
+        motionRecipe: {variant:s.variant || "unresolved", motion:s.motion || []},
+        riskLevel: level,
+        riskScore: score,
+        validationPlan: level === "high" ? ["static-contracts","entry-keyframe","reveal-keyframe","exit-keyframe","independent-review"] : level === "medium" ? ["static-contracts","entry-keyframe","reveal-keyframe","exit-keyframe"] : ["static-contracts"]
+      });
     }
     const portraitIds = portraitScenes.map((s) => s.id);
     if (portraitIds.length !== scenes.length || portraitIds.some((id, i) => id !== scenes[i]?.id)) {
@@ -95,6 +124,7 @@ if (findings.some((f) => f.severity === "BLOCKER")) {
     if (!timelineSentences.length) add("BLOCKER", "GATE-0", "timeline-empty", null, "timeline.json has no sentences", "Generate a real word-boundary timeline; estimated timing is not locked timing");
     const orphanRegistryIds = [...registryIds].filter((id) => !sceneIds.has(id));
     for (const id of orphanRegistryIds) add("WARN", "GATE-3", "orphan-registry-entry", id, "Registry contains a scene absent from current IR", "Confirm intentional removal or regenerate the registry");
+    generatedShotbook = {version:"1.0", projectId:ir.project_id || "unknown-project", source:{ir16x9:irPath,ir9x16:portraitPath,timeline:timelinePath}, shots:shotbookShots};
     writeReport(ir, scenes, {fps, durationFrames, mappedCount, registryCount: registryIds.size, scriptSegments: scriptSegments.length, timelineSentences: timelineSentences.length});
   } catch (error) {
     add("BLOCKER", "GATE-3", "preflight-exception", null, String(error?.stack || error), "Fix malformed input or validator assumptions before allowing rendering");
