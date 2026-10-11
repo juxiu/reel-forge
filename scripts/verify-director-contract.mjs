@@ -17,8 +17,10 @@ assert.deepEqual(schema.$defs.shot.properties.riskLevel.enum, ["low","medium","h
 assert.equal(pkg.scripts["verify:director-preflight"], "node scripts/preflight/validate-director.mjs");
 assert.equal(pkg.scripts["verify:director-preflight:static"], "node scripts/preflight/validate-director.mjs --static-only");
 assert.equal(pkg.scripts["verify:director-contract"], "node scripts/verify-director-contract.mjs");
+assert.equal(pkg.scripts["verify:render-mode"], "node scripts/verify-render-mode.mjs");
 assert.match(fast, /"verify:director-contract"/);
 assert.match(fast, /"verify:director-preflight:static"/);
+assert.match(fast, /"verify:render-mode"/);
 for (const rule of ["duplicate-shot-id","registry-mapping-missing","script-segment-mapping","invalid-timing","scene-overlap","high-risk-shot-review","disabledRatios"]) {
   assert.ok(validator.includes(rule), `missing production preflight rule: ${rule}`);
 }
