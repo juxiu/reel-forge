@@ -3,6 +3,7 @@ import {run, scriptSpec} from "../src/runtime/spawn.mjs";
 
 const checks = [
   "verify:skill",
+  "verify:audit-guards",
   // Optional external shot recipe library: SKIP when VIDEO_SHOTCRAFT_DIR is unset; validate it when configured.
   "verify:shotcraft",
   "verify:plan",
