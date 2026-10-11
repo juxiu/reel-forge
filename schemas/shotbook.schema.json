@@ -238,6 +238,11 @@
           "items": {
             "type": "string"
           }
+        },
+        "riskScore": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
         }
       }
     }
