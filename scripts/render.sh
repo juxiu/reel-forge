@@ -21,6 +21,8 @@ for (const name of ["length-language","narration-signoff","voiceover","pilot-pre
 }
 NODE
 fi
+# Target-duration gate uses the final timeline-derived active IR and runs before expensive full render.
+node scripts/verify-duration-target.mjs
 # Deterministic director/source gate runs before any full-video render; high-risk shots need fingerprint-bound independent review.
 node scripts/preflight/validate-director.mjs
 mkdir -p artifacts/render artifacts/frames/16x9
