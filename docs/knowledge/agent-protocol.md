@@ -1,6 +1,6 @@
 # Agent 协议（provider 长什么样、四个角色收到什么、它们的输出被谁消费）
 
-这份文件只管**外部 agent 这一层**：provider 的输入输出形态、信封的三态与 `AGENT_STRICT`、四个角色各自真正拿到什么 payload、payload 里的约束哪几条有执行者哪几条只是礼节、构建组的分组与可改范围、"每镜至少 6 张 still（高光 ≥10）+ 30 帧测渲"是计划还是证明，以及 a2e 的 11 个 QC 维度在本仓库分别由谁接手。每条规则后面跟着它的执行者（代码路径 + 行号，或某道门）；没有执行者的标「⚠ 无执行者」。
+这份文件只管**外部 agent 这一层**：provider 的输入输出形态、信封的三态与 `AGENT_STRICT`、五个角色各自真正拿到什么 payload、payload 里的约束哪几条有执行者哪几条只是礼节、构建组的分组与可改范围、"每镜至少 6 张 still（高光 ≥10）+ 30 帧测渲"是计划还是证明，以及 a2e 的 11 个 QC 维度在本仓库分别由谁接手。每条规则后面跟着它的执行者（代码路径 + 行号，或某道门）；没有执行者的标「⚠ 无执行者」。
 
 一句话结论先给：**Research/Director 内容评审现由 `scripts/run-production.mjs` 的确定性门消费**：必须完整覆盖所有 claim/解说段、明确给出 `verdict:"pass"` 且 `issues:[]`，跳过、失败、覆盖不全或有未解决 issue 均阻断。此门检查评审信封、覆盖与结论，不会自动证明 Agent 判断为真，也不代替人实际观看/听审；Build/QC 的评审仍不应被误称为人工视觉签字。
 
@@ -90,7 +90,7 @@
 
 ---
 
-## 2. 四个角色实际收到什么，它们的输出落到哪、被谁读
+## 2. 五个角色实际收到什么，它们的输出落到哪、被谁读
 
 | 角色 | 调用点与并发 | 输入 payload | 输出归属 | 输出被谁读 |
 |---|---|---|---|---|
@@ -254,7 +254,7 @@ source_urls (project.json)
 4. `AGENT_TIMEOUT_MS`（或 `commandAgent({timeoutMs})`）>0 时到点杀子进程并单独报「超时」，与退出码分开；默认 0 = 不限时；没有重试 —— `index.mjs:8` + `command.mjs:14-20` + `src/runtime/spawn.mjs:159-168,185-188`；✅ `verify:agent` 第 3 节（15 秒的假 provider 必须在 5 秒内以超时返回）与 `verify:spawn` 的三条超时断言。
 5. `AGENT_STRICT=1` 只影响"没配 provider"和"provider 返回 null/undefined"两种情况；provider 存在但失败时，strict 与否都会硬失败 —— `orchestrator.mjs:14,19`。
 6. 信封 required `role/status/output`、`additionalProperties:false`；`skipped` 时 output 只许 `{reason}` —— `contracts/agent.schema.json:5,8,12,13-27`。
-7. 四个角色只有 qc-agent 的信封被校验（`report.json.agent_reviews`）；research/director 的 `agent-reviews.json` 零读者、零校验 —— `scripts/verify-contracts.mjs:183` vs `scripts/run-production.mjs:38-39`。
+7. QC Agent 的信封由 verify:contracts 校验；Research/Director 的评审信封由 production content gate 消费（`report.json.agent_reviews`）；research/director 的 `agent-reviews.json` 零读者、零校验 —— `scripts/verify-contracts.mjs:183` vs `scripts/run-production.mjs:38-39`。
 8. agent 输出不参与判定：`qc.report.status` 在调 agent 之前由 `issues.length` 决定 —— `scripts/qc.mjs:15-64,67,73,111`。
 9. payload 里五个约束键（`only_paths`/`six_stills_per_shot`/`test_render_frames`/`semantic_renderer_required`/`settle_frames_min`）零读者；其中真正被执行的是门，不是 agent —— `scripts/build-groups.mjs:28-32` vs `verify-authored-shots.mjs:133`。
 10. 构建组按 IR 顺序每 `MAX_SHOTS_PER_GROUP`（默认 6）一组，「按下标切块」与「按镜头号反推」两种算法在四个生产者、`src/build/still-budget.mjs`、两道蓝图门与 manifest 门全部同源 `src/build/limits.mjs:44,59` —— `build-groups.mjs:10,15`、`materialize-shots.mjs:6,12-14`、`verify-shots.mjs:5,16`、`still-benchmark.mjs:4,51`、`still-budget.mjs:3,26`；✅ `verify:limits`（B 段 9408 格对账 + C 段禁本地字面量且要求**真的调用**取值函数，§3.1）。
