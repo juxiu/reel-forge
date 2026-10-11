@@ -41,6 +41,14 @@ const name = nameMatch ? nameMatch[1].trim() : "";
 if (name !== "reel-forge") throw new Error("invalid skill name: " + name);
 
 const script = readText("scripts/skill.mjs");
+const buildGroupsSource = readText("scripts/build-groups.mjs");
+const materializeShotsSource = readText("scripts/materialize-shots.mjs");
+const freshnessSource = readText("src/release/fingerprint.mjs");
+if (!script.includes("inputFingerprint=crypto.createHash") || !script.includes('if(!resume||!fs.existsSync(root+"/script.json"))')) throw new Error("fresh runs must use input-specific project IDs and rerun Research/Script");
+if (!script.includes('if(!resume||!fs.existsSync("script/timeline.json")')) throw new Error("fresh runs must regenerate TTS/timeline rather than reuse prior audio");
+if (!buildGroupsSource.includes("BUILD BLOCKED") || !buildGroupsSource.includes('source_status:"bound-to-script"')) throw new Error("build-groups must fail closed on stale shots and report source binding separately");
+if (!materializeShotsSource.includes("generic shells are not production shots")) throw new Error("materialize-shots must not create placeholder production shots");
+if (!freshnessSource.includes('"fixtures/project.json"') || !freshnessSource.includes('"public/audio.wav"')) throw new Error("release fingerprint must cover project config and actual audio");
 for (const token of ["--source", "--auto-approve", "scripts/run-production.mjs", "scripts/visual_regression.py", "verify:production"]) {
   if (!script.includes(token)) throw new Error("skill runner missing token: " + token);
 }

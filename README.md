@@ -91,9 +91,7 @@ npm run skill -- \\
 没有配置 `AGENT_COMMAND`（外部 Agent 服务）时会停在
 `script missing and no agent provider configured`。要离线跑通，请先把属于该项目的
 `fixtures/script.json`（`project_id` 必须与 `fixtures/project.json` 一致）放在盘上，
-链会把它当作者稿直接消费。镜头画面（`src/shots/G*/SC*.jsx` 与 `reference-shot-blueprint.json`）
-是**按主题 authored** 的创作产物，没有确定性生成器；换主题时必须同步重做，见
-[docs/ACCEPTANCE_REPORT.md](docs/ACCEPTANCE_REPORT.md) §«净室新主题»。
+链会把它当作者稿直接消费。镜头画面（`src/shots/G*/SC*.jsx` 与 `reference-shot-blueprint.json`）是**按主题 authored** 的创作产物，没有确定性生成器。每镜以 `project_id`、`script_id` 和口播/字幕 SHA-256 绑定到具体输入；换主题或改稿后若镜头源未重做/重新绑定，`build-groups` 与 `materialize-shots` 会在渲染前阻断，而不再静默复用旧镜头。绑定不证明语义或审美合格，仍须检查真实 Pilot 与成片。
 
 非 auto 模式会在四个人工 checkpoint 停止：
 

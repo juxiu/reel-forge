@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import crypto from "node:crypto";
 import {run as spawn} from "../src/runtime/spawn.mjs";
 import {initCheckpoints, readCheckpoints, requireCheckpoint, resolveCheckpoint} from "../src/runtime/checkpoints.mjs";
 import {requestApproval} from "../src/runtime/approval.mjs";
@@ -11,7 +12,7 @@ if(!args.length||args.includes("--help")){
 const topic=args.find(a=>!a.startsWith("--"));
 if(!topic) throw new Error("topic required");
 const values=flag=>{const out=[];for(let i=0;i<args.length;i++)if(args[i]===flag&&args[i+1])out.push(args[++i]);return out};
-const sources=values("--source"),language=values("--language")[0]||"en",duration=Number(values("--duration")[0]||40);
+const sources=values("--source").map(s=>s.trim()),language=values("--language")[0]||"en",duration=Number(values("--duration")[0]||40);
 const ratios=(values("--ratio")[0]||"16:9").split(",").map(s=>s.trim()).filter(Boolean);
 if(ratios.length!==1||ratios[0]!=="16:9") throw new Error("当前暂时只支持 --ratio 16:9；9:16 渲染已停用");
 const auto=args.includes("--auto-approve")||process.env.AUTO_APPROVE==="1",resume=args.includes("--resume");
@@ -19,7 +20,8 @@ if(!Number.isFinite(duration)||duration<5) throw new Error("invalid duration");
 if(!sources.length&&!resume) throw new Error("--source is required on first run");
 
 const slug=topic.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,48)||"project";
-const projectId="skill-"+slug;
+const inputFingerprint=crypto.createHash("sha256").update(JSON.stringify({topic:topic.trim(),sources,language,duration,ratios})).digest("hex").slice(0,12);
+const projectId="skill-"+slug+"-"+inputFingerprint;
 const requestedProject={project_id:projectId,request:topic,language,target_ratios:ratios,source_urls:sources,duration_target_s:duration};
 const backups=[];
 let preserveWorkspace=false;
@@ -77,7 +79,7 @@ function pipeline(){
   if(!ensureCheckpoint("length-language",{topic,language,ratios,duration})) return;
 
   const root="artifacts/"+projectId;
-  if(!fs.existsSync(root+"/script.json")){run("node",["scripts/verify-instruction-filter.mjs"],env);run("node",["scripts/run-production.mjs"],env);} // 过滤门排在生产之前：注入句子一旦进了 research.json 就成了下游所有环节的"事实"（agent-protocol §6）。resume 时 research.json 已在盘上，形状由 verify:contracts 兜。
+  if(!resume||!fs.existsSync(root+"/script.json")){run("node",["scripts/verify-instruction-filter.mjs"],env);run("node",["scripts/run-production.mjs"],env);} // 过滤门排在生产之前：注入句子一旦进了 research.json 就成了下游所有环节的"事实"（agent-protocol §6）。resume 时 research.json 已在盘上，形状由 verify:contracts 兜。
   const generated=JSON.parse(fs.readFileSync(root+"/script.json","utf8"));
   fs.writeFileSync("fixtures/script.json",JSON.stringify(generated,null,2));
   fs.mkdirSync("script",{recursive:true});
@@ -97,7 +99,7 @@ function pipeline(){
   fs.writeFileSync("script/storyboard_src.md",["# 分镜源表（骨架由 scripts/skill.mjs 生成）","","帧号令牌由 npm run storyboard（scripts/render_storyboard.py）换成真实帧号；标着「待填」的三列必须人/agent 填，selfcheck 只认「continuous:」「hold:」这两个**标签存在**与 hold 的帧数，不认内容 —— 画面到底有没有持续动作只能看片。","","# 白名单（写了镜头号才允许该镜头用对应效果；留空=一律不许，selfcheck 会按 0 次判）","闪烁白名单：","扫光白名单：","","# 分镜表","| SC | 起–止 | 节拍 | 画面 | 动效 |","| --- | --- | --- | --- | --- |"].concat(generated.segments.map((s,i)=>{const k=String(i+1).padStart(2,"0");return "| SC"+k+" | {S"+k+".from}–{S"+k+".to} | "+(String(s.text||"").trim().slice(0,24)||"待填")+" | 待填：主体 / 构图 / 字号档位 | continuous: 待填（本镜全程在动的东西）; hold: 36f |";})).join("\n")+"\n");
   if(!ensureCheckpoint("narration-signoff",{message:"Research 与 narration 已生成"})) return;
 
-  if(!fs.existsSync("script/timeline.json")||!fs.existsSync("public/audio.wav")) run("node",["scripts/tts_build.mjs"],env);
+  if(!resume||!fs.existsSync("script/timeline.json")||!fs.existsSync("public/audio.wav")) run("node",["scripts/tts_build.mjs"],env);
   // ⚠ tts 写出的 captions.json 是按词流自动分组的（会跨句界），必须由 sync-script 按
   //   timeline.sentences[].subs 重写成句内对齐的字幕块，否则 verify:timeline-source 会红
   //   （「字幕块不落在任何句子区间内」）。派生顺序：materialize-ir 读 sync-script 的产物 script.json。
@@ -106,7 +108,7 @@ function pipeline(){
 
   // 配音收口：以 tts-word-boundary 为唯一时间轴口径，产出二次校验件。
   // deliver / verify:production 都硬性要求它，缺了这一步交付门必然失败。
-  if(!fs.existsSync(root+"/audio/asr-second-pass.json")) run("node",["scripts/asr_second_pass.mjs"],env);
+  if(!resume||!fs.existsSync(root+"/audio/asr-second-pass.json")) run("node",["scripts/asr_second_pass.mjs"],env);
   run("node",["scripts/verify-asr.mjs"],env);
 
   run("python3",["scripts/render_storyboard.py"],env);
