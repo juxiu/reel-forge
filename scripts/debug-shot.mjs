@@ -32,11 +32,10 @@ const isRatio = (a) => RATIOS.includes(a);
 const eqRatio = argv.find((a) => a.startsWith("--ratio="));
 const ratioFlagAt = argv.indexOf("--ratio");
 const positional = argv.filter((a) => !a.startsWith("--"));
-const sceneId = positional.find((a) => !isRatio(a));
-const ratio =
-  (eqRatio ? eqRatio.slice("--ratio=".length) : ratioFlagAt >= 0 ? argv[ratioFlagAt + 1] : undefined) ||
-  positional.find(isRatio) ||
-  "16x9";
+const requestedRatio = (eqRatio ? eqRatio.slice("--ratio=".length) : ratioFlagAt >= 0 ? argv[ratioFlagAt + 1] : undefined)
+  || positional.find((a) => /^\\d+[x:]\\d+$/.test(a));
+const ratio = requestedRatio ? requestedRatio.replace(":", "x") : "16x9";
+const sceneId = positional.find((a) => !/^\\d+[x:]\\d+$/.test(a));
 
 if (!sceneId) {
   console.error("用法：npm run debug:shot -- <scene-id> [--ratio 16x9]（当前仅支持 16:9）");
