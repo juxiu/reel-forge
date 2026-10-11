@@ -114,6 +114,7 @@ function pipeline(){
   run("python3",["scripts/render_storyboard.py"],env);
   run("python3",["scripts/selfcheck.py"],env);
   run("node",["scripts/materialize-ir.mjs"],env);
+  run("node",["scripts/verify-duration-target.mjs"],env);
   run("node",["scripts/build-groups.mjs"],env);
   run("node",["scripts/materialize-shots.mjs"],env);
   run("node",["scripts/verify-shot-score.mjs"],env);
