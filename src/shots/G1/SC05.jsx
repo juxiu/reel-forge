@@ -1,42 +1,38 @@
-// reel-forge-source: {"project_id":"digest-explainer","script_id":"seg-005","script_sha256":"e9e0630c3f0c3a98a1e08db6a8c2779ff429074a7e34a85492350238dafde28b"}
+// reel-forge-source: {"project_id":"skill-explainer","script_id":"seg-005","script_sha256":"7764d6b48abaedc4dac8cc8797efae20d6eb8fdb761a409c6b837ae478db4e1d"}
 import React from "react";
 import {ExplainerShot} from "../Shot.jsx";
 import {G1_STAGE} from "./stage.jsx";
 
 /**
- * SC05 · 对比 —— 两种覆盖范围并置。
+ * SC05 · splitrows —— 工具给手，技能给方法。
  *
- * 拓扑 dualpanel：左右两块面板对置，中间一条竖缝，**没有方向性箭头**
- *（SC02 的转换有箭头，这里是并置对比，方向性是错的语义）。
- * 右侧是本镜焦点，带紫框 + glow + ✓；左侧一律灰。
- *
- * ⚠ stage.winner 指向焦点侧（0 左 / 1 右），它同时决定紫框、glow 与 ✓，三者不许各判各的。
- * ⚠ items[0]/items[1] 是两块面板的标题，icon 走 stage.icons 覆盖 —— 面板图标与行图标不是一套。
+ * 拓扑骨架在 ../stage-kit.jsx，本镜的摆法（几何 / 文案 / 焦点拍）全在下面这个 stage 里。
+ * ⚠ 不声明入场帧：入场帧由 buildPlan 从字幕块推出（-6…+3 窗口），节拍与语义镜头同源。
+ * ⚠ focus 存的是**相对入场帧的偏移**，换字幕块时焦点交接自动跟着首句走。
+ * ⚠ hero_size / camera / variant / settle_frames 必须与 fixtures/reference-shot-blueprint.json 逐字段一致。
  */
 export const SHOT_RECIPE = {
   shot_id: "SC05",
-  variant: "comparison",
-  hero_size: 200,
+  variant: "split",
+  hero_size: 190,
   camera: "parallax",
   settle_frames: 30,
-  hero_role: "compare",
-  mirror: false,
-  support_count: 2,
-  accent_index: 1,
+  narrative_job: "工具给手，技能给方法",
   stage: {
-    kind: "dualpanel",
+    kind: "splitrows",
+    focus: [0, 38, 76],
+    left_label: "工具与插件",
+    right_label: "技能",
     winner: 1,
-    icons: ["clock", "shield"],
-    notes: ["只覆盖一跳", "覆盖整条链路"],
-    caption: "覆盖范围的差别不在算法，在链路长度",
-    focus: [0, 46],
     items: [
-      {id: "p1", icon: "clock", text: "单跳校验"},
-      {id: "p2", icon: "shield", text: "端到端校验"},
+      {id: "l1", icon: "chip", text: "给一双手"},
+      {id: "r1", icon: "branch", text: "给方法"},
+      {id: "l2", icon: "lock", text: "一次性接入"},
+      {id: "r2", icon: "grid", text: "可叠加组合"},
     ],
   },
 };
 
 export function SC05({scene}) {
-  return <ExplainerShot scene={{...scene, variant: SHOT_RECIPE.variant, narrative_job: scene.narrative_job || SHOT_RECIPE.hero_role}} recipe={SHOT_RECIPE} stage={G1_STAGE} />;
+  return <ExplainerShot scene={{...scene, variant: SHOT_RECIPE.variant, narrative_job: scene.narrative_job || SHOT_RECIPE.narrative_job}} recipe={SHOT_RECIPE} stage={G1_STAGE} />;
 }

@@ -1,48 +1,34 @@
-// reel-forge-source: {"project_id":"digest-explainer","script_id":"seg-002","script_sha256":"aca69be91a86920606210fa435c1c967edc161fc4458c273830a06e6351e152b"}
+// reel-forge-source: {"project_id":"skill-explainer","script_id":"seg-002","script_sha256":"422ba5e391c0b59de97065ab0c0cffcaf0b14158843a3f157a3417d8f51d5202"}
 import React from "react";
 import {ExplainerShot} from "../Shot.jsx";
 import {G1_STAGE} from "./stage.jsx";
 
 /**
- * SC02 · 机制 —— 报文原文如何变成可校验的字段。
+ * SC02 · causechain —— 技能就是一个文件夹。
  *
- * 拓扑 split2col：左栏「原始报文」是灰的等宽文本行，右栏「解析字段」是紫框白字，
- * 中间一道 draw-on 箭头。这是**有方向的转换**，与 SC05 的并置对比在拓扑上相反。
- *
- * ⚠ 奇偶分栏：items 按下标奇偶分左右，所以 items 的**顺序**就是版式，改顺序会换布局（有意的耦合）。
- * ⚠ 右栏整体带紫框与 glow —— 但紫色只给这一栏（当前重点），左栏一律灰。
- * ⚠ 左栏第三行原本写 `nc=00000001`：verify:text-provenance 判它「数字无出处」且白名单豁免不了。
- *   报文结构可以讲，但具体计数值属于「调研没核实就不上画面」，所以这里只留字段名 `nc`。
+ * 拓扑骨架在 ../stage-kit.jsx，本镜的摆法（几何 / 文案 / 焦点拍）全在下面这个 stage 里。
+ * ⚠ 不声明入场帧：入场帧由 buildPlan 从字幕块推出（-6…+3 窗口），节拍与语义镜头同源。
+ * ⚠ focus 存的是**相对入场帧的偏移**，换字幕块时焦点交接自动跟着首句走。
+ * ⚠ hero_size / camera / variant / settle_frames 必须与 fixtures/reference-shot-blueprint.json 逐字段一致。
  */
 export const SHOT_RECIPE = {
   shot_id: "SC02",
-  variant: "split",
+  variant: "causal",
   hero_size: 190,
   camera: "parallax",
   settle_frames: 30,
-  hero_role: "mechanism",
-  mirror: true,
-  support_count: 6,
-  accent_index: 1,
+  narrative_job: "技能就是一个文件夹",
   stage: {
-    kind: "split2col",
-    left_label: "原始报文",
-    right_label: "解析字段",
-    // 本镜是全片唯一没写 focus 的镜头，也是最长的（323 帧）。补上后焦点拍表能按 36 帧的节奏
-    // 铺满整镜（减压后的 bad case 见 verify:motion），否则末段 3.9s 静止会被判 motion_too_low。
-    // 6 个 item → 6 槽：左栏第 i 行 = 槽 2i，右栏 = 槽 2i+1（拓扑里按这个口径取 k）。
-    focus: [0, 36, 72],
+    kind: "causechain",
+    focus: [0, 38, 76],
     items: [
-      {id: "l1", icon: "doc", text: "GET /orders"},
-      {id: "r1", icon: "key", text: "username"},
-      {id: "l2", icon: "doc", text: "Authorization:"},
-      {id: "r2", icon: "chunk", text: "realm"},
-      {id: "l3", icon: "doc", text: "nc"},
-      {id: "r3", icon: "lock", text: "cnonce"},
+      {id: "c1", icon: "grid", text: "一个文件夹"},
+      {id: "c2", icon: "doc", text: "SKILL.md"},
+      {id: "c3", icon: "branch", text: "需要时自己加载"},
     ],
   },
 };
 
 export function SC02({scene}) {
-  return <ExplainerShot scene={{...scene, variant: SHOT_RECIPE.variant, narrative_job: scene.narrative_job || SHOT_RECIPE.hero_role}} recipe={SHOT_RECIPE} stage={G1_STAGE} />;
+  return <ExplainerShot scene={{...scene, variant: SHOT_RECIPE.variant, narrative_job: scene.narrative_job || SHOT_RECIPE.narrative_job}} recipe={SHOT_RECIPE} stage={G1_STAGE} />;
 }

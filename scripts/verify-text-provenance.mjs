@@ -50,12 +50,21 @@ const researchNorm = norm(research);
 const wide = readJson("fixtures/render-ir-16x9.json", { scenes: [] });
 const tall = readJson("fixtures/render-ir-9x16.json", { scenes: [] });
 const issues = [];
+const warnings = [];
 const facts = [];
 const rendered = [];
 const unsourced = [];
 
+// 临时单画幅模式：口径与 qc.mjs / deliver.mjs / verify-production.mjs / verify-qc.mjs 一致。
+// 9:16 渲染已停用，render-ir-9x16.json 是**休眠 fixture**（镜数/内容可能与当前主题不同，
+// materialize-ir.mjs 明确不再刷新它）。画面文案溯源与跨比例一致性的对象只是「参与验收的比例」；
+// 范围外比例的差异按硬约束「9:16 问题统一降级为带标注警告、不阻断交付」记进 warnings，不进 issues。
+const ACCEPT = new Set(["16x9"]);
+const RATIO_IRS = [["16x9", wide], ["9x16", tall]];
+const ACCEPTED = RATIO_IRS.filter(([ratio]) => ACCEPT.has(ratio));
+
 // ---- A1. IR 文案 ----
-for (const [ratio, ir] of [["16x9", wide], ["9x16", tall]]) {
+for (const [ratio, ir] of ACCEPTED) {
   for (const scene of ir.scenes || []) {
     for (const element of scene.elements || []) {
       const text = String(element.text || "").trim();
@@ -143,7 +152,7 @@ function registeredSet() {
 const allow = registeredSet();
 let scenesWithoutShot = 0;
 
-for (const [ratio, ir] of [["16x9", wide], ["9x16", tall]]) {
+for (const [ratio, ir] of ACCEPTED) {
   const {rows, withoutShot} = renderedTexts(ir);
   scenesWithoutShot = Math.max(scenesWithoutShot, withoutShot);
   for (const row of rows) {
@@ -271,14 +280,24 @@ for (const entry of unregistered) {
 }
 
 // ---- C. 双比例一致 ----
-if (wide.scenes.length !== tall.scenes.length) {
-  issues.push("ratio scene count mismatch: " + wide.scenes.length + " vs " + tall.scenes.length);
+// 只有两个比例都参与验收时这条才成立。单画幅模式下 9:16 是休眠 fixture，
+// 拿它跟当前 16:9 比镜数是「用一个不存在的真源去判另一个」，降级为记录。
+if (ACCEPTED.length < 2) {
+  const skipped = RATIO_IRS.filter(([ratio]) => !ACCEPT.has(ratio))
+    .map(([ratio, ir]) => ratio + "=" + (ir.scenes || []).length + " 镜");
+  warnings.push("跨比例一致性检查跳过：ACCEPT_RATIOS=" + [...ACCEPT].join(",")
+    + "，范围外 " + skipped.join("、") + " 未参与溯源与一致性判定");
 } else {
-  for (let i = 0; i < wide.scenes.length; i++) {
-    const a = wide.scenes[i], b = tall.scenes[i];
-    if (a.id !== b.id) issues.push("ratio scene id mismatch at " + i + ": " + a.id + " vs " + b.id);
-    if (Math.abs(a.duration - b.duration) > 1 / 30) issues.push("ratio duration mismatch: " + a.id);
-    if ((a.variant || "") !== (b.variant || "")) issues.push("ratio variant mismatch: " + a.id);
+  const a = ACCEPTED[0][1], b = ACCEPTED[1][1];
+  if (a.scenes.length !== b.scenes.length) {
+    issues.push("ratio scene count mismatch: " + a.scenes.length + " vs " + b.scenes.length);
+  } else {
+    for (let i = 0; i < a.scenes.length; i++) {
+      const x = a.scenes[i], y = b.scenes[i];
+      if (x.id !== y.id) issues.push("ratio scene id mismatch at " + i + ": " + x.id + " vs " + y.id);
+      if (Math.abs(x.duration - y.duration) > 1 / 30) issues.push("ratio duration mismatch: " + x.id);
+      if ((x.variant || "") !== (y.variant || "")) issues.push("ratio variant mismatch: " + x.id);
+    }
   }
 }
 
@@ -294,10 +313,13 @@ const report = {
   registered_literals: allow.size,
   discovered_literals: discovered.length,
   research_bytes: research.trim().length,
+  accept_ratios: [...ACCEPT],
+  disabled_ratios: RATIO_IRS.map(([ratio]) => ratio).filter((ratio) => !ACCEPT.has(ratio)),
   blocking: true,
-  blocking_scope: "A1 IR 文案溯源 + A2 画面数字 + B 未登记字面量 + C 双比例一致；A2 的非数字无出处文案暂只出声",
+  blocking_scope: "A1 IR 文案溯源 + A2 画面数字 + B 未登记字面量；C 段跨比例一致只对 ACCEPT_RATIOS 内的比例成立（9:16 停用后降级为 warnings）",
   rationale: "a2e SKILL.md 硬性原则 2「事实有出处」+ 样片 QC「画面英文/数字逐个核对调研文档」+ narration-guidance.md §11「画面与解说分工」的可执行版本",
   issues,
+  warnings,
 };
 fs.mkdirSync(path.join(artifacts, "qc"), { recursive: true });
 fs.writeFileSync(path.join(artifacts, "qc", "text_provenance.json"), JSON.stringify(report, null, 2));
@@ -310,7 +332,10 @@ if (issues.length) {
   issues.slice(0, 12).forEach((issue) => console.error("- " + issue));
   process.exit(1);
 }
+for (const warning of warnings) console.warn("⚠ " + warning);
 console.log("text provenance PASS", JSON.stringify({
+  accept_ratios: report.accept_ratios,
+  disabled_ratios: report.disabled_ratios,
   ir_text_elements: report.ir_text_elements,
   rendered_texts: report.rendered_texts,
   registered_literals: report.registered_literals,

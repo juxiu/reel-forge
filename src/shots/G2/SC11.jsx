@@ -1,45 +1,34 @@
-// reel-forge-source: {"project_id":"digest-explainer","script_id":"seg-011","script_sha256":"5b65a591fbcd3e06bf5c91604b835a6eb52bd5ab197e601049c9285dbc71cd58"}
+// reel-forge-source: {"project_id":"skill-explainer","script_id":"seg-011","script_sha256":"972d3d6910399f4c10e31439daa4ac9de0220c879461aae42b879b2b36803c8a"}
 import React from "react";
 import {ExplainerShot} from "../Shot.jsx";
 import {G2_STAGE} from "./stage.jsx";
 
 /**
- * SC11 · orbit —— 一次请求牵涉的角色。
+ * SC11 · ladder —— 关键在于渐进式披露。
  *
  * 拓扑骨架在 ../stage-kit.jsx，本镜的摆法（几何 / 文案 / 焦点拍）全在下面这个 stage 里。
- * ⚠ 不声明入场帧：入场帧由 buildPlan 从字幕块推出（−6…+3 窗口），所以本镜节拍与语义镜头同源。
+ * ⚠ 不声明入场帧：入场帧由 buildPlan 从字幕块推出（-6…+3 窗口），节拍与语义镜头同源。
  * ⚠ focus 存的是**相对入场帧的偏移**，换字幕块时焦点交接自动跟着首句走。
+ * ⚠ hero_size / camera / variant / settle_frames 必须与 fixtures/reference-shot-blueprint.json 逐字段一致。
  */
 export const SHOT_RECIPE = {
   shot_id: "SC11",
-  variant: "network",
-  hero_size: 210,
+  variant: "sequence",
+  hero_size: 190,
   camera: "parallax",
   settle_frames: 30,
-  hero_role: "cast",
-  mirror: false,
-  support_count: 6,
-  accent_index: 0,
+  narrative_job: "关键在于渐进式披露",
   stage: {
-      kind: "orbit",
-      focus: [40,78,116],
-      rx: 356,
-      ry: 140,
-      cx: 640,
-      cy: 380,
-      icon: "link",
-      label: "一次请求",
-      items: [
-        {id: "o1", icon: "person", text: "客户端"},
-        {id: "o2", icon: "link", text: "代理"},
-        {id: "o3", icon: "db", text: "服务端"},
-        {id: "o4", icon: "doc", text: "日志"},
-        {id: "o5", icon: "clock", text: "时钟"},
-        {id: "o6", icon: "gauge", text: "缓存"},
-      ],
-    },
+    kind: "ladder",
+    focus: [0, 38, 76],
+    items: [
+      {id: "l1", icon: "doc", text: "描述：一直挂着"},
+      {id: "l2", icon: "chunk", text: "正文：命中才读"},
+      {id: "l3", icon: "db", text: "附属文件：按需再取"},
+    ],
+  },
 };
 
 export function SC11({scene}) {
-  return <ExplainerShot scene={{...scene, variant: SHOT_RECIPE.variant, narrative_job: scene.narrative_job || SHOT_RECIPE.hero_role}} recipe={SHOT_RECIPE} stage={G2_STAGE} />;
+  return <ExplainerShot scene={{...scene, variant: SHOT_RECIPE.variant, narrative_job: scene.narrative_job || SHOT_RECIPE.narrative_job}} recipe={SHOT_RECIPE} stage={G2_STAGE} />;
 }

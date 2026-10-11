@@ -1,162 +1,165 @@
 {
-  "project_id": "digest-explainer",
+  "project_id": "skill-explainer",
   "rails": [
     {
       "steps": [
-        "角色",
-        "摘要构成",
-        "三步认证"
+        "定义",
+        "对比",
+        "边界"
       ],
       "switchS": [
         "S01",
-        "S04",
-        "S07"
+        "S03",
+        "S05"
       ],
       "fromS": "S01",
+      "toS": "S06"
+    },
+    {
+      "steps": [
+        "目录",
+        "前言",
+        "披露"
+      ],
+      "switchS": [
+        "S07",
+        "S09",
+        "S11"
+      ],
+      "fromS": "S07",
       "toS": "S12"
     },
     {
       "steps": [
-        "算法三档",
-        "规范化",
-        "顺序取法"
+        "发现",
+        "执行",
+        "预算"
       ],
       "switchS": [
         "S13",
-        "S20",
-        "S23"
+        "S15",
+        "S17"
       ],
       "fromS": "S13",
+      "toS": "S18"
+    },
+    {
+      "steps": [
+        "命名",
+        "触发",
+        "迭代"
+      ],
+      "switchS": [
+        "S19",
+        "S21",
+        "S23"
+      ],
+      "fromS": "S19",
       "toS": "S24"
-    },
-    {
-      "steps": [
-        "重放窗口",
-        "时钟",
-        "代理链路"
-      ],
-      "switchS": [
-        "S25",
-        "S28",
-        "S31"
-      ],
-      "fromS": "S25",
-      "toS": "S36"
-    },
-    {
-      "steps": [
-        "改动三处",
-        "代价",
-        "场景判断"
-      ],
-      "switchS": [
-        "S37",
-        "S38",
-        "S43"
-      ],
-      "fromS": "S37",
-      "toS": "S44"
     }
   ],
   "hud": [
     {
       "fromS": "S01",
-      "toS": "S03",
-      "text": "角色",
-      "tech": "Roles"
+      "toS": "S02",
+      "text": "技能的定义",
+      "tech": "Definition"
     },
     {
-      "fromS": "S04",
+      "fromS": "S03",
+      "toS": "S04",
+      "text": "与提示词的区别",
+      "tech": "vs Prompt"
+    },
+    {
+      "fromS": "S05",
       "toS": "S06",
-      "text": "摘要构成",
-      "tech": "Digest"
+      "text": "与工具的边界",
+      "tech": "vs Tools"
     },
     {
       "fromS": "S07",
-      "toS": "S11",
-      "text": "三步认证",
-      "tech": "Auth"
+      "toS": "S08",
+      "text": "一个文件夹",
+      "tech": "Folder"
+    },
+    {
+      "fromS": "S09",
+      "toS": "S10",
+      "text": "SKILL.md",
+      "tech": "Frontmatter"
+    },
+    {
+      "fromS": "S11",
+      "toS": "S12",
+      "text": "渐进式披露",
+      "tech": "Disclosure"
     },
     {
       "fromS": "S13",
-      "toS": "S19",
-      "text": "算法三档",
-      "tech": "Algorithms"
+      "toS": "S14",
+      "text": "发现技能",
+      "tech": "Discovery"
     },
     {
-      "fromS": "S20",
+      "fromS": "S15",
+      "toS": "S16",
+      "text": "执行脚本",
+      "tech": "Execution"
+    },
+    {
+      "fromS": "S17",
+      "toS": "S18",
+      "text": "上下文预算",
+      "tech": "Context"
+    },
+    {
+      "fromS": "S19",
+      "toS": "S20",
+      "text": "命名与描述",
+      "tech": "Naming"
+    },
+    {
+      "fromS": "S21",
       "toS": "S22",
-      "text": "规范化",
-      "tech": "Canonical"
+      "text": "触发时机",
+      "tech": "Trigger"
     },
     {
       "fromS": "S23",
       "toS": "S24",
-      "text": "顺序取法",
-      "tech": "Ordering"
-    },
-    {
-      "fromS": "S25",
-      "toS": "S27",
-      "text": "重放窗口",
-      "tech": "Replay"
-    },
-    {
-      "fromS": "S28",
-      "toS": "S30",
-      "text": "时钟",
-      "tech": "Clock"
-    },
-    {
-      "fromS": "S31",
-      "toS": "S36",
-      "text": "代理链路",
-      "tech": "Proxies"
-    },
-    {
-      "fromS": "S37",
-      "toS": "S37",
-      "text": "改动三处",
-      "tech": "Changes"
-    },
-    {
-      "fromS": "S38",
-      "toS": "S42",
-      "text": "代价",
-      "tech": "Costs"
-    },
-    {
-      "fromS": "S43",
-      "toS": "S44",
-      "text": "场景判断",
-      "tech": "Choice"
+      "text": "测试与迭代",
+      "tech": "Iterate"
     }
   ],
   "chapterTech": [
-    "Digest Handshake",
-    "Algorithm & Fields",
-    "Replay & Proxies",
-    "Adoption & Trade-offs"
+    "What Is a Skill",
+    "Anatomy",
+    "Runtime",
+    "Authoring"
   ],
   "title": {
-    "big": "DIGEST",
-    "rest": "摘要握手",
-    "en": "HTTP Digest Fields",
-    "tagline": "一次握手，验证整条请求"
+    "big": "SKILL",
+    "rest": "什么是技能",
+    "en": "Agent Skills",
+    "tagline": "把方法论写成 Agent 能用的说明书"
   },
   "credit": {
     "kicker": "REEL-FORGE 样片",
-    "title": "摘要握手",
+    "title": "什么是技能",
     "byline": "脚本 · 画面 · 配音 全部由 reel-forge 生产线生成",
     "note": "all visuals drawn in code"
   },
-  "request": "Explain how HTTP Digest Fields protect message integrity.",
+  "request": "Explain what an Agent Skill is, how it is structured, how it runs, and how to author a good one.",
   "language": "zh",
   "target_ratios": [
     "16:9"
   ],
   "source_urls": [
-    "https://www.rfc-editor.org/rfc/rfc9530.html"
+    "https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills",
+    "https://code.claude.com/docs/en/skills",
+    "https://agentskills.io/",
+    "https://www.anthropic.com/news/skills"
   ],
-  "duration_target_s": 339.3
+  "duration_target_s": 190
 }

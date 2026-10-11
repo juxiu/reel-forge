@@ -1,48 +1,35 @@
-// reel-forge-source: {"project_id":"digest-explainer","script_id":"seg-001","script_sha256":"51b57fb5a3b23c4cc2464dcb75cf767ff6b3bb8e4e8ad17cc2684a2176c66d77"}
+// reel-forge-source: {"project_id":"skill-explainer","script_id":"seg-001","script_sha256":"9edc8b9ba13482f2066fdfc89b6bfa87fce5168d14d5fc3102086ab6810bfb78"}
 import React from "react";
 import {ExplainerShot} from "../Shot.jsx";
 import {G1_STAGE} from "./stage.jsx";
 
 /**
- * SC01 · 开场钩子 —— 一次摘要认证牵涉到哪些角色。
+ * SC01 · pipeline3 —— 通用 Agent 缺的是方法。
  *
- * 拓扑 radial：中心是认证节点（主角，210px，带紫柔光 + 脚环 + 入场冒星），
- * 六个卫星（客户端 / 代理 / 时钟 / 数据库 / 观测 / 攻击面）环绕并由辐条连到中心。
- *
- * ⚠ stage.items 只声明**拓扑与文案**，不声明入场帧：入场帧一律由 buildPlan 从字幕块推出，
- *   所以本镜的节拍与语义镜头同源，QC 判的 −6…+3 窗口对它同样成立。
- * ⚠ stage.focus 是**相对入场帧的偏移**，不是绝对帧 —— 换片子换字幕时焦点交接自动跟着首句走。
- * ⚠ 卫星顺序即辐条顺序，改动 items 会同时改画面拓扑，这是有意的：拓扑与内容不许脱钩。
+ * 拓扑骨架在 ../stage-kit.jsx，本镜的摆法（几何 / 文案 / 焦点拍）全在下面这个 stage 里。
+ * ⚠ 不声明入场帧：入场帧由 buildPlan 从字幕块推出（-6…+3 窗口），节拍与语义镜头同源。
+ * ⚠ focus 存的是**相对入场帧的偏移**，换字幕块时焦点交接自动跟着首句走。
+ * ⚠ hero_size / camera / variant / settle_frames 必须与 fixtures/reference-shot-blueprint.json 逐字段一致。
  */
 export const SHOT_RECIPE = {
   shot_id: "SC01",
-  variant: "network",
-  hero_size: 210,
+  variant: "sequence",
+  hero_size: 190,
   camera: "pan",
   settle_frames: 30,
-  hero_role: "hook",
-  mirror: false,
-  support_count: 6,
-  accent_index: 0,
+  narrative_job: "通用 Agent 缺的是方法",
   stage: {
-    kind: "radial",
-    hub: {cx: 640, cy: 372},
-    rx: 356,
-    ry: 140,
-    icon: "shield",
-    label: "HTTP Digest Fields",
-    focus: [46, 84, 122],
+    kind: "pipeline3",
+    focus: [0, 38, 76],
+    subs: ["能干活","到你的领域就不够","把专长装进一个容器"],
     items: [
-      {id: "client", icon: "person", text: "客户端"},
-      {id: "proxy", icon: "link", text: "中间代理"},
-      {id: "clock", icon: "clock", text: "时钟漂移"},
-      {id: "store", icon: "db", text: "共享密钥"},
-      {id: "observe", icon: "gauge", text: "重放窗口"},
-      {id: "threat", icon: "branch", text: "篡改风险"},
+      {id: "s1", icon: "chip", text: "通用能力"},
+      {id: "s2", icon: "funnel", text: "领域缺口"},
+      {id: "s3", icon: "grid", text: "技能容器"},
     ],
   },
 };
 
 export function SC01({scene}) {
-  return <ExplainerShot scene={{...scene, variant: SHOT_RECIPE.variant, narrative_job: scene.narrative_job || SHOT_RECIPE.hero_role}} recipe={SHOT_RECIPE} stage={G1_STAGE} />;
+  return <ExplainerShot scene={{...scene, variant: SHOT_RECIPE.variant, narrative_job: scene.narrative_job || SHOT_RECIPE.narrative_job}} recipe={SHOT_RECIPE} stage={G1_STAGE} />;
 }

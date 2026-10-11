@@ -1,27 +1,28 @@
 {
   "version": "0.3",
-  "project_id": "digest-explainer",
+  "project_id": "skill-explainer",
   "width": 1280,
   "height": 720,
   "fps": 30,
-  "duration": 336.3333333333333,
+  "duration": 198.36666666666665,
   "scenes": [
     {
       "id": "scene-001",
       "start": 2.8333333333333335,
-      "duration": 8.766666666666667,
+      "duration": 9.466666666666667,
       "source_ref": {
         "segment_index": 0,
         "script_id": "seg-001"
       },
-      "variant": "network",
+      "variant": "preference",
       "narrative_job": "hook",
-      "semantic_confidence": 0.5,
+      "semantic_confidence": 0.45,
       "matched_rules": [
-        "\\bconnect\\b",
-        "\\bconnection\\b",
-        "\\btransport\\b",
-        "连接|关系|传递|网络|链路"
+        "want-content-digest",
+        "want-repr-digest",
+        "\\bpreference\\b",
+        "\\bwanted\\b",
+        "偏好|选择|想要|需要|目标"
       ],
       "composition": {
         "focus": "hero-plus-flow",
@@ -37,7 +38,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "一次摘要认证牵涉到的角色,比想象的多。,客户端、服务端、代理、时钟、缓存,缺一环就校验不过。,先把这张关系网摆出来。"
+          "text": "通用 Agent 已经能干活了,但一到你的领域就不够用,缺的不是算力，是方法,所以我们需要一种,能把专长装进去的容器"
         },
         {
           "id": "flow",
@@ -65,18 +66,21 @@
     },
     {
       "id": "scene-002",
-      "start": 11.6,
-      "duration": 10.766666666666667,
+      "start": 12.3,
+      "duration": 9.3,
       "source_ref": {
         "segment_index": 1,
         "script_id": "seg-002"
       },
-      "variant": "structured",
-      "narrative_job": "explain",
+      "variant": "preference",
+      "narrative_job": "hook",
       "semantic_confidence": 0.45,
       "matched_rules": [
-        "structured",
-        "结构化|字段|层级|组织|格式"
+        "want-content-digest",
+        "want-repr-digest",
+        "\\bpreference\\b",
+        "\\bwanted\\b",
+        "偏好|选择|想要|需要|目标"
       ],
       "composition": {
         "focus": "hero-plus-flow",
@@ -92,7 +96,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "报文本身是明文,头部却带着一串看不懂的字段。,这些字段叫摘要字段,是把口令换成不可逆的凭证。,换句话说，网络上看不到口令。"
+          "text": "先给结论,一个技能就是一个文件夹,里面放着一份 SKILL.md,再加可选的脚本和资料,Agent 会在需要时自己找到它并加载"
         },
         {
           "id": "flow",
@@ -120,20 +124,21 @@
     },
     {
       "id": "scene-003",
-      "start": 22.366666666666667,
-      "duration": 7.366666666666666,
+      "start": 21.6,
+      "duration": 8.7,
       "source_ref": {
         "segment_index": 2,
         "script_id": "seg-003"
       },
-      "variant": "network",
-      "narrative_job": "mechanism",
+      "variant": "sequence",
+      "narrative_job": "sequence",
       "semantic_confidence": 0.5,
       "matched_rules": [
-        "\\bconnect\\b",
-        "\\bconnection\\b",
-        "\\btransport\\b",
-        "连接|关系|传递|网络|链路"
+        "\\bfirst\\b",
+        "\\bthen\\b",
+        "\\bnext\\b",
+        "\\bstep\\b",
+        "首先|然后|接着|下一步|步骤|流程"
       ],
       "composition": {
         "focus": "hero-plus-flow",
@@ -149,7 +154,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "并不是每套系统都值得上摘要。,公网链路该上，内网链路可以省。,差别在于链路上有没有不可信的跳。"
+          "text": "你可能一直在重复粘贴同一段指令,那是一张清单，或者一套多步流程,提示词用完就散了,技能是把它固定下来的地方"
         },
         {
           "id": "flow",
@@ -177,18 +182,21 @@
     },
     {
       "id": "scene-004",
-      "start": 29.733333333333334,
-      "duration": 10,
+      "start": 30.3,
+      "duration": 8.333333333333334,
       "source_ref": {
         "segment_index": 3,
         "script_id": "seg-004"
       },
-      "variant": "structured",
-      "narrative_job": "explain",
+      "variant": "preference",
+      "narrative_job": "hook",
       "semantic_confidence": 0.45,
       "matched_rules": [
-        "structured",
-        "结构化|字段|层级|组织|格式"
+        "want-content-digest",
+        "want-repr-digest",
+        "\\bpreference\\b",
+        "\\bwanted\\b",
+        "偏好|选择|想要|需要|目标"
       ],
       "composition": {
         "focus": "hero-plus-flow",
@@ -204,7 +212,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "摘要不是凭空来的，它由四个部分拼成。,算法、字段顺序、规范化方式、拼接顺序,缺一不可。,任何一处不同,两侧算出的摘要就不一样。"
+          "text": "技能和常驻配置不一样,正文只在使用时才被读进来,所以再长的参考资料,在真正需要之前几乎不占预算"
         },
         {
           "id": "flow",
@@ -232,21 +240,16 @@
     },
     {
       "id": "scene-005",
-      "start": 39.733333333333334,
-      "duration": 8.666666666666666,
+      "start": 38.63333333333333,
+      "duration": 7.7,
       "source_ref": {
         "segment_index": 4,
         "script_id": "seg-005"
       },
-      "variant": "network",
-      "narrative_job": "mechanism",
-      "semantic_confidence": 0.5,
-      "matched_rules": [
-        "\\bconnect\\b",
-        "\\bconnection\\b",
-        "\\btransport\\b",
-        "连接|关系|传递|网络|链路"
-      ],
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
+      "matched_rules": [],
       "composition": {
         "focus": "hero-plus-flow",
         "hero_weight": 0.68,
@@ -261,7 +264,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "覆盖一跳还是覆盖整条链，是两种设计。,单跳校验便宜，但代理能读到原文。,端到端贵一些，整条链路都不可读。"
+          "text": "技能不是工具，也不是插件,工具给它一双手，技能给的是方法,技能之间还能像积木一样叠加"
         },
         {
           "id": "flow",
@@ -289,20 +292,18 @@
     },
     {
       "id": "scene-006",
-      "start": 48.4,
-      "duration": 9.033333333333333,
+      "start": 46.333333333333336,
+      "duration": 5.566666666666666,
       "source_ref": {
         "segment_index": 5,
         "script_id": "seg-006"
       },
-      "variant": "causal",
-      "narrative_job": "mechanism",
-      "semantic_confidence": 0.5,
+      "variant": "structured",
+      "narrative_job": "explain",
+      "semantic_confidence": 0.45,
       "matched_rules": [
-        "\\bbecause\\b",
-        "\\btherefore\\b",
-        "\\bcaus(e|al)\\b",
-        "因为|因此|导致|原因|机制|原理"
+        "structured",
+        "结构化|字段|层级|组织|格式"
       ],
       "composition": {
         "focus": "hero-plus-flow",
@@ -318,7 +319,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "于是报文被压成一个固定长度的摘要。,服务器只拿摘要比对,口令始终不出网关。,这是摘要机制最核心的一次转换。"
+          "text": "现在技能已经是一个开放标准,同一份格式到处都能用,换个平台不用重写"
         },
         {
           "id": "flow",
@@ -346,8 +347,8 @@
     },
     {
       "id": "scene-007",
-      "start": 57.43333333333333,
-      "duration": 8.233333333333333,
+      "start": 53.5,
+      "duration": 9,
       "source_ref": {
         "segment_index": 6,
         "script_id": "seg-007"
@@ -370,7 +371,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "摘要认证要走完三步。,服务端先发挑战,客户端算摘要回应，服务端比对。,少任何一步都算不上一次认证。"
+          "text": "拆开看，一个技能长这样,根目录下一份 SKILL.md,旁边可以有 scripts、references、assets,只有 SKILL.md 是必需的"
         },
         {
           "id": "flow",
@@ -398,16 +399,21 @@
     },
     {
       "id": "scene-008",
-      "start": 65.66666666666667,
-      "duration": 6.866666666666666,
+      "start": 62.5,
+      "duration": 8.366666666666667,
       "source_ref": {
         "segment_index": 7,
         "script_id": "seg-008"
       },
-      "variant": "generic",
-      "narrative_job": "transition",
-      "semantic_confidence": 0,
-      "matched_rules": [],
+      "variant": "code",
+      "narrative_job": "mechanism",
+      "semantic_confidence": 0.5,
+      "matched_rules": [
+        "\\bcode\\b",
+        "\\bapi\\b",
+        "\\bfunction\\b",
+        "代码|接口|函数|调用|协议"
+      ],
       "composition": {
         "focus": "hero-plus-flow",
         "hero_weight": 0.68,
@@ -422,7 +428,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "为什么不用明文口令？,抓包就能读到，代理和日志都会留一份。,同一份凭据还能被反复重放。"
+          "text": "三个目录各管一件事,scripts 放能直接跑的代码,references 放沉淀下来的文档,assets 放模板和素材"
         },
         {
           "id": "flow",
@@ -450,20 +456,20 @@
     },
     {
       "id": "scene-009",
-      "start": 72.53333333333333,
-      "duration": 9.8,
+      "start": 70.86666666666666,
+      "duration": 7.633333333333334,
       "source_ref": {
         "segment_index": 8,
         "script_id": "seg-009"
       },
-      "variant": "causal",
-      "narrative_job": "mechanism",
+      "variant": "evidence",
+      "narrative_job": "evidence",
       "semantic_confidence": 0.5,
       "matched_rules": [
-        "\\bbecause\\b",
-        "\\btherefore\\b",
-        "\\bcaus(e|al)\\b",
-        "因为|因此|导致|原因|机制|原理"
+        "\\bevidence\\b",
+        "\\bsource\\b",
+        "\\bproof\\b",
+        "证据|来源|证明|依据|数据|研究"
       ],
       "composition": {
         "focus": "hero-plus-flow",
@@ -479,7 +485,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "摘要认证不是新发明,它是 HTTP 里的一项可选机制。,规范定义了字段、算法和拼接方式。,我们按规范里的例子来讲。"
+          "text": "SKILL.md 分成两段,开头是元数据，至少两项,名字和描述,下面才是写给 Agent 看的指令"
         },
         {
           "id": "flow",
@@ -507,19 +513,16 @@
     },
     {
       "id": "scene-010",
-      "start": 82.33333333333333,
-      "duration": 8.5,
+      "start": 78.5,
+      "duration": 8.066666666666666,
       "source_ref": {
         "segment_index": 9,
         "script_id": "seg-010"
       },
-      "variant": "structured",
-      "narrative_job": "explain",
-      "semantic_confidence": 0.45,
-      "matched_rules": [
-        "structured",
-        "结构化|字段|层级|组织|格式"
-      ],
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
+      "matched_rules": [],
       "composition": {
         "focus": "hero-plus-flow",
         "hero_weight": 0.68,
@@ -534,7 +537,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "客户端真正发出去的，就是这一行头。,用户名、域、路径、还有一串计数器。,这些字段拼起来，才得到最终的摘要。"
+          "text": "写技能最好的心智模型,是给新同事写一份入职指南,你把踩过的坑写清楚,它就不用再踩一遍"
         },
         {
           "id": "flow",
@@ -562,8 +565,8 @@
     },
     {
       "id": "scene-011",
-      "start": 90.83333333333333,
-      "duration": 7.066666666666666,
+      "start": 86.56666666666666,
+      "duration": 7.633333333333334,
       "source_ref": {
         "segment_index": 10,
         "script_id": "seg-011"
@@ -586,7 +589,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "一次请求牵涉的角色可以列成一圈。,客户端负责算，服务端负责比。,代理、缓存、日志各取所需。"
+          "text": "关键在于渐进式披露,描述一直挂着，但很短,正文命中才读,附属文件按需再取"
         },
         {
           "id": "flow",
@@ -614,8 +617,8 @@
     },
     {
       "id": "scene-012",
-      "start": 97.9,
-      "duration": 6.5,
+      "start": 94.2,
+      "duration": 7.566666666666666,
       "source_ref": {
         "segment_index": 11,
         "script_id": "seg-012"
@@ -638,7 +641,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "职责天然落在两侧。,客户端算摘要，服务端生成挑战并比对。,两边共享的只有那把密钥。"
+          "text": "这样设计是为了省上下文,常驻的只有一小段描述,所以你能同时装很多技能,而不会把窗口塞满"
         },
         {
           "id": "flow",
@@ -666,8 +669,8 @@
     },
     {
       "id": "scene-013",
-      "start": 106,
-      "duration": 7.666666666666667,
+      "start": 103.36666666666666,
+      "duration": 7.8,
       "source_ref": {
         "segment_index": 12,
         "script_id": "seg-013"
@@ -690,7 +693,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "算法分三档，按需选。,弱摘要容易撞，强摘要成本高。,多数新系统直接从第三档起步。"
+          "text": "那它到底怎么被用起来,第一步是发现,Agent 会扫描手上所有技能,找出和当前任务相关的那些"
         },
         {
           "id": "flow",
@@ -718,22 +721,16 @@
     },
     {
       "id": "scene-014",
-      "start": 113.66666666666667,
-      "duration": 8.933333333333334,
+      "start": 111.16666666666667,
+      "duration": 6.9,
       "source_ref": {
         "segment_index": 13,
         "script_id": "seg-014"
       },
-      "variant": "sequence",
-      "narrative_job": "sequence",
-      "semantic_confidence": 0.5,
-      "matched_rules": [
-        "\\bfirst\\b",
-        "\\bthen\\b",
-        "\\bnext\\b",
-        "\\bstep\\b",
-        "首先|然后|接着|下一步|步骤|流程"
-      ],
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
+      "matched_rules": [],
       "composition": {
         "focus": "hero-plus-flow",
         "hero_weight": 0.68,
@@ -748,7 +745,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "摘要值来自四层东西。,先定算法,再定字段顺序，然后规范化和拼接。,顺序一旦定错，摘要必然不等。"
+          "text": "没有匹配就完全不碰,只有相关时才会访问某个技能,所以技能多，不等于负担重"
         },
         {
           "id": "flow",
@@ -776,8 +773,8 @@
     },
     {
       "id": "scene-015",
-      "start": 122.6,
-      "duration": 8.533333333333333,
+      "start": 118.06666666666666,
+      "duration": 7.066666666666666,
       "source_ref": {
         "segment_index": 14,
         "script_id": "seg-015"
@@ -800,7 +797,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "新旧写法逐项对照，差别不小。,旧写法里算法是缺省的,新写法必须写明。,用户名是否进摘要也换了约定。"
+          "text": "命中之后,它只加载最小的那一部分,必要的说明和文件就够了,这样还能保持响应速度"
         },
         {
           "id": "flow",
@@ -828,16 +825,21 @@
     },
     {
       "id": "scene-016",
-      "start": 131.13333333333333,
-      "duration": 6.6,
+      "start": 125.13333333333334,
+      "duration": 7.666666666666667,
       "source_ref": {
         "segment_index": 15,
         "script_id": "seg-016"
       },
-      "variant": "generic",
-      "narrative_job": "transition",
-      "semantic_confidence": 0,
-      "matched_rules": [],
+      "variant": "code",
+      "narrative_job": "mechanism",
+      "semantic_confidence": 0.5,
+      "matched_rules": [
+        "\\bcode\\b",
+        "\\bapi\\b",
+        "\\bfunction\\b",
+        "代码|接口|函数|调用|协议"
+      ],
       "composition": {
         "focus": "hero-plus-flow",
         "hero_weight": 0.68,
@@ -852,7 +854,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "口令本身不会离开客户端。,它先被压成摘要，再进网。,服务器只见到摘要这一种形态。"
+          "text": "技能里真正干活的是脚本,Agent 用本地代码执行,配合文件系统完成任务,再把结论写回来"
         },
         {
           "id": "flow",
@@ -880,16 +882,22 @@
     },
     {
       "id": "scene-017",
-      "start": 137.73333333333332,
-      "duration": 6.533333333333333,
+      "start": 132.8,
+      "duration": 9.566666666666666,
       "source_ref": {
         "segment_index": 16,
         "script_id": "seg-017"
       },
-      "variant": "generic",
-      "narrative_job": "transition",
-      "semantic_confidence": 0,
-      "matched_rules": [],
+      "variant": "comparison",
+      "narrative_job": "compare",
+      "semantic_confidence": 0.5,
+      "matched_rules": [
+        "\\bversus\\b",
+        "\\bvs\\.?\\b",
+        "\\bcompare\\b",
+        "\\bcomparison\\b",
+        "相比|对比|区别|差异|优于|劣于"
+      ],
       "composition": {
         "focus": "hero-plus-flow",
         "hero_weight": 0.68,
@@ -904,7 +912,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "强度可以分三档看。,不加密、弱摘要、强摘要。,公网场景基本只考虑第三档。"
+          "text": "再回到上下文预算这条线,指令和资料都不常驻,只有命中那一刻才付出成本,这是它和常驻提示词最大的区别"
         },
         {
           "id": "flow",
@@ -932,20 +940,21 @@
     },
     {
       "id": "scene-018",
-      "start": 144.26666666666668,
-      "duration": 7.233333333333333,
+      "start": 142.36666666666667,
+      "duration": 6.7,
       "source_ref": {
         "segment_index": 17,
         "script_id": "seg-018"
       },
-      "variant": "causal",
-      "narrative_job": "mechanism",
-      "semantic_confidence": 0.5,
+      "variant": "preference",
+      "narrative_job": "hook",
+      "semantic_confidence": 0.45,
       "matched_rules": [
-        "\\bbecause\\b",
-        "\\btherefore\\b",
-        "\\bcaus(e|al)\\b",
-        "因为|因此|导致|原因|机制|原理"
+        "want-content-digest",
+        "want-repr-digest",
+        "\\bpreference\\b",
+        "\\bwanted\\b",
+        "偏好|选择|想要|需要|目标"
       ],
       "composition": {
         "focus": "hero-plus-flow",
@@ -961,7 +970,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "弱算法被淘汰是有原因的。,摘要长度有限，可以被穷举。,碰撞也更容易被构造出来。"
+          "text": "一个任务往往要用好几个技能,它们能叠在一起,Agent 自己判断需要哪些,再协调它们一起用"
         },
         {
           "id": "flow",
@@ -989,8 +998,8 @@
     },
     {
       "id": "scene-019",
-      "start": 151.5,
-      "duration": 6.766666666666667,
+      "start": 150.66666666666666,
+      "duration": 8.566666666666666,
       "source_ref": {
         "segment_index": 18,
         "script_id": "seg-019"
@@ -1013,7 +1022,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "拼接顺序必须是双方约定的。,规范给出了规范串的定义。,顺序错了，摘要就对不上。"
+          "text": "如果你的技能一直没被触发,九成是描述没写好,名字和描述是唯一的常驻信息,写得含糊，就等于不存在"
         },
         {
           "id": "flow",
@@ -1041,20 +1050,16 @@
     },
     {
       "id": "scene-020",
-      "start": 158.26666666666668,
-      "duration": 8.166666666666666,
+      "start": 159.23333333333332,
+      "duration": 8.5,
       "source_ref": {
         "segment_index": 19,
         "script_id": "seg-020"
       },
-      "variant": "transformation",
-      "narrative_job": "transform",
-      "semantic_confidence": 0.5,
-      "matched_rules": [
-        "\\bbefore\\b",
-        "\\bafter\\b",
-        "变成|转化|转换|演变|改成|从.*到"
-      ],
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
+      "matched_rules": [],
       "composition": {
         "focus": "hero-plus-flow",
         "hero_weight": 0.68,
@@ -1069,7 +1074,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "规范化之后，请求变成四段。,方法、路径、认证参数、摘要前缀。,它们按固定顺序排好，再拼起来。"
+          "text": "描述里要写清楚什么时候用它,触发时机、适用场景、还有边界,Agent 就是靠这几句判断该不该开"
         },
         {
           "id": "flow",
@@ -1097,8 +1102,8 @@
     },
     {
       "id": "scene-021",
-      "start": 166.43333333333334,
-      "duration": 7.3,
+      "start": 167.73333333333332,
+      "duration": 7.866666666666666,
       "source_ref": {
         "segment_index": 20,
         "script_id": "seg-021"
@@ -1121,7 +1126,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "谁有权定义这个顺序？,规范说了算,客户端和服务端都照它执行。,测试向量用来保证两边一致。"
+          "text": "什么时候值得建一个技能,当你反复粘贴同一段指令,当一个清单越来越长,或者某个文档已经塞不下的时候"
         },
         {
           "id": "flow",
@@ -1149,19 +1154,16 @@
     },
     {
       "id": "scene-022",
-      "start": 173.73333333333332,
-      "duration": 7.366666666666666,
+      "start": 175.6,
+      "duration": 8.166666666666666,
       "source_ref": {
         "segment_index": 21,
         "script_id": "seg-022"
       },
-      "variant": "structured",
-      "narrative_job": "explain",
-      "semantic_confidence": 0.45,
-      "matched_rules": [
-        "structured",
-        "结构化|字段|层级|组织|格式"
-      ],
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
+      "matched_rules": [],
       "composition": {
         "focus": "hero-plus-flow",
         "hero_weight": 0.68,
@@ -1176,7 +1178,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "请求侧和响应侧的字段不一样。,请求侧关心方法和路径。,响应侧关心摘要本身和随机串。"
+          "text": "与其为每个场景单独造一个 Agent,不如把专长打包成能力,让同一个通用 Agent 长出专才的分支"
         },
         {
           "id": "flow",
@@ -1204,16 +1206,21 @@
     },
     {
       "id": "scene-023",
-      "start": 181.1,
-      "duration": 6.966666666666667,
+      "start": 183.76666666666668,
+      "duration": 7.466666666666667,
       "source_ref": {
         "segment_index": 22,
         "script_id": "seg-023"
       },
-      "variant": "generic",
-      "narrative_job": "transition",
-      "semantic_confidence": 0,
-      "matched_rules": [],
+      "variant": "code",
+      "narrative_job": "mechanism",
+      "semantic_confidence": 0.5,
+      "matched_rules": [
+        "\\bcode\\b",
+        "\\bapi\\b",
+        "\\bfunction\\b",
+        "代码|接口|函数|调用|协议"
+      ],
       "composition": {
         "focus": "hero-plus-flow",
         "hero_weight": 0.68,
@@ -1228,7 +1235,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "顺序有三种取法。,手写固定序、按字典序、按规范序。,新系统应该走第三种。"
+          "text": "技能有两种被用起来的方式,相关时自动加载,也可以直接点名调用,两种都靠那份描述兜底"
         },
         {
           "id": "flow",
@@ -1256,67 +1263,12 @@
     },
     {
       "id": "scene-024",
-      "start": 188.06666666666666,
-      "duration": 5.866666666666666,
+      "start": 191.23333333333332,
+      "duration": 7.133333333333334,
       "source_ref": {
         "segment_index": 23,
         "script_id": "seg-024"
       },
-      "variant": "structured",
-      "narrative_job": "explain",
-      "semantic_confidence": 0.45,
-      "matched_rules": [
-        "structured",
-        "结构化|字段|层级|组织|格式"
-      ],
-      "composition": {
-        "focus": "hero-plus-flow",
-        "hero_weight": 0.68,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "narration",
-          "text": "字段本身也分四层。,原始头字段先规范化，再拼接，最后摘要。,每一层都可能出错。"
-        },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "enter",
-          "target": "hero",
-          "preset": "rise"
-        },
-        {
-          "type": "transform",
-          "target": "flow",
-          "preset": "travel"
-        },
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "pan",
-          "amount": 0.04
-        }
-      ]
-    },
-    {
-      "id": "scene-025",
-      "start": 195.53333333333333,
-      "duration": 6.766666666666667,
-      "source_ref": {
-        "segment_index": 24,
-        "script_id": "seg-025"
-      },
       "variant": "generic",
       "narrative_job": "transition",
       "semantic_confidence": 0,
@@ -1335,1036 +1287,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "有没有计数器，差别很大。,没有计数器，原样重放就能通过。,有了计数器，序号必须递增。"
-        },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "enter",
-          "target": "hero",
-          "preset": "rise"
-        },
-        {
-          "type": "transform",
-          "target": "flow",
-          "preset": "travel"
-        },
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "push",
-          "amount": 0.04
-        }
-      ]
-    },
-    {
-      "id": "scene-026",
-      "start": 202.3,
-      "duration": 6.5,
-      "source_ref": {
-        "segment_index": 25,
-        "script_id": "seg-026"
-      },
-      "variant": "generic",
-      "narrative_job": "transition",
-      "semantic_confidence": 0,
-      "matched_rules": [],
-      "composition": {
-        "focus": "hero-plus-flow",
-        "hero_weight": 0.68,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "narration",
-          "text": "重放被压进一个窗口里。,报文进来，先看序号是否用过。,用过就直接拒绝。"
-        },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "enter",
-          "target": "hero",
-          "preset": "rise"
-        },
-        {
-          "type": "transform",
-          "target": "flow",
-          "preset": "travel"
-        },
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "pan",
-          "amount": 0.04
-        }
-      ]
-    },
-    {
-      "id": "scene-027",
-      "start": 208.8,
-      "duration": 7.633333333333334,
-      "source_ref": {
-        "segment_index": 26,
-        "script_id": "seg-027"
-      },
-      "variant": "generic",
-      "narrative_job": "transition",
-      "semantic_confidence": 0,
-      "matched_rules": [],
-      "composition": {
-        "focus": "hero-plus-flow",
-        "hero_weight": 0.68,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "narration",
-          "text": "重放防护同样分三档。,只有随机串最弱，加上计数就好些。,再加时间窗口才算稳。"
-        },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "enter",
-          "target": "hero",
-          "preset": "rise"
-        },
-        {
-          "type": "transform",
-          "target": "flow",
-          "preset": "travel"
-        },
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "push",
-          "amount": 0.04
-        }
-      ]
-    },
-    {
-      "id": "scene-028",
-      "start": 216.43333333333334,
-      "duration": 7.066666666666666,
-      "source_ref": {
-        "segment_index": 27,
-        "script_id": "seg-028"
-      },
-      "variant": "generic",
-      "narrative_job": "transition",
-      "semantic_confidence": 0,
-      "matched_rules": [],
-      "composition": {
-        "focus": "hero-plus-flow",
-        "hero_weight": 0.68,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "narration",
-          "text": "时钟偏了就会失败。,客户端快了一点，服务端就判过期。,请求直接被拒，没有补救机会。"
-        },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "enter",
-          "target": "hero",
-          "preset": "rise"
-        },
-        {
-          "type": "transform",
-          "target": "flow",
-          "preset": "travel"
-        },
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "pan",
-          "amount": 0.04
-        }
-      ]
-    },
-    {
-      "id": "scene-029",
-      "start": 223.5,
-      "duration": 6.7,
-      "source_ref": {
-        "segment_index": 28,
-        "script_id": "seg-029"
-      },
-      "variant": "generic",
-      "narrative_job": "transition",
-      "semantic_confidence": 0,
-      "matched_rules": [],
-      "composition": {
-        "focus": "hero-plus-flow",
-        "hero_weight": 0.68,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "narration",
-          "text": "规范对时钟有明确要求。,两侧时间必须足够接近。,偏差过大会被当成异常。"
-        },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "enter",
-          "target": "hero",
-          "preset": "rise"
-        },
-        {
-          "type": "transform",
-          "target": "flow",
-          "preset": "travel"
-        },
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "push",
-          "amount": 0.04
-        }
-      ]
-    },
-    {
-      "id": "scene-030",
-      "start": 230.2,
-      "duration": 8.433333333333334,
-      "source_ref": {
-        "segment_index": 29,
-        "script_id": "seg-030"
-      },
-      "variant": "structured",
-      "narrative_job": "explain",
-      "semantic_confidence": 0.45,
-      "matched_rules": [
-        "structured",
-        "结构化|字段|层级|组织|格式"
-      ],
-      "composition": {
-        "focus": "hero-plus-flow",
-        "hero_weight": 0.68,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "narration",
-          "text": "每次请求都要变的东西有三个。,计数器自增，随机串重算，质量参数固定。,这三个字段是防重放的关键。"
-        },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "enter",
-          "target": "hero",
-          "preset": "rise"
-        },
-        {
-          "type": "transform",
-          "target": "flow",
-          "preset": "travel"
-        },
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "pan",
-          "amount": 0.04
-        }
-      ]
-    },
-    {
-      "id": "scene-031",
-      "start": 238.63333333333333,
-      "duration": 7.3,
-      "source_ref": {
-        "segment_index": 30,
-        "script_id": "seg-031"
-      },
-      "variant": "network",
-      "narrative_job": "mechanism",
-      "semantic_confidence": 0.5,
-      "matched_rules": [
-        "\\bconnect\\b",
-        "\\bconnection\\b",
-        "\\btransport\\b",
-        "连接|关系|传递|网络|链路"
-      ],
-      "composition": {
-        "focus": "hero-plus-flow",
-        "hero_weight": 0.68,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "narration",
-          "text": "有代理的时候，链路会变长。,每一跳都可能看到明文。,缓存和日志还会各自留一份。"
-        },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "enter",
-          "target": "hero",
-          "preset": "rise"
-        },
-        {
-          "type": "transform",
-          "target": "flow",
-          "preset": "travel"
-        },
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "push",
-          "amount": 0.04
-        }
-      ]
-    },
-    {
-      "id": "scene-032",
-      "start": 245.93333333333334,
-      "duration": 7.433333333333334,
-      "source_ref": {
-        "segment_index": 31,
-        "script_id": "seg-032"
-      },
-      "variant": "generic",
-      "narrative_job": "transition",
-      "semantic_confidence": 0,
-      "matched_rules": [],
-      "composition": {
-        "focus": "hero-plus-flow",
-        "hero_weight": 0.68,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "narration",
-          "text": "于是有了逐跳和端到端两种做法。,逐跳便宜，但只覆盖一段。,端到端贵，覆盖整条链。"
-        },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "enter",
-          "target": "hero",
-          "preset": "rise"
-        },
-        {
-          "type": "transform",
-          "target": "flow",
-          "preset": "travel"
-        },
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "pan",
-          "amount": 0.04
-        }
-      ]
-    },
-    {
-      "id": "scene-033",
-      "start": 253.36666666666667,
-      "duration": 8.233333333333333,
-      "source_ref": {
-        "segment_index": 32,
-        "script_id": "seg-033"
-      },
-      "variant": "generic",
-      "narrative_job": "transition",
-      "semantic_confidence": 0,
-      "matched_rules": [],
-      "composition": {
-        "focus": "hero-plus-flow",
-        "hero_weight": 0.68,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "narration",
-          "text": "部署方式常见三种。,全链摘要最彻底，也最贵。,逐跳摘要是折中,边缘摘要介于两者之间。"
-        },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "enter",
-          "target": "hero",
-          "preset": "rise"
-        },
-        {
-          "type": "transform",
-          "target": "flow",
-          "preset": "travel"
-        },
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "push",
-          "amount": 0.04
-        }
-      ]
-    },
-    {
-      "id": "scene-034",
-      "start": 261.6,
-      "duration": 7.5,
-      "source_ref": {
-        "segment_index": 33,
-        "script_id": "seg-034"
-      },
-      "variant": "sequence",
-      "narrative_job": "sequence",
-      "semantic_confidence": 0.5,
-      "matched_rules": [
-        "\\bfirst\\b",
-        "\\bthen\\b",
-        "\\bnext\\b",
-        "\\bstep\\b",
-        "首先|然后|接着|下一步|步骤|流程"
-      ],
-      "composition": {
-        "focus": "hero-plus-flow",
-        "hero_weight": 0.68,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "narration",
-          "text": "每一跳要做四件事。,先认证，再转发，然后重新认证，最后落库。,任何一跳漏掉都会断链。"
-        },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "enter",
-          "target": "hero",
-          "preset": "rise"
-        },
-        {
-          "type": "transform",
-          "target": "flow",
-          "preset": "travel"
-        },
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "pan",
-          "amount": 0.04
-        }
-      ]
-    },
-    {
-      "id": "scene-035",
-      "start": 269.1,
-      "duration": 6.1,
-      "source_ref": {
-        "segment_index": 34,
-        "script_id": "seg-035"
-      },
-      "variant": "network",
-      "narrative_job": "mechanism",
-      "semantic_confidence": 0.5,
-      "matched_rules": [
-        "\\bconnect\\b",
-        "\\bconnection\\b",
-        "\\btransport\\b",
-        "连接|关系|传递|网络|链路"
-      ],
-      "composition": {
-        "focus": "hero-plus-flow",
-        "hero_weight": 0.68,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "narration",
-          "text": "覆盖范围的差别不在算法。,在链路长度。,一跳和整条链是两个量级。"
-        },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "enter",
-          "target": "hero",
-          "preset": "rise"
-        },
-        {
-          "type": "transform",
-          "target": "flow",
-          "preset": "travel"
-        },
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "push",
-          "amount": 0.04
-        }
-      ]
-    },
-    {
-      "id": "scene-036",
-      "start": 275.2,
-      "duration": 6.433333333333334,
-      "source_ref": {
-        "segment_index": 35,
-        "script_id": "seg-036"
-      },
-      "variant": "transformation",
-      "narrative_job": "transform",
-      "semantic_confidence": 0.5,
-      "matched_rules": [
-        "\\bbefore\\b",
-        "\\bafter\\b",
-        "变成|转化|转换|演变|改成|从.*到"
-      ],
-      "composition": {
-        "focus": "hero-plus-flow",
-        "hero_weight": 0.68,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "narration",
-          "text": "密钥也随 hops 拆开。,共享密钥变成每跳一把。,好处是任何一把都能单独撤回。"
-        },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "enter",
-          "target": "hero",
-          "preset": "rise"
-        },
-        {
-          "type": "transform",
-          "target": "flow",
-          "preset": "travel"
-        },
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "pan",
-          "amount": 0.04
-        }
-      ]
-    },
-    {
-      "id": "scene-037",
-      "start": 283.23333333333335,
-      "duration": 6.4,
-      "source_ref": {
-        "segment_index": 36,
-        "script_id": "seg-037"
-      },
-      "variant": "structured",
-      "narrative_job": "explain",
-      "semantic_confidence": 0.45,
-      "matched_rules": [
-        "structured",
-        "结构化|字段|层级|组织|格式"
-      ],
-      "composition": {
-        "focus": "hero-plus-flow",
-        "hero_weight": 0.68,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "narration",
-          "text": "真正接入要改三处。,选算法、配字段、对齐顺序。,顺序那一步最容易被漏掉。"
-        },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "enter",
-          "target": "hero",
-          "preset": "rise"
-        },
-        {
-          "type": "transform",
-          "target": "flow",
-          "preset": "travel"
-        },
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "push",
-          "amount": 0.04
-        }
-      ]
-    },
-    {
-      "id": "scene-038",
-      "start": 289.6333333333333,
-      "duration": 7.033333333333333,
-      "source_ref": {
-        "segment_index": 37,
-        "script_id": "seg-038"
-      },
-      "variant": "generic",
-      "narrative_job": "transition",
-      "semantic_confidence": 0,
-      "matched_rules": [],
-      "composition": {
-        "focus": "hero-plus-flow",
-        "hero_weight": 0.68,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "narration",
-          "text": "代价也是从这三处来的。,每跳多算一次，两侧顺序要对齐。,调试成本明显上升。"
-        },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "enter",
-          "target": "hero",
-          "preset": "rise"
-        },
-        {
-          "type": "transform",
-          "target": "flow",
-          "preset": "travel"
-        },
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "pan",
-          "amount": 0.04
-        }
-      ]
-    },
-    {
-      "id": "scene-039",
-      "start": 296.6666666666667,
-      "duration": 7.366666666666666,
-      "source_ref": {
-        "segment_index": 38,
-        "script_id": "seg-039"
-      },
-      "variant": "causal",
-      "narrative_job": "mechanism",
-      "semantic_confidence": 0.5,
-      "matched_rules": [
-        "\\bbecause\\b",
-        "\\btherefore\\b",
-        "\\bcaus(e|al)\\b",
-        "因为|因此|导致|原因|机制|原理"
-      ],
-      "composition": {
-        "focus": "hero-plus-flow",
-        "hero_weight": 0.68,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "narration",
-          "text": "但要先记住一件事。,摘要是可选机制，不开就没有这些代价。,代价集中在顺序和时钟上。"
-        },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "enter",
-          "target": "hero",
-          "preset": "rise"
-        },
-        {
-          "type": "transform",
-          "target": "flow",
-          "preset": "travel"
-        },
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "push",
-          "amount": 0.04
-        }
-      ]
-    },
-    {
-      "id": "scene-040",
-      "start": 304.03333333333336,
-      "duration": 7.233333333333333,
-      "source_ref": {
-        "segment_index": 39,
-        "script_id": "seg-040"
-      },
-      "variant": "generic",
-      "narrative_job": "transition",
-      "semantic_confidence": 0,
-      "matched_rules": [],
-      "composition": {
-        "focus": "hero-plus-flow",
-        "hero_weight": 0.68,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "narration",
-          "text": "落到配置上就是这几行。,算法写明，质量参数写明,计数器每次自增。,顺序仍然要对齐。"
-        },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "enter",
-          "target": "hero",
-          "preset": "rise"
-        },
-        {
-          "type": "transform",
-          "target": "flow",
-          "preset": "travel"
-        },
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "pan",
-          "amount": 0.04
-        }
-      ]
-    },
-    {
-      "id": "scene-041",
-      "start": 311.26666666666665,
-      "duration": 5.6,
-      "source_ref": {
-        "segment_index": 40,
-        "script_id": "seg-041"
-      },
-      "variant": "generic",
-      "narrative_job": "transition",
-      "semantic_confidence": 0,
-      "matched_rules": [],
-      "composition": {
-        "focus": "hero-plus-flow",
-        "hero_weight": 0.68,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "narration",
-          "text": "落地会碰到四个组件。,网关、应用、客户端，还有运维。,每一个都要改。"
-        },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "enter",
-          "target": "hero",
-          "preset": "rise"
-        },
-        {
-          "type": "transform",
-          "target": "flow",
-          "preset": "travel"
-        },
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "push",
-          "amount": 0.04
-        }
-      ]
-    },
-    {
-      "id": "scene-042",
-      "start": 316.8666666666667,
-      "duration": 5.533333333333333,
-      "source_ref": {
-        "segment_index": 41,
-        "script_id": "seg-042"
-      },
-      "variant": "generic",
-      "narrative_job": "transition",
-      "semantic_confidence": 0,
-      "matched_rules": [],
-      "composition": {
-        "focus": "hero-plus-flow",
-        "hero_weight": 0.68,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "narration",
-          "text": "代价最终还是要落在两侧。,客户端多存一次摘要。,服务端多算一次摘要。"
-        },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "enter",
-          "target": "hero",
-          "preset": "rise"
-        },
-        {
-          "type": "transform",
-          "target": "flow",
-          "preset": "travel"
-        },
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "pan",
-          "amount": 0.04
-        }
-      ]
-    },
-    {
-      "id": "scene-043",
-      "start": 322.4,
-      "duration": 6.533333333333333,
-      "source_ref": {
-        "segment_index": 42,
-        "script_id": "seg-043"
-      },
-      "variant": "evidence",
-      "narrative_job": "evidence",
-      "semantic_confidence": 0.5,
-      "matched_rules": [
-        "\\bevidence\\b",
-        "\\bsource\\b",
-        "\\bproof\\b",
-        "证据|来源|证明|依据|数据|研究"
-      ],
-      "composition": {
-        "focus": "hero-plus-flow",
-        "hero_weight": 0.68,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "narration",
-          "text": "该不该上摘要，先看场景。,公网该上，纯内网可以省。,真正的判断依据是链路。"
-        },
-        {
-          "id": "flow",
-          "type": "signal"
-        }
-      ],
-      "motion": [
-        {
-          "type": "enter",
-          "target": "hero",
-          "preset": "rise"
-        },
-        {
-          "type": "transform",
-          "target": "flow",
-          "preset": "travel"
-        },
-        {
-          "type": "camera",
-          "target": "stage",
-          "preset": "push",
-          "amount": 0.04
-        }
-      ]
-    },
-    {
-      "id": "scene-044",
-      "start": 328.93333333333334,
-      "duration": 7.4,
-      "source_ref": {
-        "segment_index": 43,
-        "script_id": "seg-044"
-      },
-      "variant": "network",
-      "narrative_job": "mechanism",
-      "semantic_confidence": 0.5,
-      "matched_rules": [
-        "\\bconnect\\b",
-        "\\bconnection\\b",
-        "\\btransport\\b",
-        "连接|关系|传递|网络|链路"
-      ],
-      "composition": {
-        "focus": "hero-plus-flow",
-        "hero_weight": 0.68,
-        "safe_margin": 0.08
-      },
-      "light": {
-        "mode": "hero-key",
-        "key_intensity": 0.82,
-        "accent": "purple"
-      },
-      "elements": [
-        {
-          "id": "hero",
-          "type": "narration",
-          "text": "判断有先后顺序。,先看场景，再看链路长度，最后看成本。,顺序反了就会为不需要的安全买单。"
+          "text": "所以技能到底是什么,是一份能被执行的方法论,也是给 Agent 的一份入职指南,从一个文件夹开始"
         },
         {
           "id": "flow",

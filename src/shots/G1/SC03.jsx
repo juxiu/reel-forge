@@ -1,40 +1,38 @@
-// reel-forge-source: {"project_id":"digest-explainer","script_id":"seg-003","script_sha256":"a73015a22f3c06b4bfe267607f381ce3f7815bfd05476e7673ccaf96711a4566"}
+// reel-forge-source: {"project_id":"skill-explainer","script_id":"seg-003","script_sha256":"66c97bb73d607899796b115085182a6d6ada1ea9dc2bfc06fc528ecd2079a701"}
 import React from "react";
 import {ExplainerShot} from "../Shot.jsx";
 import {G1_STAGE} from "./stage.jsx";
 
 /**
- * SC03 · 协商 —— 三种校验方案里选哪个。
+ * SC03 · comparetable —— 提示词用完就散，技能把它固定下来。
  *
- * 拓扑 ranked3：三行候选横向排行，最右一列是判定标记（选中 ✓ / 淘汰 ✗），
- * 行间有一条行进轨道撑住持续动作。这一列判定标记是本镜独有的语法。
- *
- * ⚠ stage.pick 指定第几行是「选中」—— 它同时决定紫框、glow 与 ✓ 的出现，三者不许各判各的。
- * ⚠ 淘汰行不消失，只降到 0.5 不透明度（isPast）：这是「讲完仍留在画面上」的承接做法。
+ * 拓扑骨架在 ../stage-kit.jsx，本镜的摆法（几何 / 文案 / 焦点拍）全在下面这个 stage 里。
+ * ⚠ 不声明入场帧：入场帧由 buildPlan 从字幕块推出（-6…+3 窗口），节拍与语义镜头同源。
+ * ⚠ focus 存的是**相对入场帧的偏移**，换字幕块时焦点交接自动跟着首句走。
+ * ⚠ hero_size / camera / variant / settle_frames 必须与 fixtures/reference-shot-blueprint.json 逐字段一致。
  */
 export const SHOT_RECIPE = {
   shot_id: "SC03",
-  variant: "preference",
-  hero_size: 185,
+  variant: "comparison",
+  hero_size: 200,
   camera: "push",
   settle_frames: 30,
-  hero_role: "negotiation",
-  mirror: false,
-  support_count: 3,
-  accent_index: 2,
+  narrative_job: "提示词用完就散，技能把它固定下来",
   stage: {
-    kind: "ranked3",
-    pick: 2,
-    caption: "只有端到端能覆盖整条链路",
-    focus: [0, 40, 80],
+    kind: "comparetable",
+    focus: [0, 38, 76],
+    left_label: "提示词",
+    right_label: "技能",
+    winner: 1,
     items: [
-      {id: "c1", icon: "clock", text: "单跳摘要"},
-      {id: "c2", icon: "link", text: "逐跳摘要"},
-      {id: "c3", icon: "shield", text: "端到端摘要"},
+      {id: "l1", icon: "doc", text: "用完就散"},
+      {id: "r1", icon: "grid", text: "固定下来"},
+      {id: "l2", icon: "clock", text: "每次重写"},
+      {id: "r2", icon: "link", text: "随时复用"},
     ],
   },
 };
 
 export function SC03({scene}) {
-  return <ExplainerShot scene={{...scene, variant: SHOT_RECIPE.variant, narrative_job: scene.narrative_job || SHOT_RECIPE.hero_role}} recipe={SHOT_RECIPE} stage={G1_STAGE} />;
+  return <ExplainerShot scene={{...scene, variant: SHOT_RECIPE.variant, narrative_job: scene.narrative_job || SHOT_RECIPE.narrative_job}} recipe={SHOT_RECIPE} stage={G1_STAGE} />;
 }

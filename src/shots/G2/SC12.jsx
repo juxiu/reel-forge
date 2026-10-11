@@ -1,41 +1,37 @@
-// reel-forge-source: {"project_id":"digest-explainer","script_id":"seg-012","script_sha256":"cdac01d61a41d66aa2a6e2fd33e4899317ee98768bdda26ebd4c6661f376107d"}
+// reel-forge-source: {"project_id":"skill-explainer","script_id":"seg-012","script_sha256":"cecbb131fc1816220d755822ee62ed2ff5f81911985837caf1ccd0657fe0ecd2"}
 import React from "react";
 import {ExplainerShot} from "../Shot.jsx";
 import {G2_STAGE} from "./stage.jsx";
 
 /**
- * SC12 · splitrows —— 两侧各自负责什么。
+ * SC12 · reshape —— 常驻的只有一小段描述。
  *
  * 拓扑骨架在 ../stage-kit.jsx，本镜的摆法（几何 / 文案 / 焦点拍）全在下面这个 stage 里。
- * ⚠ 不声明入场帧：入场帧由 buildPlan 从字幕块推出（−6…+3 窗口），所以本镜节拍与语义镜头同源。
+ * ⚠ 不声明入场帧：入场帧由 buildPlan 从字幕块推出（-6…+3 窗口），节拍与语义镜头同源。
  * ⚠ focus 存的是**相对入场帧的偏移**，换字幕块时焦点交接自动跟着首句走。
+ * ⚠ hero_size / camera / variant / settle_frames 必须与 fixtures/reference-shot-blueprint.json 逐字段一致。
  */
 export const SHOT_RECIPE = {
   shot_id: "SC12",
-  variant: "split",
-  hero_size: 190,
-  camera: "push",
+  variant: "transformation",
+  hero_size: 200,
+  camera: "pan",
   settle_frames: 30,
-  hero_role: "division",
-  mirror: false,
-  support_count: 4,
-  accent_index: 0,
+  narrative_job: "常驻的只有一小段描述",
   stage: {
-      kind: "splitrows",
-      focus: [0,40,80],
-      winner: 1,
-      caption: "职责落在两侧",
-      left_label: "客户端做的",
-      right_label: "服务端做的",
-      items: [
-        {id: "d1", icon: "key", text: "算摘要"},
-        {id: "d2", icon: "scale", text: "比对摘要"},
-        {id: "d3", icon: "shield", text: "生成挑战"},
-        {id: "d4", icon: "shield", text: "返回结果"},
-      ],
-    },
+    kind: "reshape",
+    focus: [0, 38],
+    from_icon: "doc",
+    to_icon: "grid",
+    from_sub: "所有资料都挂着",
+    to_sub: "窗口不再塞满",
+    items: [
+      {id: "f", icon: "doc", text: "全量常驻"},
+      {id: "t", icon: "grid", text: "小段描述"},
+    ],
+  },
 };
 
 export function SC12({scene}) {
-  return <ExplainerShot scene={{...scene, variant: SHOT_RECIPE.variant, narrative_job: scene.narrative_job || SHOT_RECIPE.hero_role}} recipe={SHOT_RECIPE} stage={G2_STAGE} />;
+  return <ExplainerShot scene={{...scene, variant: SHOT_RECIPE.variant, narrative_job: scene.narrative_job || SHOT_RECIPE.narrative_job}} recipe={SHOT_RECIPE} stage={G2_STAGE} />;
 }
