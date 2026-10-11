@@ -21,9 +21,9 @@ const timeline = rawTimeline && project.rails ? {...rawTimeline, rails: project.
  *    两条都要写：进度条按 totalFrames 铺满，画面按 scenes 的 start/duration 排，
  *    两个真源不一致时末章进度条会提前走完或永远差一截。
  *
- * ⚠ includeAudio 跟着 timeline 走：public/audio.mp3 与 timeline.gen.mjs 由同一个脚本（npm run tts）写出，
+ * ⚠ includeAudio 跟着 timeline 走：public/audio.wav 与 timeline.gen.mjs 由同一个脚本（npm run tts）写出，
  *    所以「有真实时间轴」是「有配音」的可靠代理。写死 true 会让 fresh clone 的第一次预览直接抛
- *    "Asset not found: audio.mp3"，而那跟画面质量无关。
+ *    "Asset not found: audio.wav"，而那跟画面质量无关。
  */
 
 const FPS = Number(fixtureWide.fps) || 30;

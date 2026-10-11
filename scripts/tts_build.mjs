@@ -11,7 +11,10 @@ const LEAD_FRAMES=Number(process.env.LEAD_FRAMES||45);
 const SENTENCE_GAP_FRAMES=Number(process.env.SENTENCE_GAP_FRAMES||10);
 const PARAGRAPH_GAP_FRAMES=Number(process.env.PARAGRAPH_GAP_FRAMES||30);
 const CHAPTER_GAP_FRAMES=Number(process.env.CHAPTER_GAP_FRAMES||45);
-const TAIL_FRAMES=Number(process.env.TAIL_FRAMES||60);
+// TAIL 90：对齐 a2e（template/scripts/tts_build.py TAIL=90）——片尾静音 3s 给收尾卡渐暗留足，
+// 60 帧（2s）时收尾卡还没停稳就黑场。段末补停留（a2e SHORT_TAIL=45）不在此做：本仓由 QC
+// 的 hold_too_short 门检测，构建时静默补帧会掩盖分镜层的时长声明。
+const TAIL_FRAMES=Number(process.env.TAIL_FRAMES||90);
 
 function parseNarration(text){
   const lines=text.split(/\r?\n/),items=[];
@@ -70,14 +73,22 @@ function runFfmpeg(args){
   const result=spawn("ffmpeg",args,{encoding:"utf8"});
   if(result.error) throw new Error("ffmpeg 无法启动: "+result.error+"（不在 PATH？装 ffmpeg 或设置 FFMPEG_PATH）");
   if(result.status!==0) throw new Error("ffmpeg failed: "+(result.stderr||"").slice(-1000));
+  return result;
 }
 function mixAudio(parts,totalSeconds,outFile){
   if(!parts.length) throw new Error("no audio parts");
   const args=["-y"];for(const part of parts) args.push("-i",part.file);
   const inputs=parts.map((part,index)=>{const delay=Math.max(0,Math.round(part.start*1000));return "["+index+":a]adelay="+delay+"|"+delay+"[a"+index+"]";});
   const labels=parts.map((_,index)=>"[a"+index+"]").join("");
-  const filter=[...inputs,labels+"amix=inputs="+parts.length+":duration=longest:normalize=0,apad,atrim=0:"+totalSeconds+",alimiter=limit=0.89[out]"].join(";");
-  runFfmpeg([...args,"-filter_complex",filter,"-map","[out]","-ar","48000","-ac","2","-c:a","libmp3lame","-b:a","192k",outFile]);
+  const mix=[...inputs,labels+"amix=inputs="+parts.length+":duration=longest:normalize=0,apad,atrim=0:"+totalSeconds+",volumedetect[out]"].join(";");
+  // 峰值归一（a2e 口径 peak 0.89）两遍法：alimiter 只防削波不抬响度，TTS 拼接后的低电平段会留在原地。
+  // 先 volumedetect 测全片 max_volume，再 volume 抬到 -1.01 dBFS（=线性 0.89）；增益封顶 +12dB 防静音段疯抬。
+  const probe=runFfmpeg([...args,"-filter_complex",mix,"-map","[out]","-f","null","-"]);
+  const m=/max_volume:\s*(-?[\d.]+)\s*dB/.exec(probe.stderr||"");
+  const gainDb=Math.min(12,m?-1.01-parseFloat(m[1]):0);
+  const fc=[...inputs,labels+"amix=inputs="+parts.length+":duration=longest:normalize=0,apad,atrim=0:"+totalSeconds+",volume="+gainDb.toFixed(2)+"dB[out]"].join(";");
+  // wav 16bit PCM（a2e 口径）：无损中间格式直进编码，不再 mp3→aac 双代有损。
+  runFfmpeg([...args,"-filter_complex",fc,"-map","[out]","-ar","48000","-ac","2","-c:a","pcm_s16le",outFile]);
 }
 function resultProvider(engine){return engine==="edge"?"edge-tts":engine==="wav"?"user-wav":engine;}
 
@@ -87,7 +98,7 @@ const project=JSON.parse(fs.readFileSync("fixtures/project.json","utf8"));
 const language=project.language||"zh";
 const engine=String(process.env.TTS_ENGINE||project.tts?.engine||"edge").toLowerCase();
 const voice=process.env.TTS_VOICE||project.tts?.voice||(language==="zh"?"zh-CN-YunxiNeural":"en-US-JennyNeural");
-const rate=process.env.TTS_RATE||project.tts?.rate||"+0%";
+const rate=process.env.TTS_RATE||project.tts?.rate||"+8%";
 const supportedEngines=new Set(["edge","kokoro","piper","kokoro_onnx","wav"]);
 if(!supportedEngines.has(engine)) throw new Error("unsupported TTS engine: "+engine);
 const root=path.join("artifacts",project.project_id,"audio");
@@ -110,11 +121,20 @@ const spoken = items
   .filter((item) => item.type !== "chapter")
   .map((item, index) => {
     const chunks = item.text.split("|").map((value) => value.trim()).filter(Boolean);
+    const cleanText = chunks.join(language === "en" ? " " : ",");
+    // a2e 连读风格：合成前剥离句读标点（实测同句 12.7s→10.6s，4.2→5.0 字/秒，对齐 a2e 的
+    // 5.5 字/秒量级）。标点停顿三重叠加是语速慢的主因：块内原有标点 + join 的逗号 + edge-tts
+    // 对每个句读的 0.3–0.5s 气口。字幕/溯源仍用 cleanText 原文——只有送进合成器的文本去标点。
+    const strip = (value) => value.replace(/[，。、！？；：,.!?;:]/g, "");
+    const spokenText = strip(cleanText);
+    const spokenChunks = chunks.map(strip);
     return {
       index,
       item,
       chunks,
-      cleanText: chunks.join(language === "en" ? " " : ","),
+      cleanText,
+      spokenText,
+      spokenChunks,
       outDir: path.join(root, "sentence-" + String(index + 1).padStart(3, "0")),
     };
   });
@@ -123,8 +143,8 @@ const spoken = items
 let synthesized = 0;
 async function synthOne(entry) {
   const result = engine === "edge"
-    ? await edgeTts({text: entry.cleanText, voice, outDir: entry.outDir, rate})
-    : await nativeTts({engine, text: entry.cleanText, voice, outDir: entry.outDir, rate, index: entry.index + 1});
+    ? await edgeTts({text: entry.spokenText, voice, outDir: entry.outDir, rate})
+    : await nativeTts({engine, text: entry.spokenText, voice, outDir: entry.outDir, rate, index: entry.index + 1});
   synthesized++;
   process.stderr.write(`\r  TTS 合成 ${synthesized}/${spoken.length}（并发 ${CONCURRENCY}）`);
   return {...entry, result};
@@ -180,9 +200,13 @@ const sentences = [];
 const audioParts = [];
 const allWords = [];
 for (const entry of synthResults) {
-  const {item, chunks, cleanText, result} = entry;
+  const {item, chunks, cleanText, spokenText, spokenChunks, result} = entry;
   if (item.chapter !== lastChapter) {
-    if (sentenceIndex > 0) cursorSeconds += CHAPTER_GAP_FRAMES / FPS;
+    // ⚠ 第 1 章也要吃章前空白（对齐 a2e template/scripts/tts_build.py：遍历到 chapter 标记就
+    //   `t += CHAPTER_GAP / FPS`，对 C1 同样生效）。旧写法 `if (sentenceIndex > 0)` 把首章短路，
+    //   片头只剩 LEAD 45（1.5s，扣掉离场后仅 40 帧），片头四件套（片名/tagline/英文副标）里
+    //   最晚入场的英文副标（f0+42）永远来不及出现 —— 真帧实测片头区间只有幕底点阵，无片名。
+    cursorSeconds += CHAPTER_GAP_FRAMES / FPS;
     lastChapter = item.chapter;
   }
   cursorSeconds += item.gapBefore / FPS;
@@ -190,7 +214,9 @@ for (const entry of synthResults) {
   if (!words.length) throw new Error("no real word timing for sentence " + (entry.index + 1));
   const offset = cursorSeconds;
   for (const word of words) allWords.push({...word, start: Number(word.start) + offset, end: Number(word.end) + offset});
-  const timings = alignedChunks(cleanText, chunks, words, result.manifest.duration_s);
+  // 词边界对齐必须在**去标点空间**做：words 的 timings 对应的是 spokenText，
+  // alignedChunks 用 text.indexOf(chunk) 对位，chunk 也得是同一形态（去标点）。
+  const timings = alignedChunks(spokenText, spokenChunks, words, result.manifest.duration_s);
   const from = Math.round((offset + Number(words[0].start)) * FPS) + 1;
   const to = Math.max(from, Math.round((offset + Number(words.at(-1).end)) * FPS));
   const subs = chunks.map((chunk, index) => {
@@ -207,13 +233,19 @@ for (const entry of synthResults) {
 }
 
 const totalSeconds=cursorSeconds+TAIL_FRAMES/FPS;
-const audioFile=path.join(root,"audio.mp3");
+const audioFile=path.join(root,"audio.wav");
 mixAudio(audioParts,totalSeconds,audioFile);
-fs.mkdirSync("public",{recursive:true});fs.copyFileSync(audioFile,"public/audio.mp3");
+fs.mkdirSync("public",{recursive:true});fs.copyFileSync(audioFile,"public/audio.wav");
 const chapterItems=items.filter(item=>item.type==="chapter");
 const chapters=chapterItems.length?chapterItems.map(item=>{const first=sentences.find(sentence=>sentence.chapter===item.chapter);return{n:item.chapter,title:item.title,from:first?.from??1};}):[{n:1,title:"",from:1}];
 const captionSource=captionsFromWords(allWords,{language});
 const timeline={fps:FPS,total_frames:Math.max(1,Math.ceil(totalSeconds*FPS)),engine,voice,rate,language,timing_mode:"tts-word-boundary",chapters,sentences,speech_seconds:Number(speechSeconds.toFixed(3))};
+// 声明式内容配置（a2e config.ts 对齐）：hud 小节导航词条 / credit 片尾署名卡 / chapterTech 章节英文副标，
+// 由 fixtures/project.json 声明、这里透传；消费端（hudEntries/EndingCredit/ChapterCard）早已就绪。
+if(project.hud?.length) timeline.hud=project.hud;
+if(project.title) timeline.title=project.title;
+if(project.credit) timeline.credit=project.credit;
+if(project.chapterTech?.length) timeline.chapters=timeline.chapters.map((c,i)=>({...c,tech:project.chapterTech[i]||""}));
 fs.mkdirSync("script",{recursive:true});
 fs.writeFileSync("script/timeline.json",JSON.stringify(timeline,null,2));
 // 打包用的装载点：script/timeline.json 是 gitignore 的运行产物，直接 import 它会让 fresh clone 在跑配音前连 bundle 都过不了。

@@ -5,6 +5,11 @@ import {runMediaQc} from "../src/qc/run.mjs";
 // 非阻断项：visual-pixel 回归记录（参考资产为 64x36 合成图，embedding 非语义模型）。
 const project = JSON.parse(fs.readFileSync(process.env.PROJECT_FILE || "fixtures/project.json", "utf8"));
 const qcDir = "artifacts/" + project.project_id + "/qc";
+// 验收范围：与 qc.mjs / verify-production.mjs 同一口径（用户决策 —— 16:9 是验收基准）。
+// 范围外比例仍查：成片在位、媒体探测、测量文件在位、visual 仍是 advisory；
+// 豁免的只有 frame/motion 的 PASS 判定，豁免结果显式写进输出，不许静默。
+const ACCEPT = new Set((process.env.ACCEPT_RATIOS || "16x9,9x16").split(",").map((s) => s.trim()).filter(Boolean));
+if (!ACCEPT.has("16x9")) throw new Error("ACCEPT_RATIOS 必须包含 16x9（16:9 是验收基准，不可移出范围）");
 const results = [];
 for (const ratio of ["16x9", "9x16"]) {
   const file = "artifacts/render/reel-forge-" + ratio + ".mp4";
@@ -16,8 +21,10 @@ for (const ratio of ["16x9", "9x16"]) {
   const motionFile = qcDir + "/motion_" + ratio + ".json";
   for (const [label, file] of [["frame metrics", frameFile], ["motion", motionFile]]) {
     if (!fs.existsSync(file)) throw new Error(label + " missing: " + file);
-    const report = JSON.parse(fs.readFileSync(file, "utf8"));
-    if (report.summary?.status !== "PASS") throw new Error(label + " failed for " + ratio);
+    if (ACCEPT.has(ratio)) {
+      const report = JSON.parse(fs.readFileSync(file, "utf8"));
+      if (report.summary?.status !== "PASS") throw new Error(label + " failed for " + ratio);
+    }
   }
 
   const visualFile = qcDir + "/visual_regression_" + ratio + ".json";
@@ -43,4 +50,4 @@ for (const item of results) {
   if (!(item.duration > 0)) throw new Error("invalid duration: " + item.ratio);
   if (!(item.motion_frames >= 2)) throw new Error("insufficient motion: " + item.ratio);
 }
-console.log("qc PASS", JSON.stringify({ media: results, text_provenance: provenance.status, ir_text_elements: provenance.ir_text_elements, rendered_texts: provenance.rendered_texts, unsourced: (provenance.unsourced_rendered_text || []).length }));
+console.log("qc PASS", JSON.stringify({ accept_ratios: [...ACCEPT], media: results, text_provenance: provenance.status, ir_text_elements: provenance.ir_text_elements, rendered_texts: provenance.rendered_texts, unsourced: (provenance.unsourced_rendered_text || []).length }));

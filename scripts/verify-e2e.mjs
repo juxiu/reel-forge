@@ -2,7 +2,7 @@ import fs from "node:fs";
 
 // verify:e2e 是"跑完一次生产之后"的端到端契约校验，不是 CI 快速校验。
 // 它依赖运行产物（TTS 时间轴 / 配音 / 调研），这些不入库，因此缺文件时给出可执行的提示。
-const REMIND = "\n提示：先执行 npm run tts（生成 public/audio.mp3 与 script/timeline.json），再执行 npm run run-production。";
+const REMIND = "\n提示：先执行 npm run tts（生成 public/audio.wav 与 script/timeline.json），再执行 npm run run-production。";
 function need(file, hint) {
   if (!fs.existsSync(file) || !fs.statSync(file).size) {
     throw new Error("缺少运行产物：" + file + (hint ? "（应由 " + hint + " 生成）" : "") + REMIND);
@@ -22,7 +22,7 @@ if (script.project_id !== project.project_id) throw new Error("script project mi
 if (!timeline.sentences.length || timeline.total_frames < 1) throw new Error("timeline missing");
 if (!fs.existsSync("script/timeline-source.json") || !fs.statSync("script/timeline-source.json").size) throw new Error("timeline source missing");
 if (!Array.isArray(captions) || !captions.length) throw new Error("captions missing");
-if (!fs.existsSync("public/audio.mp3") || !fs.statSync("public/audio.mp3").size) throw new Error("final audio missing");
+if (!fs.existsSync("public/audio.wav") || !fs.statSync("public/audio.wav").size) throw new Error("final audio missing");
 if (wide.width !== 1280 || wide.height !== 720 || tall.width !== 720 || tall.height !== 1280) throw new Error("multi-ratio IR invalid");
 if (wide.scenes.length !== script.segments.length || tall.scenes.length !== script.segments.length) throw new Error("scene/script coverage mismatch");
 

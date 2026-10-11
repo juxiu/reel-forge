@@ -23,7 +23,7 @@ import {pathToFileURL} from 'node:url';
 const ROOT = process.cwd();
 const SRC = path.join(ROOT, 'src');
 const EXTS = ['.mjs', '.js', '.cjs', '.jsx', '.json'];
-const RUNTIME_ARTIFACTS = ['script/timeline.json', 'script/timeline-source.json', 'script/timeline.md', 'public/audio.mp3', 'artifacts/'];
+const RUNTIME_ARTIFACTS = ['script/timeline.json', 'script/timeline-source.json', 'script/timeline.md', 'public/audio.wav', 'artifacts/'];
 
 function walk(dir, out = []) {
   if (!fs.existsSync(dir)) return out;

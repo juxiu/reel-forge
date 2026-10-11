@@ -13,7 +13,7 @@
 | 状态变化 `enter → transform → settle` | ⚠ 只有 lint | `MOTION_STATES` 三缺一即报（`grammar.mjs:21, 35`）；`state_change` 无渲染读者 |
 | 真实运镜类型 | ✅ 同源词表 | 词表只有渲染层那一份：`CAMERA_PRESETS`（`src/visual/camera.mjs:82`）= `push / slow_push / slowPush / pull / pan / scroll / handoff / parallax / static / none`，查表一律走 `isCameraPreset()`（`:95`）。**旧版这一页写的 `push/pan/slide/parallax/orbit/zoom` 是错的**：`slide`/`orbit`/`zoom` 渲染层没有实现，写了只会被 `plan` 判成 `camera-unknown-preset` 或静默退化成慢推。`static`/`none` 是「显式不运镜」，与「没声明才走兜底慢推」不同 → `motion-vocabulary.md` §5 |
 | 正值运镜幅度 | ✅ 两道 | lint `camera-motion-missing`（`grammar.mjs:32`）+ 帧数与末拍约束在 `scripts/verify-render-layer.mjs:44-73`（结束帧 ≤ `len − CAMERA_LIMITS.clear`、推近 ≤ `maxScale`、`scroll` 取景不越内容区） |
-| ≥4 秒的画面单元 | ⚠ 半 | lint `minDuration = 4`（秒，`grammar.mjs:26` 参数默认值、`:36` 判定）；`SHOT_MIN_FRAMES = 120` 这个常量本身只参与 contracts 不变式 → `style-guide.md` §10 |
+| ≥4 秒的画面单元 | ✅ 两道同口径 | 权威执行者在分镜层：`selfcheck.py:77` 判 `shot.to - shot.from + 1 < 120`（区间含留白，a2e 口径）。生产侧 lint 与它**同口径**：`shotUnitSeconds()`（`src/visual/grammar.mjs:26-44`）用「本镜 start → 下一镜 start」量，`minDuration = 4`（`:57`）；`verify:visual-grammar` 内含反例自检（1 s 独占一镜必红）。等效规则 = a2e「短句 <3 s 并入相邻镜头」（`reference/narration-storyboard.md` §3.1）；`SHOT_MIN_FRAMES = 120` 只参与 contracts 不变式 → `style-guide.md` §10 |
 
 ## 2. 持续动作与稳定期
 

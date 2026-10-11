@@ -298,7 +298,9 @@ for (const producer of PRODUCER_ALIGN) {
     failures.push(`${producer.name}：契约 required ${missingRequired.join(", ")}，但 ${producer.source} 没写这些键`);
   }
   if (produced.spread) alignNotes.push(`${producer.name}：生产者用了展开写法（…base），静态对撞只能查已显式写出的键，required 方向跳过`);
-  if (unused.length) alignNotes.push(`${producer.name}：契约登记了但生产者当前没写：${unused.join(", ")}`);
+  // 注意：这条只说明字段**不在对象字面量里**，不等于「没写」——hud/title/credit 都在字面量之后
+  // 按 project.json 声明条件补写。措辞必须准确，否则会把人引去改一个其实正常的字段。
+  if (unused.length) alignNotes.push(`${producer.name}：契约登记了、但不在生产者对象字面量里（可能随后条件补写）：${unused.join(", ")}`);
   if (!undeclared.length && !missingRequired.length) {
     aligned.push(`${producer.name} ← ${producer.source} 的字段表（${produced.keys.length} 个键）`);
   }

@@ -8,6 +8,7 @@ artifacts/
 # <Audio> 由 includeAudio 控制，没配音时主合成直接不放音频层。
 # 所以 fresh clone 可以在一次 TTS 都没跑的情况下打开 Remotion Studio 看画面。
 public/audio.mp3
+public/audio.wav
 
 script/timeline.json
 script/timeline-source.json

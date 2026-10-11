@@ -4,12 +4,12 @@
   "width": 1280,
   "height": 720,
   "fps": 30,
-  "duration": 441.1666666666667,
+  "duration": 339.3,
   "scenes": [
     {
       "id": "scene-001",
-      "start": 1.6,
-      "duration": 12.233333333333334,
+      "start": 2.8333333333333335,
+      "duration": 8.766666666666667,
       "source_ref": {
         "segment_index": 0,
         "script_id": "seg-001"
@@ -37,7 +37,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "一次摘要认证牵涉到的角色，比想象的多。,客户端、服务端、代理、时钟、缓存，缺一环就校验不过。,先把这张关系网摆出来。"
+          "text": "一次摘要认证牵涉到的角色,比想象的多。,客户端、服务端、代理、时钟、缓存,缺一环就校验不过。,先把这张关系网摆出来。"
         },
         {
           "id": "flow",
@@ -65,8 +65,8 @@
     },
     {
       "id": "scene-002",
-      "start": 14.933333333333334,
-      "duration": 11.733333333333334,
+      "start": 11.6,
+      "duration": 10.766666666666667,
       "source_ref": {
         "segment_index": 1,
         "script_id": "seg-002"
@@ -92,7 +92,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "报文本身是明文，头部却带着一串看不懂的字段。,这些字段叫摘要字段，是把口令换成不可逆的凭证。,换句话说，网络上看不到口令。"
+          "text": "报文本身是明文,头部却带着一串看不懂的字段。,这些字段叫摘要字段,是把口令换成不可逆的凭证。,换句话说，网络上看不到口令。"
         },
         {
           "id": "flow",
@@ -120,8 +120,8 @@
     },
     {
       "id": "scene-003",
-      "start": 27.766666666666666,
-      "duration": 8.933333333333337,
+      "start": 22.366666666666667,
+      "duration": 7.366666666666666,
       "source_ref": {
         "segment_index": 2,
         "script_id": "seg-003"
@@ -177,8 +177,8 @@
     },
     {
       "id": "scene-004",
-      "start": 37.8,
-      "duration": 12.666666666666671,
+      "start": 29.733333333333334,
+      "duration": 10,
       "source_ref": {
         "segment_index": 3,
         "script_id": "seg-004"
@@ -204,7 +204,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "摘要不是凭空来的，它由四个部分拼成。,算法、字段顺序、规范化方式、拼接顺序，缺一不可。,任何一处不同，两侧算出的摘要就不一样。"
+          "text": "摘要不是凭空来的，它由四个部分拼成。,算法、字段顺序、规范化方式、拼接顺序,缺一不可。,任何一处不同,两侧算出的摘要就不一样。"
         },
         {
           "id": "flow",
@@ -232,8 +232,8 @@
     },
     {
       "id": "scene-005",
-      "start": 51.56666666666667,
-      "duration": 10.733333333333327,
+      "start": 39.733333333333334,
+      "duration": 8.666666666666666,
       "source_ref": {
         "segment_index": 4,
         "script_id": "seg-005"
@@ -289,8 +289,8 @@
     },
     {
       "id": "scene-006",
-      "start": 63.4,
-      "duration": 9.833333333333336,
+      "start": 48.4,
+      "duration": 9.033333333333333,
       "source_ref": {
         "segment_index": 5,
         "script_id": "seg-006"
@@ -318,7 +318,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "于是报文被压成一个固定长度的摘要。,服务器只拿摘要比对，口令始终不出网关。,这是摘要机制最核心的一次转换。"
+          "text": "于是报文被压成一个固定长度的摘要。,服务器只拿摘要比对,口令始终不出网关。,这是摘要机制最核心的一次转换。"
         },
         {
           "id": "flow",
@@ -346,8 +346,8 @@
     },
     {
       "id": "scene-007",
-      "start": 74.33333333333333,
-      "duration": 9.466666666666669,
+      "start": 57.43333333333333,
+      "duration": 8.233333333333333,
       "source_ref": {
         "segment_index": 6,
         "script_id": "seg-007"
@@ -370,7 +370,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "摘要认证要走完三步。,服务端先发挑战，客户端算摘要回应，服务端比对。,少任何一步都算不上一次认证。"
+          "text": "摘要认证要走完三步。,服务端先发挑战,客户端算摘要回应，服务端比对。,少任何一步都算不上一次认证。"
         },
         {
           "id": "flow",
@@ -398,8 +398,8 @@
     },
     {
       "id": "scene-008",
-      "start": 84.9,
-      "duration": 8.133333333333326,
+      "start": 65.66666666666667,
+      "duration": 6.866666666666666,
       "source_ref": {
         "segment_index": 7,
         "script_id": "seg-008"
@@ -450,8 +450,8 @@
     },
     {
       "id": "scene-009",
-      "start": 94.13333333333334,
-      "duration": 11.36666666666666,
+      "start": 72.53333333333333,
+      "duration": 9.8,
       "source_ref": {
         "segment_index": 8,
         "script_id": "seg-009"
@@ -479,7 +479,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "摘要认证不是新发明，它是 HTTP 里的一项可选机制。,规范定义了字段、算法和拼接方式。,我们按规范里的例子来讲。"
+          "text": "摘要认证不是新发明,它是 HTTP 里的一项可选机制。,规范定义了字段、算法和拼接方式。,我们按规范里的例子来讲。"
         },
         {
           "id": "flow",
@@ -507,8 +507,8 @@
     },
     {
       "id": "scene-010",
-      "start": 106.6,
-      "duration": 11,
+      "start": 82.33333333333333,
+      "duration": 8.5,
       "source_ref": {
         "segment_index": 9,
         "script_id": "seg-010"
@@ -562,8 +562,8 @@
     },
     {
       "id": "scene-011",
-      "start": 118.7,
-      "duration": 9.86666666666666,
+      "start": 90.83333333333333,
+      "duration": 7.066666666666666,
       "source_ref": {
         "segment_index": 10,
         "script_id": "seg-011"
@@ -614,8 +614,8 @@
     },
     {
       "id": "scene-012",
-      "start": 129.66666666666666,
-      "duration": 8.033333333333331,
+      "start": 97.9,
+      "duration": 6.5,
       "source_ref": {
         "segment_index": 11,
         "script_id": "seg-012"
@@ -666,8 +666,8 @@
     },
     {
       "id": "scene-013",
-      "start": 139.63333333333333,
-      "duration": 9.133333333333354,
+      "start": 106,
+      "duration": 7.666666666666667,
       "source_ref": {
         "segment_index": 12,
         "script_id": "seg-013"
@@ -718,8 +718,8 @@
     },
     {
       "id": "scene-014",
-      "start": 149.86666666666667,
-      "duration": 10.133333333333326,
+      "start": 113.66666666666667,
+      "duration": 8.933333333333334,
       "source_ref": {
         "segment_index": 13,
         "script_id": "seg-014"
@@ -748,7 +748,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "摘要值来自四层东西。,先定算法，再定字段顺序，然后规范化和拼接。,顺序一旦定错，摘要必然不等。"
+          "text": "摘要值来自四层东西。,先定算法,再定字段顺序，然后规范化和拼接。,顺序一旦定错，摘要必然不等。"
         },
         {
           "id": "flow",
@@ -776,8 +776,8 @@
     },
     {
       "id": "scene-015",
-      "start": 161.1,
-      "duration": 9.700000000000017,
+      "start": 122.6,
+      "duration": 8.533333333333333,
       "source_ref": {
         "segment_index": 14,
         "script_id": "seg-015"
@@ -800,7 +800,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "新旧写法逐项对照，差别不小。,旧写法里算法是缺省的，新写法必须写明。,用户名是否进摘要也换了约定。"
+          "text": "新旧写法逐项对照，差别不小。,旧写法里算法是缺省的,新写法必须写明。,用户名是否进摘要也换了约定。"
         },
         {
           "id": "flow",
@@ -828,8 +828,8 @@
     },
     {
       "id": "scene-016",
-      "start": 171.9,
-      "duration": 7.900000000000006,
+      "start": 131.13333333333333,
+      "duration": 6.6,
       "source_ref": {
         "segment_index": 15,
         "script_id": "seg-016"
@@ -880,8 +880,8 @@
     },
     {
       "id": "scene-017",
-      "start": 180.9,
-      "duration": 7.933333333333337,
+      "start": 137.73333333333332,
+      "duration": 6.533333333333333,
       "source_ref": {
         "segment_index": 16,
         "script_id": "seg-017"
@@ -932,8 +932,8 @@
     },
     {
       "id": "scene-018",
-      "start": 189.93333333333334,
-      "duration": 7.633333333333326,
+      "start": 144.26666666666668,
+      "duration": 7.233333333333333,
       "source_ref": {
         "segment_index": 17,
         "script_id": "seg-018"
@@ -989,8 +989,8 @@
     },
     {
       "id": "scene-019",
-      "start": 198.66666666666666,
-      "duration": 7.666666666666686,
+      "start": 151.5,
+      "duration": 6.766666666666667,
       "source_ref": {
         "segment_index": 18,
         "script_id": "seg-019"
@@ -1041,8 +1041,8 @@
     },
     {
       "id": "scene-020",
-      "start": 207.43333333333334,
-      "duration": 10.066666666666663,
+      "start": 158.26666666666668,
+      "duration": 8.166666666666666,
       "source_ref": {
         "segment_index": 19,
         "script_id": "seg-020"
@@ -1097,8 +1097,8 @@
     },
     {
       "id": "scene-021",
-      "start": 218.6,
-      "duration": 8.833333333333343,
+      "start": 166.43333333333334,
+      "duration": 7.3,
       "source_ref": {
         "segment_index": 20,
         "script_id": "seg-021"
@@ -1121,7 +1121,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "谁有权定义这个顺序？,规范说了算，客户端和服务端都照它执行。,测试向量用来保证两边一致。"
+          "text": "谁有权定义这个顺序？,规范说了算,客户端和服务端都照它执行。,测试向量用来保证两边一致。"
         },
         {
           "id": "flow",
@@ -1149,8 +1149,8 @@
     },
     {
       "id": "scene-022",
-      "start": 228.53333333333333,
-      "duration": 8.199999999999989,
+      "start": 173.73333333333332,
+      "duration": 7.366666666666666,
       "source_ref": {
         "segment_index": 21,
         "script_id": "seg-022"
@@ -1204,8 +1204,8 @@
     },
     {
       "id": "scene-023",
-      "start": 237.83333333333334,
-      "duration": 8,
+      "start": 181.1,
+      "duration": 6.966666666666667,
       "source_ref": {
         "segment_index": 22,
         "script_id": "seg-023"
@@ -1256,8 +1256,8 @@
     },
     {
       "id": "scene-024",
-      "start": 246.93333333333334,
-      "duration": 8.433333333333337,
+      "start": 188.06666666666666,
+      "duration": 5.866666666666666,
       "source_ref": {
         "segment_index": 23,
         "script_id": "seg-024"
@@ -1311,8 +1311,8 @@
     },
     {
       "id": "scene-025",
-      "start": 257.3,
-      "duration": 8.433333333333337,
+      "start": 195.53333333333333,
+      "duration": 6.766666666666667,
       "source_ref": {
         "segment_index": 24,
         "script_id": "seg-025"
@@ -1363,8 +1363,8 @@
     },
     {
       "id": "scene-026",
-      "start": 266.8333333333333,
-      "duration": 7.03333333333336,
+      "start": 202.3,
+      "duration": 6.5,
       "source_ref": {
         "segment_index": 25,
         "script_id": "seg-026"
@@ -1415,8 +1415,8 @@
     },
     {
       "id": "scene-027",
-      "start": 274.96666666666664,
-      "duration": 8,
+      "start": 208.8,
+      "duration": 7.633333333333334,
       "source_ref": {
         "segment_index": 26,
         "script_id": "seg-027"
@@ -1467,8 +1467,8 @@
     },
     {
       "id": "scene-028",
-      "start": 284.06666666666666,
-      "duration": 8.366666666666674,
+      "start": 216.43333333333334,
+      "duration": 7.066666666666666,
       "source_ref": {
         "segment_index": 27,
         "script_id": "seg-028"
@@ -1519,8 +1519,8 @@
     },
     {
       "id": "scene-029",
-      "start": 293.53333333333336,
-      "duration": 7.199999999999989,
+      "start": 223.5,
+      "duration": 6.7,
       "source_ref": {
         "segment_index": 28,
         "script_id": "seg-029"
@@ -1571,8 +1571,8 @@
     },
     {
       "id": "scene-030",
-      "start": 301.8333333333333,
-      "duration": 9.700000000000045,
+      "start": 230.2,
+      "duration": 8.433333333333334,
       "source_ref": {
         "segment_index": 29,
         "script_id": "seg-030"
@@ -1626,8 +1626,8 @@
     },
     {
       "id": "scene-031",
-      "start": 312.6333333333333,
-      "duration": 7.600000000000023,
+      "start": 238.63333333333333,
+      "duration": 7.3,
       "source_ref": {
         "segment_index": 30,
         "script_id": "seg-031"
@@ -1683,8 +1683,8 @@
     },
     {
       "id": "scene-032",
-      "start": 321.3333333333333,
-      "duration": 8.53333333333336,
+      "start": 245.93333333333334,
+      "duration": 7.433333333333334,
       "source_ref": {
         "segment_index": 31,
         "script_id": "seg-032"
@@ -1735,8 +1735,8 @@
     },
     {
       "id": "scene-033",
-      "start": 330.96666666666664,
-      "duration": 9.300000000000011,
+      "start": 253.36666666666667,
+      "duration": 8.233333333333333,
       "source_ref": {
         "segment_index": 32,
         "script_id": "seg-033"
@@ -1759,7 +1759,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "部署方式常见三种。,全链摘要最彻底，也最贵。,逐跳摘要是折中，边缘摘要介于两者之间。"
+          "text": "部署方式常见三种。,全链摘要最彻底，也最贵。,逐跳摘要是折中,边缘摘要介于两者之间。"
         },
         {
           "id": "flow",
@@ -1787,8 +1787,8 @@
     },
     {
       "id": "scene-034",
-      "start": 341.3666666666667,
-      "duration": 9.033333333333303,
+      "start": 261.6,
+      "duration": 7.5,
       "source_ref": {
         "segment_index": 33,
         "script_id": "seg-034"
@@ -1845,8 +1845,8 @@
     },
     {
       "id": "scene-035",
-      "start": 351.5,
-      "duration": 6.7666666666666515,
+      "start": 269.1,
+      "duration": 6.1,
       "source_ref": {
         "segment_index": 34,
         "script_id": "seg-035"
@@ -1902,8 +1902,8 @@
     },
     {
       "id": "scene-036",
-      "start": 359.3666666666667,
-      "duration": 8.133333333333326,
+      "start": 275.2,
+      "duration": 6.433333333333334,
       "source_ref": {
         "segment_index": 35,
         "script_id": "seg-036"
@@ -1958,8 +1958,8 @@
     },
     {
       "id": "scene-037",
-      "start": 369.43333333333334,
-      "duration": 8.133333333333326,
+      "start": 283.23333333333335,
+      "duration": 6.4,
       "source_ref": {
         "segment_index": 36,
         "script_id": "seg-037"
@@ -2013,8 +2013,8 @@
     },
     {
       "id": "scene-038",
-      "start": 378.6666666666667,
-      "duration": 7.733333333333292,
+      "start": 289.6333333333333,
+      "duration": 7.033333333333333,
       "source_ref": {
         "segment_index": 37,
         "script_id": "seg-038"
@@ -2065,8 +2065,8 @@
     },
     {
       "id": "scene-039",
-      "start": 387.5,
-      "duration": 8.166666666666686,
+      "start": 296.6666666666667,
+      "duration": 7.366666666666666,
       "source_ref": {
         "segment_index": 38,
         "script_id": "seg-039"
@@ -2122,8 +2122,8 @@
     },
     {
       "id": "scene-040",
-      "start": 396.76666666666665,
-      "duration": 8.600000000000023,
+      "start": 304.03333333333336,
+      "duration": 7.233333333333333,
       "source_ref": {
         "segment_index": 39,
         "script_id": "seg-040"
@@ -2146,7 +2146,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "落到配置上就是这几行。,算法写明，质量参数写明，计数器每次自增。,顺序仍然要对齐。"
+          "text": "落到配置上就是这几行。,算法写明，质量参数写明,计数器每次自增。,顺序仍然要对齐。"
         },
         {
           "id": "flow",
@@ -2174,8 +2174,8 @@
     },
     {
       "id": "scene-041",
-      "start": 406.46666666666664,
-      "duration": 7.266666666666708,
+      "start": 311.26666666666665,
+      "duration": 5.6,
       "source_ref": {
         "segment_index": 40,
         "script_id": "seg-041"
@@ -2226,8 +2226,8 @@
     },
     {
       "id": "scene-042",
-      "start": 414.8333333333333,
-      "duration": 5.933333333333337,
+      "start": 316.8666666666667,
+      "duration": 5.533333333333333,
       "source_ref": {
         "segment_index": 41,
         "script_id": "seg-042"
@@ -2250,7 +2250,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "代价最终落在两侧。,客户端多存一次摘要。,服务端多算一次摘要。"
+          "text": "代价最终还是要落在两侧。,客户端多存一次摘要。,服务端多算一次摘要。"
         },
         {
           "id": "flow",
@@ -2278,8 +2278,8 @@
     },
     {
       "id": "scene-043",
-      "start": 421.8666666666667,
-      "duration": 7.2333333333333485,
+      "start": 322.4,
+      "duration": 6.533333333333333,
       "source_ref": {
         "segment_index": 42,
         "script_id": "seg-043"
@@ -2335,8 +2335,8 @@
     },
     {
       "id": "scene-044",
-      "start": 430.2,
-      "duration": 8.933333333333337,
+      "start": 328.93333333333334,
+      "duration": 7.4,
       "source_ref": {
         "segment_index": 43,
         "script_id": "seg-044"

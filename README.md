@@ -51,7 +51,6 @@ Delivery
 ~~~bash
 git clone https://github.com/juxiu/reel-forge.git
 cd reel-forge
-git checkout feat/visual-benchmark-skill
 
 npm install
 pip install -r requirements.txt
@@ -67,7 +66,7 @@ npm run verify:fast
 
 `verify:fast` 不需要任何运行产物，检查清单里已含 `verify:authored-shots`（authored 镜头合规）与 `verify:limits`（分组与 still 数量真源）；想单跑某一道用 `npm run verify:<name>`。
 
-**要渲染或跑 <code>verify:e2e</code>，必须先生成 TTS 产物**：<code>public/audio.mp3</code>、<code>script/timeline.json</code>、<code>fixtures/captions.json</code>。它们由 <code>npm run tts</code> 生成、不入库（<code>src/remotion/index.jsx</code> 会 import时间轴，<code>&lt;Audio&gt;</code> 依赖配音文件），所以全新 clone 的第一步是：
+**要渲染或跑 <code>verify:e2e</code>，必须先生成 TTS 产物**：<code>public/audio.wav</code>、<code>script/timeline.json</code>、<code>fixtures/captions.json</code>。它们由 <code>npm run tts</code> 生成、不入库（<code>src/remotion/index.jsx</code> 会 import时间轴，<code>&lt;Audio&gt;</code> 依赖配音文件），所以全新 clone 的第一步是：
 
 ~~~bash
 npm run tts            # 配音 + 帧级时间轴（需完整版 FFmpeg）
@@ -85,6 +84,14 @@ npm run skill -- \\
   --source https://www.rfc-editor.org/rfc/rfc9530.html \\
   --auto-approve
 ~~~
+
+⚠ 全新主题的解说稿由 agent 生成：这一链在 Research 之后会调 `createAgentProvider()`，
+没有配置 `AGENT_COMMAND`（外部 Agent 服务）时会停在
+`script missing and no agent provider configured`。要离线跑通，请先把属于该项目的
+`fixtures/script.json`（`project_id` 必须与 `fixtures/project.json` 一致）放在盘上，
+链会把它当作者稿直接消费。镜头画面（`src/shots/G*/SC*.jsx` 与 `reference-shot-blueprint.json`）
+是**按主题 authored** 的创作产物，没有确定性生成器；换主题时必须同步重做，见
+[docs/ACCEPTANCE_REPORT.md](docs/ACCEPTANCE_REPORT.md) §«净室新主题»。
 
 非 auto 模式会在四个人工 checkpoint 停止：
 
@@ -212,6 +219,10 @@ Production PASS
 
 - [SKILL.md](SKILL.md) — Agent Skill 行为规范
 - [docs/USAGE.md](docs/USAGE.md) — 完整使用说明
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — **系统架构**：分层职责、Agent 与脚本边界、关键数据流、artifact 清单、失败恢复、完整执行图
+- [docs/PRODUCTION_METHOD.md](docs/PRODUCTION_METHOD.md) — **完整生产方法**：每个阶段（Research → … → Delivery）的输入/输出/机制/判断标准/失败路径/验证方法
+- [docs/ANYTHING2EXPLAINER_PARITY.md](docs/ANYTHING2EXPLAINER_PARITY.md) — **与 anything2explainer 的能力对照**：源代码证据、对应实现、差距与补齐、状态、测试证据、剩余缺口
+- [docs/ACCEPTANCE_REPORT.md](docs/ACCEPTANCE_REPORT.md) — **验收报告**：commit / 环境 / 实际命令 / PASS-FAIL-BLOCKED-SKIPPED / 产物位置 / QC 与 Repair 结果 / 剩余风险
 - [docs/integrations/video-shotcraft.md](docs/integrations/video-shotcraft.md) — 可选镜头配方库接入、来源记录与许可证边界
 - [docs/REFERENCE_PROCESS.md](docs/REFERENCE_PROCESS.md) — 生产过程与完成定义
 - [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md) — 当前项目状态

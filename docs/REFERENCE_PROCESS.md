@@ -15,7 +15,7 @@ Research → Narration → TTS/Timeline → Storyboard → Overlay/Primitives �
 | Scaffold | fixtures/project.json | contracts、Remotion composition | verify:plan / contracts |
 | Research | source_urls | research.json / research.md | source 可抓取，claim 有 evidence |
 | Narration | script/narration.txt / script.json | script contract | claim_id 全部可追溯 |
-| TTS/Timeline | npm run tts | public/audio.mp3、timeline JSON/MD/source、captions | WordBoundary 为真实时间源 |
+| TTS/Timeline | npm run tts | public/audio.wav、timeline JSON/MD/source、captions | WordBoundary 为真实时间源 |
 | Storyboard | npm run storyboard | 分镜表.md | token 解析、句段覆盖、镜头节奏约束 |
 | Overlay/Primitives | src/remotion | HUD、章节卡、进度条、字幕、安全区 | verify:visual |
 | G1 Pilot | npm run preview / pilot | preview.mp4、preview manifest、approval/checkpoint | pilot-preview 必须 approved 才能完整渲染 |

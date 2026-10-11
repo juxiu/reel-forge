@@ -8,7 +8,14 @@ import {buildResearchMarkdown} from "../src/research/research-md.mjs";
 
 const project=JSON.parse(fs.readFileSync(process.argv[2]||"fixtures/project.json","utf8"));
 const scriptFile=process.argv[3]||"fixtures/script.json";
-const script=fs.existsSync(scriptFile)?JSON.parse(fs.readFileSync(scriptFile,"utf8")):null;
+// 只认属于当前项目的 script.json。上一次跑过的项目会把它的 fixtures/script.json 留在盘上，
+// 新主题一键链走到这里就会拿**别人的解说稿**去跑，撞上 pipeline 的 project_id 守卫，
+// 报出的是「script project_id mismatch」这种和新主题毫无关系的错——见 §12 净室实测。
+// 判为空脚本后，runProduction 会走「script 缺失」分支：有 AGENT_COMMAND 就用 agent 生成，
+// 没有就给出明确的「script missing and no agent provider configured」，而不是误导性的身份错。
+const loaded=fs.existsSync(scriptFile)?JSON.parse(fs.readFileSync(scriptFile,"utf8")):null;
+if(loaded&&loaded.project_id!==project.project_id) console.warn("RUN-PRODUCTION NOTE: 忽略不属于本项目的 "+scriptFile+"（project_id="+loaded.project_id+"，当前 "+project.project_id+"）；无 agent 时会按 script 缺失处理");
+const script=loaded&&loaded.project_id===project.project_id?loaded:null;
 const root="artifacts";
 const lock=FileLock.forProject(project.project_id,root);
 lock.acquire();

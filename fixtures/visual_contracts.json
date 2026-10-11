@@ -425,6 +425,7 @@
       "min": 20,
       "max": 45,
       "clear": 30,
+      "exit": 8,
       "maxScale": 1.4
     },
     "presets": [

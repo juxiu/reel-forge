@@ -246,8 +246,8 @@ size  = round(min(hi, max(HERO_MIN, base × scale)))
 | `still_max_seconds` | 3.0 | 完全静止 > 3 s 才报 `freeze`。**不为凑指标给静止物体加漂浮** |
 | `hold_thr` | 1.5 | 「无大面积变化」：落位后的动词动作 0.4–1.2，入场/运镜 2.5+ |
 | `hold_min_frames` | 30 | 离场前必须停这么久；`export-visual-contracts.mjs:80` 断言它 `== CAMERA_LIMITS.clear` |
-| `exit_brightness_k` / `exit_tail_frames` | 0.9 / 20 | 区亮度掉到尾段中位数的这个比例以下 = 已在离场（`motion_check.py:201-206`） |
-| `glow_off_frames` | 6 | 已离场时 hold 先扣掉这 6 帧（`motion_check.py:216`） |
+| `exit_brightness_k` / `exit_tail_frames` | 0.9 / 20 | 区亮度掉到尾段中位数的这个比例以下 = 已在离场；末拍稳定期定位还会从该帧往回**最多 `exit_tail_frames` 帧**跳过仍在离场的帧（`motion_check.py:206-227`） |
+| `glow_off_frames` | 6 | 已离场时 hold 先扣掉这 6 帧（`motion_check.py:236-238`） |
 | `diff_px_thr` | 25 | 全分辨率逐像素差 > 25 才算变化像素 |
 | `class_true_static` / `class_small_motion` | 800 / 2500 | 变化像素中位 `<800` → 真静；`800–2500` → 小面积动作；`>2500` → 其实有动作（采样太粗）。⚠ 换算按**面积 ×k²**，不按取景区占比——设计里 30×30 的脉动图元在 9:16 上是 285 设备像素，按占比折算会被判成「真静」，于是「给动词动作」的建议永远发不出来（`export-visual-contracts.mjs:190-195`）；9:16 的两个阈值仍需真机复核 |
 

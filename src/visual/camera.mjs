@@ -12,7 +12,9 @@
  */
 import {clamp01, easeInOutPow} from './easing.mjs';
 
-export const CAMERA_LIMITS = {min: 20, max: 45, clear: 30, maxScale: 1.4};
+// exit = 末 EXIT_TAIL 帧离场（easing.mjs BEAT.EXIT_TAIL）：运镜结束必须离**离场起点** ≥ clear 帧，
+// 所以可用窗口是 duration − clear − exit，而不是 duration − clear。
+export const CAMERA_LIMITS = {min: 20, max: 45, clear: 30, exit: 8, maxScale: 1.4};
 
 /**
  * 关键帧插值。f 之间 easeInOutPow(2.5)；首值之前停在第一帧、末值之后停在最后一帧。
@@ -113,7 +115,7 @@ export function cameraKeysFromMotion(motion, f0, duration, bands) {
   // ⚠ 镜头太短就**不做运镜**，而不是压缩到 CAMERA_MIN 以下硬做：
   //   「运镜结束到离场 ≥30 帧」和「运镜 20–45 帧」是两条同时成立的硬规则，
   //   34 帧的镜头只剩 4 帧可运，硬塞的结果是相机一路动到离场——那正是这两条要防的画面。
-  const usable = duration - CAMERA_LIMITS.clear;
+  const usable = duration - CAMERA_LIMITS.clear - CAMERA_LIMITS.exit;
   if (usable < CAMERA_LIMITS.min) return null;
   const amount = clamp01(Number(cam.amount ?? 0.05) / 0.12);
   const len = Math.max(CAMERA_LIMITS.min, Math.min(usable, Math.min(CAMERA_LIMITS.max, Math.round(CAMERA_LIMITS.min + amount * 25))));
@@ -146,7 +148,7 @@ function scrollRange(bands, focus, len) {
 export function cameraKeysFromPreset(preset, f0, duration, bands, opts = {}) {
   const name = String(preset || '').toLowerCase();
   if (!name || name === 'static' || name === 'none') return null;
-  const usable = duration - CAMERA_LIMITS.clear;
+  const usable = duration - CAMERA_LIMITS.clear - CAMERA_LIMITS.exit;
   if (usable < CAMERA_LIMITS.min) return null;
   // amount 来自 IR（0–0.12 的位移强度），预设名来自分镜声明：两者各管一半，
   // 否则「authored 写了 pan」和「director 给了 amount」会互相覆盖。
@@ -189,7 +191,7 @@ export const staticKeys = (f0 = 1, bands) => [{f: f0, x: 640, y: camCenterY(band
 
 /** 无显式 camera 声明时的兜底：1.0→1.05 慢推贯穿（样片允许的例外，仍避开末拍）。 */
 export function slowPushKeys(f0, duration, bands) {
-  const usable = duration - CAMERA_LIMITS.clear;
+  const usable = duration - CAMERA_LIMITS.clear - CAMERA_LIMITS.exit;
   const y = camCenterY(bands);
   // 短镜头兜底成**静止机位**（单关键帧），而不是硬做一段会捅进末拍的慢推。
   if (usable < CAMERA_LIMITS.min) return staticKeys(f0, bands);
@@ -221,7 +223,10 @@ export function cameraSettlesBeforeExit(keys, duration) {
   if (!keys || keys.length === 0) return true;
   const last = keys[keys.length - 1];
   const first = keys[0];
-  if (last.f > duration - CAMERA_LIMITS.clear) return false;
-  if (Math.abs(last.s - first.s) < 1e-6 && Math.abs(last.x - first.x) < 1e-6 && Math.abs(last.y - first.y) < 1e-6) return true;
+  // 静止机位没有「动到离场」这回事 —— 先判它，否则短到没有可运窗口的镜头（len ≤ clear+exit）
+  // 会因为 last.f=1 > 负数的边界而被判失败。
+  const moved = Math.abs(last.s - first.s) > 1e-6 || Math.abs(last.x - first.x) > 1e-6 || Math.abs(last.y - first.y) > 1e-6;
+  if (!moved) return true;
+  if (last.f > duration - CAMERA_LIMITS.clear - CAMERA_LIMITS.exit) return false;
   return last.s <= CAMERA_LIMITS.maxScale + 1e-6;
 }

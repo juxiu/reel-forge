@@ -26,8 +26,10 @@ mkdir -p artifacts/render artifacts/frames/16x9 artifacts/frames/9x16
 for TOOL in ffmpeg; do
   command -v "$TOOL" >/dev/null 2>&1 || { echo "render blocked: 缺少 $TOOL（成片有了但 QC 读不到帧）"; exit 127; }
 done
-npx remotion render src/remotion/index.jsx ReelForge16x9 artifacts/render/reel-forge-16x9.mp4 --codec=h264 --crf=16 --concurrency=4 --log=error
-npx remotion render src/remotion/index.jsx ReelForge9x16 artifacts/render/reel-forge-9x16.mp4 --codec=h264 --crf=16 --concurrency=4 --log=error
+# --timeout=300000：单帧渲染超时 5 分钟（默认 30s）。暗场大图 + 每帧全量 SVG 描边时，
+# 低并发worker偶发超 30s 就整片报废重跑；对齐 a2e 的同参数（它全片渲也带这个值）。
+npx remotion render src/remotion/index.jsx ReelForge16x9 artifacts/render/reel-forge-16x9.mp4 --codec=h264 --crf=16 --concurrency=4 --timeout=300000 --log=error
+npx remotion render src/remotion/index.jsx ReelForge9x16 artifacts/render/reel-forge-9x16.mp4 --codec=h264 --crf=16 --concurrency=4 --timeout=300000 --log=error
 rm -rf artifacts/frames && mkdir -p artifacts/frames/16x9 artifacts/frames/9x16
 # ⚠ 帧必须是 PNG，不能是 JPG：
 #   · 测量层是纯标准库实现，JPEG 解码要 Pillow；缺依赖时 QC 会「静默不跑」，比慢更糟。
@@ -60,3 +62,5 @@ if [ "$COUNT_16" -lt 1 ] || [ "$COUNT_9" -lt 1 ]; then
   exit 1
 fi
 echo "frames extracted: 16x9=$COUNT_16 9x16=$COUNT_9 (option: $FPSMODE_OPT)"
+# 成片缩略总表（a2e sheet.py 对齐）：QC 通读全片的第一入口——先看 sheet 列可疑镜头，再逐节拍看单帧。
+node scripts/sheet-gen.mjs

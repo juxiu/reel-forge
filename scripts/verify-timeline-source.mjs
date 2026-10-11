@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import {railEntries, chaptersOf, chapterCardWindows} from "../src/visual/timeline.mjs";
+import {BEAT} from "../src/visual/easing.mjs";
 
 /**
  * 时序单真源门：**镜区间、字幕块必须与`script/timeline.json` 同源**。
@@ -20,10 +21,11 @@ import {railEntries, chaptersOf, chapterCardWindows} from "../src/visual/timelin
  * 判据：
  *   1. timeline.json 必须在（没有它就没有真源，直接 FAIL —— 「三份数据」本身就是缺陷）
  *   2. 镜数 == 句数（一镜一段）
- *   3. 每镜 start == 对应句子的 from（按fps 换算，容差 1 帧）
- *   4. 每镜时长 == 该句子的 to-from
- *   5. 字幕块必须落在某一句的区间内，且数量与句子数一致
- *   6. 末镜末端== timeline.total_frames（允许 TAIL 差异，但要有解释）
+ *   3. 镜区间 = 由 timeline 按 a2e 衔接规则派生：镜 i = [句 i 的 from − SHOT_LEAD,
+ *      同章下一句 from − SHOT_LEAD − 1]；章末 / 片末 = 句 i 的 to + SHOT_TAIL（容差 1 帧）
+ *      —— 衔接规则的真源是 src/visual/easing.mjs 的 BEAT，不在这里另写数字
+ *   4. 字幕块必须落在某一句的区间内，且数量与句子数一致
+ *   5. 末镜末端 == 末字幕末端 + SHOT_TAIL（离场尾段）
  */
 
 const FPS = 30;
@@ -66,28 +68,35 @@ if (ir.scenes.length !== sentences.length) {
   problems.push(`镜数 ${ir.scenes.length} ≠ 句数 ${sentences.length} —— 一镜一段的约定破了（一段 = 一个镜头 = 一个镜头段）`);
 }
 
-// 2) 逐镜比对 start / 时长
+// 2) 逐镜比对：镜区间必须是 timeline 按 a2e 衔接规则派生的。
+//    ⚠ 口径事故（2026-10-10）：这一门原来断言「镜 start == 句 from」，那是在镜区间=句跨度的
+//    旧口径下写的。改成 a2e 的相邻首尾相接口径（本句 from−8 起、下一句 from−9 止）后，
+//    镜区间整体前移 SHOT_LEAD 帧 —— 门应当跟着改成新口径，而不是把 8 帧偏移当成漂移。
+//    IR 的 start/duration 是秒、start 对应 0-based 帧号，timeline 的 from/to 是 1-based 帧号，
+//    所以「1-based 首帧」= round(start*FPS)+1，「1-based 末帧」= round((start+duration)*FPS)。
 const TOL = 1; // 帧
 const drift = [];
 for (let i = 0; i < Math.min(ir.scenes.length, sentences.length); i++) {
   const sc = ir.scenes[i];
   const se = sentences[i];
-  const wantFrom = Math.round(Number(se.from));
-  const wantTo = Math.round(Number(se.to));
-  const gotFrom = Math.round(sc.start * FPS);
-  const gotTo = Math.round((sc.start + sc.duration) * FPS);
-  const dFrom = gotFrom - wantFrom;
-  const dTo = gotTo - wantTo;
-  if (Math.abs(dFrom) > TOL || Math.abs(dTo) > TOL) {
-    drift.push({i, id: sc.id, sentence: se.id, wantFrom, gotFrom, dFrom, dTo});
+  const next = sentences[i + 1];
+  const tiles = next && next.chapter === se.chapter;
+  const wantStart = Math.round(Number(se.from)) - BEAT.SHOT_LEAD;
+  const wantEnd = tiles
+    ? Math.round(Number(next.from)) - BEAT.SHOT_LEAD - 1
+    : Math.round(Number(se.to)) + BEAT.SHOT_TAIL;
+  const gotStart = Math.round(sc.start * FPS) + 1;
+  const gotEnd = Math.round((sc.start + sc.duration) * FPS);
+  if (Math.abs(gotStart - wantStart) > TOL || Math.abs(gotEnd - wantEnd) > TOL) {
+    drift.push({i, id: sc.id, sentence: se.id, wantStart, gotStart, wantEnd, gotEnd});
   }
 }
 if (drift.length) {
   const first = drift[0];
   problems.push(
-    `${drift.length}/${Math.min(ir.scenes.length, sentences.length)} 镜的帧区间与 timeline 对不上` +
-    `（例：${first.id} 应 ${first.wantFrom} 起、实为 ${first.gotFrom}，差 ${first.dFrom} 帧）` +
-    " —— 镜区间必须是 timeline 派生的，不能另写",
+    `${drift.length}/${Math.min(ir.scenes.length, sentences.length)} 镜的帧区间不是 timeline 派生的` +
+    `（例：${first.id} 应 [${first.wantStart},${first.wantEnd}]、实为 [${first.gotStart},${first.gotEnd}]）` +
+    " —— 镜区间必须按 a2e 衔接规则从 timeline 派生，不能另写",
   );
 }
 
@@ -101,16 +110,16 @@ if (outside.length) {
   problems.push(`${outside.length} 个字幕块不落在任何句子区间内 —— 字幕与时间轴不同源`);
 }
 
-// 4) 末端漂移
+// 4) 末端漂移：末镜末端 = 末字幕末端 + 离场尾段（SHOT_TAIL）。
 const lastSentence = sentences[sentences.length - 1];
 const lastCaption = caps[caps.length - 1];
 const lastScene = ir.scenes[ir.scenes.length - 1];
 const capEndFrame = Math.round(Number(lastCaption.end) * FPS);
 const sceneEndFrame = Math.round((lastScene.start + lastScene.duration) * FPS);
-if (Math.abs(sceneEndFrame - capEndFrame) > TOL) {
+if (Math.abs((sceneEndFrame - capEndFrame) - BEAT.SHOT_TAIL) > TOL) {
   problems.push(
     `末端漂移：末镜到 ${sceneEndFrame} 帧、末字幕到 ${capEndFrame} 帧，相差 ${sceneEndFrame - capEndFrame} 帧` +
-    `（${((sceneEndFrame - capEndFrame) / FPS).toFixed(2)}s）`,
+    `（末镜应比末字幕多出离场尾段 ${BEAT.SHOT_TAIL} 帧，实差 ${((sceneEndFrame - capEndFrame) / FPS).toFixed(2)}s）`,
   );
 }
 

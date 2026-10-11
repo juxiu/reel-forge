@@ -14,8 +14,15 @@ import crypto from "node:crypto";
  *
  * 这和本仓库反复记过的「假开关」是同一类：门在查「东西存不存在」，没在查「东西对不对」。
  *
- * 指纹覆盖「决定画面的那几样」：双比例 IR（只取与画面有关的字段）、44 个镜头源文件、
- * 解说词、字幕块、画面字面量白名单。**不覆盖** artifacts/ 自身（否则自我循环）。
+ * 指纹覆盖「决定画面的那几样」：双比例 IR（只取与画面有关的字段）、镜头源（44 个 SC*.jsx +
+ * 组私有 stage.jsx + 共用 stage-kit.jsx/plan.mjs/registry 等）、通用渲染层（src/remotion）、
+ * 视觉真源（src/visual）、解说词、字幕块、画面字面量白名单。**不覆盖** artifacts/ 自身（否则自我循环）。
+ *
+ * ⚠ 2026-10-11 补漏：此前只覆盖 src/shots 下的「G 组目录里的 SC 镜头源、组私有 stage.jsx、
+ *   共用 stage-kit.jsx」，于是 `src/shots/plan.mjs`（焦点拍表真源：focusMarks/focusSlots 全由它算出）、
+ *   `src/remotion/Primitives.jsx`（图元几何）、`src/visual/easing.mjs`（节拍常量）这些
+ *   **实实在在改画面**的文件改了之后，指纹纹丝不动 —— QC 产物照样「新鲜」，还是假绿。
+ *   判据是「这个文件改了，像素会不会变」；会变就必须进指纹，跟它在哪个目录无关。
  *
  * ⚠ 判据与生产者共用本文件（qc.mjs 写进 report.json，verify-production 重算比对）——
  *   校验算法在两处各写一份的话，换一次算法就会有一边永远绿。
@@ -52,26 +59,13 @@ export function releaseFingerprint() {
     if (fs.existsSync(f)) inputs[f] = sha(irEssence(f));
   }
 
-  // 2) 镜头源文件：44 个 SC*.jsx（画面真源，逐字节）
-  const shots = {};
-  const shotsRoot = "src/shots";
-  if (fs.existsSync(shotsRoot)) {
-    for (const group of fs.readdirSync(shotsRoot, {withFileTypes: true}).filter((d) => d.isDirectory() && /^G\d+$/.test(d.name))) {
-      for (const name of fs.readdirSync(path.join(shotsRoot, group.name))) {
-        if (!/^SC\d+\.jsx$/.test(name)) continue;
-        const rel = `${shotsRoot}/${group.name}/${name}`;
-        shots[rel] = sha(fs.readFileSync(rel, "utf8"));
-      }
-    }
-    // 组私有舞台与套件同样是画面输入
-    for (const group of fs.readdirSync(shotsRoot, {withFileTypes: true}).filter((d) => d.isDirectory() && /^G\d+$/.test(d.name))) {
-      const stage = `${shotsRoot}/${group.name}/stage.jsx`;
-      if (fs.existsSync(stage)) shots[stage] = sha(fs.readFileSync(stage, "utf8"));
-    }
-    const kit = `${shotsRoot}/stage-kit.jsx`;
-    if (fs.existsSync(kit)) shots[kit] = sha(fs.readFileSync(kit, "utf8"));
+  // 2) 画面真源：镜头源 + 通用渲染层 + 视觉真源。判据只有一个 —— 改了它像素会不会变。
+  //    逐字节哈希；递归收集 .jsx/.js/.mjs，跳过文档与构建产物。
+  const code = {};
+  for (const dir of ["src/shots", "src/remotion", "src/visual"]) {
+    for (const rel of walkCode(dir)) code[rel] = sha(fs.readFileSync(rel, "utf8"));
   }
-  inputs["src/shots/**"] = shots;
+  inputs["src/shots/**+remotion+visual"] = code;
 
   // 3) 解说词 / 字幕块 / 画面字面量白名单
   for (const f of ["script/narration.txt", "script/storyboard_src.md", "fixtures/captions.json", "fixtures/visual-literals.json"]) {
@@ -83,8 +77,22 @@ export function releaseFingerprint() {
   let groups = 0;
   try {
     scenes = JSON.parse(fs.readFileSync("fixtures/render-ir-16x9.json", "utf8")).scenes.length;
-    groups = Object.keys(shots).filter((k) => /^src\/shots\/G\d+\/SC\d+\.jsx$/.test(k)).length;
+    groups = Object.keys(code).filter((k) => /^src\/shots\/G\d+\/SC\d+\.jsx$/.test(k)).length;
   } catch {}
 
   return {fingerprint: sha(JSON.stringify(inputs)), inputs, scenes, shots: groups};
+}
+
+/** 递归收集一个目录下的代码文件（相对路径，字典序，跨平台稳定）。 */
+function walkCode(dir) {
+  const out = [];
+  const visit = (d) => {
+    for (const ent of fs.readdirSync(d, {withFileTypes: true})) {
+      const p = path.join(d, ent.name);
+      if (ent.isDirectory()) visit(p);
+      else if (/\.(jsx|js|mjs)$/.test(ent.name)) out.push(p);
+    }
+  };
+  if (fs.existsSync(dir)) visit(dir);
+  return out.sort();
 }

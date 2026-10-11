@@ -39,7 +39,11 @@ export async function edgeTts({text,voice,outDir,retries=4,rate="+0%"}) {
   for(let attempt=1;attempt<=retries;attempt++){
     try{
       // python3 在 Windows 上可能只叫 python/py —— 交给 spawn 层按别名解析。
-      const r=await runAsync("python3",["scripts/edge_tts_provider.py","--text",text,"--voice",voice,"--rate",rate,"--audio",audio,"--timings",timings],{stdio:"inherit"});
+      // ⚠ timeout 必须传（spawn.mjs 实现了这个选项，但调用方不传就是静默无效——假开关教训）：
+      //   2026-10-10 实测 3 个 python 子进程在网络上挂起 1h24m，node 侧 0% CPU 永久等待，
+      //   整条生产链卡死在 TTS 阶段。正常合成 <15s，120s 阈值足够宽裕；
+      //   超时抛错走下面的退避重试，最终由串行补齐兜底。
+      const r=await runAsync("python3",["scripts/edge_tts_provider.py","--text",text,"--voice",voice,"--rate",rate,"--audio",audio,"--timings",timings],{stdio:"inherit",timeout:120000});
       // 找不到解释器属于环境问题，重试 4 次只会白等；直接抛，错误里带命令名。
       if(r.error) throw new Error("edge tts: "+r.error);
       if(r.status!==0) throw new Error("edge tts failed: exit "+(r.status??"signal "+r.signal));

@@ -59,7 +59,7 @@
 
 | 上游 | 事故一句话 | 状态 | 本仓库执行者 |
 |---|---|---|---|
-| `:8` | 「末 2 帧不离场 + 下一镜头硬切」被两侧理解成「我不动、你从节拍帧才入场」→ 一片 5 处组界空场 | ✅ | 离场不是文字约定而是算出来的：`exitPlan`（`src/shots/plan.mjs:35-40`）按 `BEAT.EXIT_HOLD_MIN/MAX = 30/45`（`src/visual/easing.mjs:139-140`）给 `exitAt`，入场晚于它记 `beat-after-exit`（`plan.mjs:428`），夹具把五类 plan issue 全列进必查 token（`scripts/verify-render-layer.mjs:140`） |
+| `:8` | 「末 2 帧不离场 + 下一镜头硬切」被两侧理解成「我不动、你从节拍帧才入场」→ 一片 5 处组界空场 | ✅ | 离场不是文字约定而是算出来的：`exitPlan`（`src/shots/plan.mjs:41-46`）按 `BEAT.EXIT_TAIL = 8`（`src/visual/easing.mjs:142`）给 `exitAt = len − 8`（末 8 帧离场，与 a2e `exitOp len=8` 同口径），`BEAT.EXIT_HOLD_MIN/MAX = 30/45`（`:143-144`）只夹紧 hold，入场晚于 `exitAt` 记 `beat-after-exit`（`plan.mjs:428`），夹具把五类 plan issue 全列进必查 token（`scripts/verify-render-layer.mjs:140`） |
 | `:9` | 6.7%/帧的线性 exitFade 末帧还剩 40–57%，动态下「啪」一声 → 用 `1−(n/N)^1.5` | ✅ + 📝 | 渲染层用的是幂加速：`exitDrop` 的 α = `1 − (n/len)^1.6`、Δ=440（`easing.mjs:164-168`，幂常量 `BEAT.EXIT_ACCEL_P` `:138`），调用点 `Primitives.jsx`（Hud/ChapterCard）与 `SemanticShots.jsx:9` 导入。**但**线性的 `exitFade`（`easing.mjs:163`）照样导出，且**零调用者**——它不会中招，因为它没人用；同理 `exitRise`（`:170-172`）零调用者（§10 表 A） |
 | `:10` | 自下滑入 Δ≈300 穿过 y637–690 字幕带（一片 6 处），改「Δ≤120 或侧向滑入 + 前 6 帧渐入」 | ◐ | **侧向滑入**这一半的常量在（`BEAT.LATERAL`，`easing.mjs:130`，注释「横向滑入 Δ260–320」）**但零调用者**；入场位移走 `slideIn`。字幕带禁令写在 `Primitives.jsx:500`（「⚠ 字幕带与进度条带（y637–720）永不放画面内容；入场轨迹不得穿过字幕带」），执行者只有**静态 y**：`verify-render-layer.mjs:167-170` 判 authored 元素的 `y` 是否越出 `[contentTopNoRail−200, contentBottom+40]`。**运动轨迹穿过带子这件事没有静态判据**——要渲出来才看得见 |
 | `:46` | 首批元素等到字幕块起始帧才动 → 镜头首段空屏，组界叠成 11–16 帧纯黑；裁定「首批元素的 f0 = 镜头首帧」 | ⚠（静态） | 本仓库选了另一条路：入场锚在**本元素对应字幕块**并允许早 6 帧（`BEAT_WINDOW = [-6, 3]`，`src/visual/style.mjs:160`；排布在 `beatFrames`，`plan.mjs:279-`，窗口内从 −4 起排）。效果是「镜头前 ≤ subFrom−7 帧可能没人动」——上游要 8 帧预算，这里给 7 帧。**这段空场没有任何静态判据**，只有测量层 `EMPTY_FIELD` 类 token 在真渲帧上才判得到（`scripts/frame_metrics.py`），而真渲从未跑过（见文末验证缺口） |
@@ -143,7 +143,7 @@
 | `:150` | 短片缩短 `CHAPTER_GAP` 后，HUD 原有「间隔 <30 帧即视为同章」的规则会把上一章胶囊盖到下一章章节卡上；应按句子的 `chapter` 比较，而不是猜间隔 | ✅ 🔒 | 本仓库从第一版就是按 `chapter` 字段聚合：`chaptersOf` 用 `s.chapter ?? 1` 建 `lastFrameOfChapter`（`timeline.mjs:36-39`），章节边界不靠猜。`CHAPTER_GAP_FRAMES` 只在 `tts_build.mjs` 里当留白用 |
 | `:76-77` | 片尾 `EndingTop` 的淡入帧数决定末段纯黑有多长；`endingFade=30` 会从「末句 −30」开始压黑，把全片最后一个动作吃掉 | 🔒 ◐ | 形状不同：本仓库压黑在内容**之后**（`Root.jsx:80` `from = lastSceneFrame + 12`；`Primitives.jsx:602` 早退）。**残留**：`+12` 与同文件 `:599` 注释「⚠ endingFade 会吃掉末拍动作，留 ≥30 帧」直接矛盾——注释要求 30，装配层给 12，没有门（§10 表 B 第一行） |
 | `:189-190` | 片尾进度条不能在画面全黑后孤悬 2 s：`EndingTop` 改成随 `endingFade` 同步压黑；署名卡起点必须 **>** 末句 `to`（第一版与末字幕、末镜头残影重叠 20 帧） | ◐ | 起点条件天然满足（`from = lastSceneFrame + 12 > 末句 to`）。**进度条与片尾没有联动**：`Root.jsx:76-77` 的 `Hud`/`ProgressBar` 无条件渲染到 `totalFrames`，署名期间它们只是被 `Primitives.jsx:607` 那块 α=0.72 的黑压住，而条体自己是 0.52 α（`Primitives.jsx:459`）——上游的修法是「同步淡出」，本仓库没有 |
-| `:151` | 只有 40 帧的片头要重排动效预算，不能把长片头的 glitch + 副标 + 推镜挤一起；最终选三行统一 6 帧淡入 | ⚠ | 没有片头专段（`TitleCard` 未装配，`style-guide.md` §6 字体角色表那行标了），所以这条在本仓库既没实现也没落点 |
+| `:151` | 只有 40 帧的片头要重排动效预算，不能把长片头的 glitch + 副标 + 推镜挤一起；最终选三行统一 6 帧淡入 | ✅ | 片头专段已装配：`TitleCard`（`src/remotion/Primitives.jsx`）挂在 `Root.jsx` 字幕**之下**的常驻层，窗口 `[1, chapters[0].from − 9]`；数据来自 `fixtures/project.json.title`（big/rest/en/tagline），由 `tts_build.mjs:246` 透传进 `timeline.title`。四件套错峰入场（big → rest → tagline → en 最晚 `f0+42`），所以第 1 章也吃章前 45（`:205-210`），片头区间实为 90 帧 —— 旧写法首章短路只剩 LEAD 45，英文副标永远来不及出现 |
 
 ---
 
@@ -243,7 +243,7 @@
 ## 可核对规则
 
 1. 上游教训的规模与分片是 125 条 / 5 部片（26+33+32+5+29），行号见 §0；本文不复制其文本，只给对照。
-2. 离场停留是算出来的不是约定的：`exitPlan`（`src/shots/plan.mjs:35-40`）+ `BEAT.EXIT_HOLD_MIN/MAX`（`src/visual/easing.mjs:139-140`）；入场晚于 `exitAt` 记 `beat-after-exit`（`plan.mjs:428`）。
+2. 离场停留是算出来的不是约定的：`exitPlan`（`src/shots/plan.mjs:41-46`）按 `BEAT.EXIT_TAIL = 8` 定 `exitAt = len − 8`（`src/visual/easing.mjs:142`），`BEAT.EXIT_HOLD_MIN/MAX = 30/45`（`:143-144`）只夹紧 hold；入场晚于 `exitAt` 记 `beat-after-exit`（`plan.mjs:428`）。
 3. 离场淡出用幂不用线性：`exitDrop` 的 α = `1 − (n/len)^1.6`（`easing.mjs:164-168`）；线性的 `exitFade`（`:163`）零调用者。
 4. kf 首值陷阱在引擎层就是设计约束：`easing.mjs:74` 注释 + `:101` 行为；关键帧一律以 1-based 镜头首帧为起点。
 5. 首帧不空这条只有半个体系：`softOp(…, 0.25)` 有调用者，`firstOp(…, 0.57)`（`easing.mjs:161`）**没有**；片尾 `Primitives.jsx:603` 仍用线性 `fadeIn`，`N === from` 那一帧全黑。

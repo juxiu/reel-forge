@@ -61,11 +61,15 @@ if (asr.required_real_asr === true && asr.source !== "external-asr-provider") {
 const provenance = JSON.parse(fs.readFileSync(manifestDir + "/text_provenance.json", "utf8"));
 if (provenance.status !== "PASS") throw new Error("delivery text provenance not PASS");
 
+// 验收范围：与 qc.mjs / verify-production.mjs / deliver.mjs 同一口径（用户决策 —— 16:9 是验收基准）。
+// 范围外比例的测量文件照常进包并逐文件校验 sha256（审计可查），只豁免 PASS 判定。
+const ACCEPT = new Set((process.env.ACCEPT_RATIOS || "16x9,9x16").split(",").map((s) => s.trim()).filter(Boolean));
+if (!ACCEPT.has("16x9")) throw new Error("ACCEPT_RATIOS 必须包含 16x9（16:9 是验收基准，不可移出范围）");
 for (const ratio of ["16x9", "9x16"]) {
   const frame = JSON.parse(fs.readFileSync(manifestDir + "/frame_metrics_" + ratio + ".json", "utf8"));
   const motion = JSON.parse(fs.readFileSync(manifestDir + "/motion_" + ratio + ".json", "utf8"));
   const visual = JSON.parse(fs.readFileSync(manifestDir + "/visual_regression_" + ratio + ".json", "utf8"));
-  if (frame.summary?.status !== "PASS" || motion.summary?.status !== "PASS") {
+  if (ACCEPT.has(ratio) && (frame.summary?.status !== "PASS" || motion.summary?.status !== "PASS")) {
     throw new Error("delivery metrics not PASS: " + ratio);
   }
   if (visual.gate !== "advisory" || visual.blocking !== false) {

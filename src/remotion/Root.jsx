@@ -1,6 +1,6 @@
 import React from 'react';
 import {AbsoluteFill, Audio, Sequence, staticFile, useCurrentFrame} from 'remotion';
-import {Backdrop, ChapterCard, EndingCredit, Hud, ProgressBar, Rail, Subtitle} from './Primitives.jsx';
+import {Backdrop, ChapterCard, EndingCredit, Hud, ProgressBar, Rail, Subtitle, TitleCard} from './Primitives.jsx';
 import {Design, Fonts} from './Design.jsx';
 import {FootageTrack} from './Footage.jsx';
 import {SHOT_REGISTRY} from '../shots/registry.jsx';
@@ -12,7 +12,7 @@ import {captionBlocks, chaptersOf, chapterCardAt, hudEntries, railEntries} from 
 export {captionBlocks, chaptersOf, chapterCardAt, hudEntries, railEntries};
 
 /**
- * 成片装配：幕底 → 实拍底 → 镜头 → 常驻覆盖层（HUD / 进度条 / 章节卡 / 字幕 / 片尾）。
+ * 成片装配：幕底 → 实拍底 → 镜头 → 常驻覆盖层（片头 / HUD / 进度条 / 章节卡 / 字幕 / 片尾）。
  *
  * ⚠ 帧号约定：这里统一换算成 1-based 的 N（Remotion 的 frame 从 0 起）。
  *    覆盖层用**全片绝对帧**，镜头内部用**镜头相对帧**（引擎里 N = frame + 1），
@@ -37,7 +37,7 @@ const toFrames = (v, fps) => Math.round(Number(v) * fps);
  * @param {object} props.timeline   叙事侧真源（章节 / 片名 / 背景 / 署名 / 效果白名单）
  * @param {object} props.filmFx     覆盖 timeline.fx 的片级效果（装配测试用）
  */
-export function ReelForgeComposition({renderIR, captions = [], timeline = null, includeScenes = true, includeAudio = true, audioFile = 'audio.mp3', showEndingCredit = true, filmFx = null}) {
+export function ReelForgeComposition({renderIR, captions = [], timeline = null, includeScenes = true, includeAudio = true, audioFile = 'audio.wav', showEndingCredit = true, filmFx = null}) {
   const frame = useCurrentFrame();
   const N = frame + 1;
   const fps = Number(renderIR.fps) || 30;
@@ -52,6 +52,12 @@ export function ReelForgeComposition({renderIR, captions = [], timeline = null, 
   const sweepWhitelist = filmFx?.sweepScenes || timeline?.fx?.sweep_scenes || [];
   const sweepScenes = sweepWhitelist.slice(0, SWEEP_WHITELIST_MAX).map(String);
   const card = chapterCardAt(chapters, N);
+  // 片头（a2e G0 常驻层的「片头」）：片名四件套铺在第 1 章之前那段静音上，
+  // 与 a2e 同构——窗口 = [1, chapters[0].from − 9]（−9 是分镜层的首镜入场预留，
+  // 与 IR 里 scene-001.start = 首句.from−9 同一口径）。timeline.title 由 project.json 声明、
+  // tts_build 透传，缺省时整段不出卡（旧片仍可渲染）。
+  const titleCfg = timeline?.title || renderIR?.title || null;
+  const titleTo = chapters.length ? chapters[0].from - 9 : 0;
 
   const ctx = {fps, captions: blocks, timeline, fx: {sweepScenes}, chapters};
 
@@ -78,6 +84,7 @@ export function ReelForgeComposition({renderIR, captions = [], timeline = null, 
           {rails.map((r) => <Rail key={r.id} spec={r} N={N} />)}
           <ProgressBar chapters={chapters} totalFrames={totalFrames} N={N} />
           {card ? <ChapterCard N={N} chapter={card.chapter} prevTo={chapters[card.index - 1].to} from={card.start} to={card.end} tech={card.chapter.tech} /> : null}
+          {titleCfg && titleTo > 1 ? <TitleCard N={N} f0={1} big={titleCfg.big} rest={titleCfg.rest} tagline={titleCfg.tagline} en={titleCfg.en} lastFrame={titleTo} /> : null}
           {blocks.map((b) => (b.text ? <Subtitle key={b.id} text={b.text} N={N} from={b.from} to={b.to} /> : null))}
           {showEndingCredit && lastSceneFrame > 0 ? <EndingCredit N={N} from={lastSceneFrame + 12} to={totalFrames} credit={timeline?.credit || renderIR?.credit} /> : null}
         </Design>

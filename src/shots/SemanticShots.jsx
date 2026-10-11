@@ -62,7 +62,7 @@ export function SemanticShot({scene, recipe = {}, variant, captions: captionsPro
   const lb = layoutBands(d.bands, d.height);
   const pos = heroPos(plan, lb);
   const sp = setPiece(1, plan.subFrom);
-  const ex = N >= plan.exit.exitAt ? exitDrop(N - plan.exit.exitAt, 12) : {opacity: 1, dy: 0};
+  const ex = N >= plan.exit.exitAt ? exitDrop(N - plan.exit.exitAt, plan.exit.exitTail) : {opacity: 1, dy: 0};
   const sceneId = String(scene?.id || scene?.scene_id || '');
   const sweepAllowed = plan.fx.sweep && (ctx.fx?.sweepScenes || []).includes(sceneId);
 

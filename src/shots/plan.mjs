@@ -29,14 +29,72 @@ export function shotFrames(scene, fps = 30) {
 }
 
 /**
- * 离场时序：末拍落位后必须停 EXIT_HOLD_MIN…MAX 帧再走。
- * 返回 {exitAt, hold}；exitAt = 离场开始帧（1-based N），hold = 实际静止帧数。
+ * 离场时序：离场动画（末 EXIT_TAIL 帧）必须**结束在镜头末帧**，末拍落位后到离场起点之间
+ * 还必须有 EXIT_HOLD_MIN…MAX 帧的静止。
+ *
+ * ⚠ 旧口径 `exitAt = len − hold`（hold=30–45）把「停留预算」当成了「离场起点到片尾的距离」，
+ *    而离场动画只有 12 帧 —— 于是每个镜头末尾留下 hold−12 = 18…33 帧的**纯幕底空舞台**
+ *    （与镜头间空场叠加，每 ~8s 出现约 51 帧、1.7s 没有内容的画面）。
+ *    a2e 的真值是「末 8 帧离场」（exitOp len=8）、镜头区间到 from−9 为止，content 一直演到片尾。
+ *    返回 {exitAt, hold, holdMin, exitTail, len}；exitAt = 离场开始帧（1-based N）。
  */
 export function exitPlan(len, settleFrames) {
   const want = Math.round(Number(settleFrames) || BEAT.EXIT_HOLD_MIN);
   const hold = Math.max(BEAT.EXIT_HOLD_MIN, Math.min(BEAT.EXIT_HOLD_MAX, want));
-  const exitAt = Math.max(1, len - hold);
-  return {exitAt, hold, len};
+  const exitAt = Math.max(1, len - BEAT.EXIT_TAIL);
+  return {exitAt, hold, holdMin: BEAT.EXIT_HOLD_MIN, exitTail: BEAT.EXIT_TAIL, len};
+}
+
+// ---- 焦点拍表 ----
+/** 作者只写了一个焦点偏移时的分格步长（帧）。 */
+const FOCUS_SINGLE_GAP = 44;
+
+/**
+ * 把作者写的焦点偏移（相对入场帧、**只覆盖镜头前段**）按周期铺满 [entry, lastBeat]。
+ *
+ * ⚠ 为什么必须铺满：43 个有 focus 的镜头里，作者的偏移（典型 `[0,40,80]`）加起来只覆盖镜头前
+ *   ~110 帧，而镜头有 150–323 帧（render-IR 实测中位 221）。末拍之后画面上只剩幕底亮度呼吸，
+ *   motion_check 实测变化 0.02–0.12（判据 still_thr = 0.35 以下）→ 连续静止 140 帧 = 4.7 s，
+ *   于是**每一个镜头**都报 `motion_too_low`（medium，阻断）。a2e 的每一镜都有贯穿全镜的
+ *   「动词动作」，本仓的对应物就是焦点交接 —— 把它铺满整镜就是这条缺陷的根治。
+ *
+ * 周期 = 末拍偏移 + 最后一格的步长（外推一格）；相邻两拍的距离因此等于作者的分格节奏
+ * （实测 34–58 帧），拍数不足时整周期重复，紫色焦点在同样的槽序上再走一轮。
+ * 拍距 ≤ 58 帧这条上界本身就是安全保证：即使每拍只产生一帧越限变化，最长静止也 ≤ 58 帧
+ * = 1.93 s < still_max_seconds(3.0 s)。
+ *
+ * @param {number[]} offsets 作者写的相对偏移（recipe.stage.focus）
+ * @param {number} entry     入场帧（plan.hero.f0）
+ * @param {number} lastBeat  末拍上限（= 离场起点 − EXIT_HOLD_MAX − FOCUS_RISE）。
+ *   为什么要留两段余量：motion_check 的 hold 是从离场点往回数「无大面积变化」的帧数，
+ *   而最后一拍的效果要 FOCUS_RISE 帧才爬到位（别按 EXIT_HOLD_MIN 卡——那只留 30 帧，
+ *   实测 hold = 30 − 11 − GLOW_OFF(6) ≈ 13~19 < 30 → 每个有焦点的镜头都报 hold_too_short）。
+ */
+export function tileFocus(offsets, entry, lastBeat) {
+  const src = (Array.isArray(offsets) ? offsets : []).map(Number).filter((v) => Number.isFinite(v));
+  if (!src.length) return [];
+  const start = Math.max(1, Math.round(Number(entry) || 1));
+  const end = Math.max(start, Math.round(Number(lastBeat) || start));
+  const rel = src.map((o) => o - src[0]);
+  const n = rel.length;
+  const last = rel[n - 1];
+  const step = n > 1 ? last - rel[n - 2] : FOCUS_SINGLE_GAP;
+  const period = Math.max(FOCUS_SINGLE_GAP, last + Math.max(BEAT.STAGGER * 8, step));
+  const marks = [];
+  // 上限 512 拍只是防御（period ≥ 44 时，任何真实镜头都不会接近它）。
+  for (let cycle = 0; cycle < 512; cycle++) {
+    let overflow = false;
+    for (let i = 0; i < n; i++) {
+      const m = start + src[0] + cycle * period + rel[i];
+      if (m > end) {
+        overflow = true;
+        break;
+      }
+      marks.push(m);
+    }
+    if (overflow) break;
+  }
+  return marks;
 }
 
 // ---- 画面文字的出身 ----
@@ -290,7 +348,8 @@ export function beatFrames(planSupport, capsOrSubFrom, len = Infinity) {
   const blocks = caps && caps.length ? caps.map((c) => Math.max(1, c.localFrom)) : [Math.max(1, Number(capsOrSubFrom) || 1)];
   const n = planSupport.filter((it) => !(Number.isFinite(Number(it.f0)) && Number(it.f0) > 0)).length;
   const perBlock = Math.max(1, Math.min(BEAT_PER_BLOCK_MAX, Math.ceil(n / blocks.length)));
-  const last = Math.max(1, len - BEAT.EXIT_HOLD_MIN);
+  // 入场帧上限：末拍落位后还要留 EXIT_HOLD_MIN 帧静止 + 末 EXIT_TAIL 帧离场，才轮到镜头末帧。
+  const last = Math.max(1, len - BEAT.EXIT_TAIL - BEAT.EXIT_HOLD_MIN);
   const fit = (v) => Math.max(1, Math.min(Math.round(v), last));
   /** beat 相对**离它最近的那块字幕**：QC 判的是「这场画面出现时，有没有一句正在说的字幕」，不是「当初排给了哪一块」。 */
   const beatOf = (f0) => {
@@ -417,6 +476,11 @@ export function buildPlan({scene, recipe = {}, captions = [], fps = 30, bands, l
   if (presetName && !presetKnown) flag('camera-unknown-preset', `camera-unknown-preset: 「${declaredPreset}」不在运镜词表（${cameraVocabulary().join('/')}）内，本镜已退回慢推`, {declared: declaredPreset, fallback: 'slowpush'});
   // 主角也守节拍窗口：以前引擎里写死 f0=1，镜头比首句字幕早开几帧时主角会先于解说登场。
   if (hero) hero.f0 = Math.max(1, subFrom + BEAT_WINDOW[0] + 2);
+  // 焦点拍表：作者的 relative 节奏铺满整镜（见 tileFocus 的注释）。
+  // 槽数取「作者写的焦点数」与「图元数」的较大者 —— 拓扑按 item 下标取 k[i]，
+  // 槽数少于图元数时多出来的图元会拿到 undefined（`opacity: 0.32 + 0.5*undefined` = NaN）。
+  const focusSlots = Math.max(Array.isArray(recipe?.stage?.focus) ? recipe.stage.focus.length : 0, items.length, 1);
+  const focusMarks = tileFocus(recipe?.stage?.focus, hero?.f0 ?? subFrom, exit.exitAt - BEAT.EXIT_HOLD_MAX - BEAT.FOCUS_RISE);
   // 紫只给当前重点：同镜头 ≤1 个 active 图元，多余的降级为白/灰并出声
   let actives = 0;
   for (const it of items) {
@@ -454,6 +518,10 @@ export function buildPlan({scene, recipe = {}, captions = [], fps = 30, bands, l
     fx: effectsOf(scene, recipe),
     key: keyLight(scene),
     focus: str(scene?.composition?.focus || 'hero-plus-flow'),
+    // 焦点拍表（铺满整镜的绝对帧号）与槽数：舞台层 focusWalk/isPast 按它交接紫色焦点。
+    // ⚠ 与上面的 focus 字段（构图模式 hero-plus-flow/single-hero）同名不同物，勿混用。
+    focusMarks,
+    focusSlots,
     issues,
     repairs,
     mirror: Boolean(recipe.mirror),

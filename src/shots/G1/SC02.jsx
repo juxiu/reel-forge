@@ -27,6 +27,10 @@ export const SHOT_RECIPE = {
     kind: "split2col",
     left_label: "原始报文",
     right_label: "解析字段",
+    // 本镜是全片唯一没写 focus 的镜头，也是最长的（323 帧）。补上后焦点拍表能按 36 帧的节奏
+    // 铺满整镜（减压后的 bad case 见 verify:motion），否则末段 3.9s 静止会被判 motion_too_low。
+    // 6 个 item → 6 槽：左栏第 i 行 = 槽 2i，右栏 = 槽 2i+1（拓扑里按这个口径取 k）。
+    focus: [0, 36, 72],
     items: [
       {id: "l1", icon: "doc", text: "GET /orders"},
       {id: "r1", icon: "key", text: "username"},

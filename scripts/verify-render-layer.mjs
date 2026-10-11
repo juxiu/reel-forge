@@ -49,7 +49,7 @@ ok(tall.bands.contentBottom < tall.bands.subTop, '9:16 内容区不得压进字�
     const keys = cameraKeysFromMotion([{type: 'camera', target: 'stage', preset, amount: 0.12}], 1, len, bands);
     ok(keys && keys.length >= 2, `motion preset=${preset} 应生成 keys`);
     const last = keys[keys.length - 1];
-    ok(last.f <= len - CAMERA_LIMITS.clear, `运镜结束帧必须 ≤ len−${CAMERA_LIMITS.clear}（preset=${preset}，实得 ${last.f}/${len}）`);
+    ok(last.f <= len - CAMERA_LIMITS.clear - CAMERA_LIMITS.exit, `运镜结束帧必须 ≤ len−clear−exit=${len - CAMERA_LIMITS.clear - CAMERA_LIMITS.exit}（preset=${preset}，实得 ${last.f}/${len}）`);
     ok(last.s <= CAMERA_LIMITS.maxScale + 1e-6, `推近不得超过 ${CAMERA_LIMITS.maxScale}（preset=${preset}，s=${last.s}）`);
     if (preset === 'scroll') {
       // 滚动扫的是内容区，两端不贴边：越过 contentBottom 就是把元素甩进字幕带
@@ -67,7 +67,7 @@ ok(tall.bands.contentBottom < tall.bands.subTop, '9:16 内容区不得压进字�
   eq(shortFallback.length, 1, '短镜头兜底 = 单关键帧静止机位');
   // 兜底慢推同样避开末拍
   const fallback = slowPushKeys(1, 120, bands);
-  ok(fallback[fallback.length - 1].f <= 120 - BEAT.CAMERA_CLEAR, '无声明运镜时的慢推也必须避开末拍');
+  ok(fallback[fallback.length - 1].f <= 120 - BEAT.CAMERA_CLEAR - CAMERA_LIMITS.exit, '无声明运镜时的慢推也必须避开末拍与离场');
   eq(camAt(0, CAMERA.push(1, {len: 30})).s, 1, 'camAt 首帧前应取首关键帧值（不是 0）');
   eq(camAt(999, CAMERA.push(1, {len: 30, to: 1.3})).s, 1.3, 'camAt 末帧后停在末值');
 }
@@ -115,13 +115,15 @@ ok(tall.bands.contentBottom < tall.bands.subTop, '9:16 内容区不得压进字�
 // ---- 3) 离场节拍预算 ----
 {
   const p = exitPlan(120, 30);
-  eq(p.hold, 30, 'settle_frames=30 → 末拍停留 30 帧');
-  eq(p.exitAt, 90, '离场起点 = len − hold（90 帧起离场，90–120 共 31 帧含落位帧）');
+  eq(p.hold, 30, 'settle_frames=30 → 末拍停留预算 30 帧');
+  eq(p.exitAt, 120 - BEAT.EXIT_TAIL, '离场起点 = len − EXIT_TAIL（末 8 帧离场，动画结束在镜头末帧）');
+  eq(p.exitAt + p.exitTail, 120, '离场动画必须正好结束在镜头末帧（不得留空舞台）');
   ok(p.exitAt >= 1 && p.exitAt <= 120, '离场起点必须落在镜头内');
   const def = exitPlan(200);
-  ok(def.hold >= BEAT.EXIT_HOLD_MIN && def.hold <= BEAT.EXIT_HOLD_MAX, `缺省停留须落在 ${BEAT.EXIT_HOLD_MIN}–${BEAT.EXIT_HOLD_MAX}`);
+  ok(def.hold >= BEAT.EXIT_HOLD_MIN && def.hold <= BEAT.EXIT_HOLD_MAX, `缺省停留预算须落在 ${BEAT.EXIT_HOLD_MIN}–${BEAT.EXIT_HOLD_MAX}`);
+  ok(def.exitAt === 200 - BEAT.EXIT_TAIL, '缺省 exitAt 同样只让出 EXIT_TAIL 帧');
   const tooShort = exitPlan(20, 45);
-  ok(tooShort.exitAt >= 1, '镜头短于停留预算时离场起点不得为负');
+  ok(tooShort.exitAt >= 1, '镜头短于离场预算时离场起点不得为负');
 }
 
 // ---- 4) buildPlan：真实 fixture，两种画幅 ----

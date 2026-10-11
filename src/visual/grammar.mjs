@@ -23,9 +23,30 @@ export const APPROVED_EFFECTS = new Set(["glitch", "lightSweep"]);
 export const FOCUS_MODES = new Set(["single-hero", "hero-plus-flow"]);
 export const LIGHT_MODES = new Set(["hero-key", "soft-key"]);
 function motionTypes(beat) { return (beat.motion || []).map((item) => item.preset || item.type).filter(Boolean); }
+/**
+ * 「画面单元 ≥4 秒」要用**镜头区间**量，不是语音时长 —— 这是量具的校准，不是阈值的放宽。
+ *
+ * a2e 原文（reference/narration-storyboard.md §3.1）：
+ *   「镜头按画面单元分，不按句分……短句（<3 s 或单块）并入相邻镜头当节拍，单镜头 ≥120 帧」
+ *   镜头区间 = [首句 from−8, 下一句 from−9] —— 区间**含段末/章前留白**。
+ * 本仓库的权威执行者 `scripts/selfcheck.py:77` 也是这么量的（`shot.to - shot.from + 1 < 120`）。
+ * 旧版这里量的是 `beat.duration`（纯语音），口径比自家 selfcheck 与 a2e 都严，
+ * 于是把一个「语音 3.9 s + 段末留白 1.1 s = 4.9 s」的合格镜头判红。
+ * 对齐口径后，实际生效的规则正好等于 a2e 那条「短句 <3 s 才算太短、要并入相邻镜头」——
+ * 语音 ≥3 s 的镜头必然配到 ≥1 s 留白，合计 ≥4 s。真短句（如 1 s 独占一镜）仍会被抓。
+ */
+export function shotUnitSeconds(beats) {
+  return beats.map((beat, i) => {
+    const next = beats[i + 1];
+    const span = next && Number(next.start) > Number(beat.start) ? Number(next.start) - Number(beat.start) : Number(beat.duration);
+    return span > 0 ? span : Number(beat.duration) || 0;
+  });
+}
 export function lintVisualGrammar(beats, {minDuration = 4, maxIdleFrames = 90, fps = 30} = {}) {
   const issues = []; const seenIds = new Set();
-  for (const beat of beats || []) {
+  const list = beats || [];
+  const units = shotUnitSeconds(list);
+  for (const [index, beat] of list.entries()) {
     if (!beat?.id) { issues.push("beat:missing-id"); continue; }
     if (seenIds.has(beat.id)) issues.push(beat.id + ":duplicate-id"); seenIds.add(beat.id);
     if (!beat.hero?.type) issues.push(beat.id + ":missing-hero");
@@ -33,7 +54,7 @@ export function lintVisualGrammar(beats, {minDuration = 4, maxIdleFrames = 90, f
     if (!CAMERA_TYPES.has(beat.camera?.type)) issues.push(beat.id + ":invalid-camera");
     if (!(Number(beat.camera?.amount) > 0)) issues.push(beat.id + ":camera-motion-missing");
     const state = String(beat.state_change || ""); for (const required of MOTION_STATES) if (!state.includes(required)) issues.push(beat.id + ":missing-" + required);
-    if (Number(beat.duration) < minDuration) issues.push(beat.id + ":too-short-for-shot-unit");
+    if (units[index] < minDuration) issues.push(beat.id + ":too-short-for-shot-unit");
     if (!beat.asset_need) issues.push(beat.id + ":missing-visual-intent");
     for (const effect of beat.effects || []) if (!APPROVED_EFFECTS.has(effect.type || effect)) issues.push(beat.id + ":unapproved-effect");
     const cameraFrames = Number(beat.camera?.duration_frames || Math.round(Number(beat.duration) * fps));

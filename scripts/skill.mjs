@@ -80,11 +80,27 @@ function pipeline(){
   const generated=JSON.parse(fs.readFileSync(root+"/script.json","utf8"));
   fs.writeFileSync("fixtures/script.json",JSON.stringify(generated,null,2));
   fs.mkdirSync("script",{recursive:true});
-  fs.writeFileSync("script/narration.txt",generated.segments.map(s=>String(s.text||"").trim()).filter(Boolean).join("\n")+"\n");
+  // narration.txt 必须写成 sync-script.mjs 能读回的格式：`# CHAPTER n 标题` 起章、
+  // **空行分段**（一段=一个 segment=一个镜头）、段内用 `|` 切字幕块。以前这里只把
+  // 每段的 text 用单个 \n 拼起来，sync-script 按空行切块只会得到 1 个 block ——
+  // 新主题一键链于是把整篇解说压成一个镜头，verify:asr 立刻报 segment-count-mismatch。
+  // 参考片 script/narration.txt 就是「标题 + 空行分段 + | 字幕块」这个形状。
+  const narration=[];let lastChapter=null;
+  for(const s of generated.segments){
+    const ch=Number(s.chapter||0),title=String(s.chapter_title||"").trim();
+    if(ch&&ch!==lastChapter){narration.push("# CHAPTER "+ch+(title?" "+title:""),"");lastChapter=ch;}
+    const subs=Array.isArray(s.subtitles)&&s.subtitles.length?s.subtitles:[String(s.text||"").trim()];
+    narration.push(subs.map(x=>String(x||"").trim()).filter(Boolean).join(" | "),"");
+  }
+  fs.writeFileSync("script/narration.txt",narration.join("\n").replace(/\n+$/,"\n"));
   fs.writeFileSync("script/storyboard_src.md",["# 分镜源表（骨架由 scripts/skill.mjs 生成）","","帧号令牌由 npm run storyboard（scripts/render_storyboard.py）换成真实帧号；标着「待填」的三列必须人/agent 填，selfcheck 只认「continuous:」「hold:」这两个**标签存在**与 hold 的帧数，不认内容 —— 画面到底有没有持续动作只能看片。","","# 白名单（写了镜头号才允许该镜头用对应效果；留空=一律不许，selfcheck 会按 0 次判）","闪烁白名单：","扫光白名单：","","# 分镜表","| SC | 起–止 | 节拍 | 画面 | 动效 |","| --- | --- | --- | --- | --- |"].concat(generated.segments.map((s,i)=>{const k=String(i+1).padStart(2,"0");return "| SC"+k+" | {S"+k+".from}–{S"+k+".to} | "+(String(s.text||"").trim().slice(0,24)||"待填")+" | 待填：主体 / 构图 / 字号档位 | continuous: 待填（本镜全程在动的东西）; hold: 36f |";})).join("\n")+"\n");
   if(!ensureCheckpoint("narration-signoff",{message:"Research 与 narration 已生成"})) return;
 
-  if(!fs.existsSync("script/timeline.json")||!fs.existsSync("public/audio.mp3")) run("node",["scripts/tts_build.mjs"],env);
+  if(!fs.existsSync("script/timeline.json")||!fs.existsSync("public/audio.wav")) run("node",["scripts/tts_build.mjs"],env);
+  // ⚠ tts 写出的 captions.json 是按词流自动分组的（会跨句界），必须由 sync-script 按
+  //   timeline.sentences[].subs 重写成句内对齐的字幕块，否则 verify:timeline-source 会红
+  //   （「字幕块不落在任何句子区间内」）。派生顺序：materialize-ir 读 sync-script 的产物 script.json。
+  run("node",["scripts/sync-script.mjs"],env);
   if(!ensureCheckpoint("voiceover",{message:"voiceover 与 native-TTS 时间轴已生成"})) return;
 
   // 配音收口：以 tts-word-boundary 为唯一时间轴口径，产出二次校验件。
@@ -115,7 +131,7 @@ function pipeline(){
   run("sh",["scripts/render.sh"],env);
   for(const ratio of ["16x9","9x16"]){
     run("python3",["scripts/frame_metrics.py","--frames","artifacts/frames/"+ratio,"--render-ir","fixtures/render-ir-"+ratio+".json","--out","artifacts/"+projectId+"/qc/frame_metrics_"+ratio+".json"],env);
-    run("python3",["scripts/motion_check.py","artifacts/frames/"+ratio,"--render-ir","fixtures/render-ir-"+ratio+".json","--report","artifacts/"+projectId+"/qc/motion_"+ratio+".json"],env);
+    run("python3",["scripts/motion_check.py","--frames","artifacts/frames/"+ratio,"--render-ir","fixtures/render-ir-"+ratio+".json","--report","artifacts/"+projectId+"/qc/motion_"+ratio+".json"],env);
     run("python3",["scripts/visual_regression.py","--frames","artifacts/frames/"+ratio,"--render-ir","fixtures/render-ir-"+ratio+".json","--out","artifacts/"+projectId+"/qc/visual_regression_"+ratio+".json"],env);
   }
   run("node",["scripts/contact-sheet.mjs"],env); // 渲染后、qc 之前：把计划帧与盘上真图对账成 media_index + contact_sheet，qc-agent 的 payload 才有图像通道（没有它 qc.mjs 只能带 NO-INDEX）

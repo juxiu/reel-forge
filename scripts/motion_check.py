@@ -203,7 +203,13 @@ if args.render_ir and os.path.exists(args.render_ir):
         still_pct = round(100.0 * sum(1 for v in diffs if v < STILL_THR) / len(diffs), 1)
         best, end_i = longest_run(diffs, STILL_THR)
         longest_s = round(best * STEP / fps, 2)
-        # 末拍稳定期：先剔掉尾部已在离场的帧（区亮度 < 尾段中位 × EXIT_K），再从最后可见帧往前数「无大面积变化」
+        # 末拍稳定期：先剔掉尾部已在离场的帧，再从最后可见帧往前数「无大面积变化」。
+        # ⚠ 亮度法只找到「已经明显变暗」的那一帧，而离场是**加速下坠 + 淡出**：最早几帧
+        #   亮度还没掉到 EXIT_K×ref 以下，变化却已经很大。旧口径直接从这里往回数，第一步就
+        #   撞上大变化 → hold=0，于是每个正常离场的镜头都被报成 hold_too_short（假阳性）。
+        #   校准：定位到 e 之后，再从 e 往回**最多 EXIT_TAIL 帧**跳过仍在离场的帧（变化 ≥ HOLD_THR），
+        #   然后才开始计 hold。上限就是文档化的离场尾段帧数，不会把「内容一直动到末帧」
+        #   这种真缺陷洗掉 —— 那种情况下退出点会一路顶到上限，hold 仍然很小。
         bright = [s["bright"] for s in picked]
         tail = bright[-EXIT_TAIL:] if len(bright) >= EXIT_TAIL else bright
         ref = vision.median(tail)
@@ -211,6 +217,14 @@ if args.render_ir and os.path.exists(args.render_ir):
         while e > 0 and bright[e] < EXIT_K * ref:
             e -= 1
         exited = e < len(bright) - 1
+        if exited:
+            skipped = 0
+            while e > 0 and skipped < EXIT_TAIL:
+                ch = picked[e]["change"]
+                if ch is None or ch < HOLD_THR:
+                    break
+                e -= 1
+                skipped += 1
         hold = 0
         k = e
         while k > 0:

@@ -173,7 +173,7 @@
 
 a2e 的两条终检在本仓库的落点：**闪烁终检"命中数必须等于白名单条数"** → `selfcheck.py` 的白名单匹配（已知破口：扫光是子串匹配，三位镜头号会误放行；见 `narration-and-storyboard.md` §5.3）；**「QC 不改源码」** → 结构性成立：`qc.mjs` 全程只读产物，写盘只有 `report.json/report.md`（`:93-94`）。改画面走 `scripts/repair.mjs` + `src/repair/engine.mjs`（纯 IR 改写，确定性，无 agent），且 `repair-cycle.mjs:49-53` 在修复状态是 `escalated`/`noop` 时**拒绝重渲染**并指名"必须回分镜/文案层"——这正是 a2e 需要"修复 agent 每 1–2 组"的位置上，本仓库用门实现的可执行版本。
 
-另有每镜打分 lint：`scripts/verify-shot-score.mjs`（对 16x9/9x16 各跑一次 `lintShotScores`，读 `visual_regression_*.json` 的逐 scene 分数），在一键链里出现两次（`skill.mjs:100` 渲染前、`:118` 渲染后）。它是 lint 不是审美裁判。
+另有每镜打分 lint：`scripts/verify-shot-score.mjs`（对 16x9/9x16 各跑一次 `lintShotScores`，阻断分只由 IR 结构维度算出），在一键链里出现两次（`skill.mjs:100` 渲染前、`:118` 渲染后）。它是 lint 不是审美裁判。`visual_regression_*.json` 只作附注读出（标 `OK/ABSENT/STALE`），**不进判据**——它一旦参与，判据就取决于「那一层可选报告在不在」（2026-10-11 事故：同一 IR，无报告全 PASS、有报告 22 镜 FAIL）。脚本里有一条不变量断言守着它。
 
 ---
 

@@ -46,15 +46,17 @@ export const textW = (s, size, emScale = 1, letterSpacing = 0) =>
   textEm(s, emScale) * size + letterSpacing * charCount(s);
 
 /**
- * 超宽就等比缩字号，最低到 minSize（默认 78%）。返回 1 位小数，避免亚像素抖动。
- * letterSpacing 那部分宽度不随字号变，先从 maxW 扣掉再解字号。
+ * 超宽就等比缩字号，最低到 minSize。返回 1 位小数，避免亚像素抖动。
+ * minSize 默认取 max(22, size*0.78)：a2e 明文「图内说明最小 22px」——小标签（26–28px）
+ * 按纯比例会缩到 20–22px 以下，跌破可读红线；大字仍按 78% 比例兜底不受 22 钳制。
  * 缩到 minSize 仍然超宽 → 文案违反了每块长度预算，改文案，不要指望这里。
  */
-export function fitSize(s, maxW, size, minSize = size * 0.78, emScale = 1, letterSpacing = 0) {
+export function fitSize(s, maxW, size, minSize, emScale = 1, letterSpacing = 0) {
+  const min = minSize ?? Math.max(22, size * 0.78);
   const em = textEm(s, emScale);
   const extra = letterSpacing * charCount(s);
   if (em * size + extra <= maxW) return size;
-  return Math.max(minSize, Math.round(((maxW - extra) / Math.max(1e-6, em)) * 10) / 10);
+  return Math.max(min, Math.round(((maxW - extra) / Math.max(1e-6, em)) * 10) / 10);
 }
 
 /** 是否已缩到极限仍超宽（= 文案超预算，QC 应报缺陷）。 */

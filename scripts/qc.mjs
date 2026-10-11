@@ -20,18 +20,39 @@ const warnings=[];
 const qcDir=path.join("artifacts",project.project_id,"qc");
 // flags → issue 的翻译在 src/qc/flags.mjs（那边有独立测试）：这张表决定 Repair 往哪动手，
 // 压在 qc.mjs 里就只能靠跑一次真实渲染才知道它错没错。
+// ⚠ 新鲜度判据：测量文件必须**晚于**它量的那批帧。
+//   事故（2026-10-11）：`npm run render` 只重出帧、不重跑测量，而这里读的是盘上的
+//   artifacts/<pid>/qc/*.json —— 于是 10-08 的旧测量配着 10-11 的新帧照样报 QC PASS
+//   （粘住的 motion_16x9.json 只有开头 4 个镜头，另外 40 镜从未被量过）。
+//   覆盖度断言在 verify:production 里拦下了它，但 QC 自己必须先说「这份测量已经过期」，
+//   否则「跑完 render 直接 qc」这条路看起来永远是绿的。
+//   用帧目录 mtime（render.sh 抽帧时它会被重建）当基准，不用文件计数：后者要遍历上万张。
+const framesAt=(ratio)=>{const d=path.join("artifacts","frames",ratio);try{return fs.statSync(d).mtimeMs}catch{return 0}};
+const isStale=(file,at)=>{try{return at>0&&fs.statSync(file).mtimeMs+1000<at}catch{return false}};
+// 验收范围（用户决策，2026-10-10 起有效：验收与对标以 16:9 为对象；9:16 只保持双画幅能力，不投入质量打磨）。
+// 范围外比例的测量**照跑照记**：blocking 不转阻断 issue，而是降级为带标注的 warning ——
+// 报告里仍然看得到 FAIL 与原因，只是不拦交付。这不是静默跳过：accept_ratios 会写进 report.json，
+// verify:production 对范围外比例同样只查产物在位与覆盖度、不查 PASS，并在输出里显式列出。
+const ACCEPT=new Set((process.env.ACCEPT_RATIOS||"16x9,9x16").split(",").map(s=>s.trim()).filter(Boolean));
+if(!ACCEPT.has("16x9")) throw new Error("ACCEPT_RATIOS 必须包含 16x9（16:9 是验收基准，不可移出范围）");
 for(const ratio of ["16x9","9x16"]){
   const frameFile=path.join(qcDir,"frame_metrics_"+ratio+".json");
   const motionFile=path.join(qcDir,"motion_"+ratio+".json");
   const visualFile=path.join(qcDir,"visual_regression_"+ratio+".json");
+  const at=framesAt(ratio);
   for(const [file,source] of [[frameFile,"frame_metrics"],[motionFile,"motion"]]){
-    if(!fs.existsSync(file))continue;
+    // ⚠ 缺测量文件必须阻断，不能 continue 静默跳过。事故：2026-10-08 的 4 镜产物没被重跑，
+    //   而这里对缺失的 frame_metrics/motion 直接 continue，于是 44 镜的片子配着 4 镜的旧测量
+    //   照样过 QC —— 「没量到」被当成了「量过没问题」。测量覆盖必须先有量，才谈得上判。
+    if(!fs.existsSync(file)||!fs.statSync(file).size){issues.push({node:source+"-"+ratio,type:source+"_missing",ratio});continue;}
+    if(isStale(file,at)){issues.push({node:source+"-"+ratio,type:"stale_"+source,ratio,detail:"测量文件早于 artifacts/frames/"+ratio+"（渲染后没重跑测量），本次结果不可信"});continue;}
     const split=reportToIssues(JSON.parse(fs.readFileSync(file,"utf8")),ratio,source);
-    issues.push(...split.issues);
-    warnings.push(...split.warnings);
+    if(ACCEPT.has(ratio)){issues.push(...split.issues);warnings.push(...split.warnings);}
+    else for(const item of split.issues) warnings.push({...item,severity:"low",detail:"[验收范围外 "+ratio+"] "+(item.detail||item.type)+" —— ACCEPT_RATIOS="+[...ACCEPT].join(",")+"，仅记录不阻断"});
   }
   // visual regression 降级为非阻断回归信号（参考资产为 64x36 合成图，embedding 非语义模型）。
-  if(!fs.existsSync(visualFile)) issues.push({node:"visual-record-"+ratio,type:"visual_record_missing",ratio});
+  // 陈旧与缺失同判：它仍是 run-to-run 的漂移记录，拿着旧帧的记录贴不到这一次的画面上。
+  if(!fs.existsSync(visualFile)||isStale(visualFile,at)) issues.push({node:"visual-record-"+ratio,type:"visual_record_missing",ratio});
 }
 // 画面文字出处门（阻断）：a2e 硬性原则 2「事实有出处」。
 const provenanceFile=path.join(qcDir,"text_provenance.json");
@@ -76,6 +97,7 @@ const reviews=await runNamedAgents(agent,["16x9","9x16"].map(ratio=>({
 
 const result={
   project_id:project.project_id,status:issues.length?"FAIL":"PASS",issues,warnings,
+  accept_ratios:[...ACCEPT],
   // ⚠ 记下这份 QC 对应的是**哪一版输入**（IR / 44 个镜头源 / 解说词 / 字幕 / 字面量白名单）。
   //   verify:production 会重算指纹比对 —— 少了这一段，那道门只能证明「文件都在」，
   //   证明不了「产物对应当前输入」：2026-10-08 的 4 镜产物曾一路配着 44 镜的 IR 报 PASS。

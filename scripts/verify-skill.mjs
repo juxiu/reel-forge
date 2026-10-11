@@ -109,4 +109,29 @@ if (!auditCall.line.startsWith("runSoft(")) throw new Error(`plan-audit 必须�
 const repairCycle = callSite(/^\s*run\(\s*"npm"\s*,\s*\[\s*"run"\s*,\s*"repair-cycle"\s*\]/m);
 if (!repairCycle) throw new Error("scripts/skill.mjs 不再跑 repair-cycle：plan-audit 的软失败没人消化了，这条容忍必须改成硬失败");
 
-console.log("skill contract PASS", JSON.stringify({name, sections: required.length, cli: "npm run skill", commands: citedCommands.length, checkpoints: documented.length, env_flags: envFlags.length, pipeline_order: "plan-audit → qc（容忍型）"}));
+// ---- 5. 测量层的**命令行形态**也是契约（位置参数 vs --frames）----
+// 事故（2026-10-11）：motion_check.py 的帧目录是 `--frames <dir>` 这个**可选参数**
+// （它没有位置参数），而 skill.mjs 与 repair-cycle.mjs 两处都按位置参数传
+// `artifacts/frames/<ratio>` → argparse 报 "unrecognized arguments: artifacts/frames/16x9"
+// 并以 2 退出。CI（.github/workflows/verify.yml）里写的是正确形态，所以这条链从没在 CI 上跑过，
+// 缺陷一直藏着：只有真跑 `npm run skill` 或「repair 后重测」才会撞上。
+// 断言只认调用行：注释里写脚本名不算，行首是 // 、* 、# 的一律跳过。
+// ⚠ token 一律锚成**完整引号字面量**：`"visual-regression"` 不能写成子串 `visual-regression`，
+//   否则 `scripts/verify-visual-regression.mjs`（它不吃 --frames）会被误判成测量调用。
+const MEASURE_CLI = [/"scripts\/motion_check\.py"/, /"scripts\/frame_metrics\.py"/, /"scripts\/visual_regression\.py"/, /"motion-check"/, /"frame-metrics"/, /"visual-regression"/];
+const measureCalls = [];
+for (const file of ["scripts/skill.mjs", "scripts/repair-cycle.mjs", "scripts/run-flow.mjs"]) {
+  readText(file).split("\n").forEach((line, i) => {
+    if (/^\s*(\/\/|\*|#)/.test(line)) return;
+    if (!MEASURE_CLI.some((re) => re.test(line))) return;
+    // 「执行」才算调用：跳过只是提到脚本名的赋值/日志行（比如这条清单自身）。
+    if (!/(run|runSoft|runAsync|spawn)\s*\(/.test(line)) return;
+    measureCalls.push({file, line: i + 1, text: line.trim()});
+  });
+}
+if (!measureCalls.length) throw new Error("找不到任何测量层调用语句 —— 这条形态断言已经测不到东西");
+for (const call of measureCalls) {
+  if (!call.text.includes("--frames")) throw new Error(`${call.file}:${call.line} 调测量脚本没带 --frames（motion_check.py / frame_metrics.py / visual_regression.py 都不接受位置参数）：${call.text}`);
+}
+
+console.log("skill contract PASS", JSON.stringify({name, sections: required.length, cli: "npm run skill", commands: citedCommands.length, checkpoints: documented.length, env_flags: envFlags.length, pipeline_order: "plan-audit → qc（容忍型）", measure_cli: measureCalls.length + " 处带 --frames"}));

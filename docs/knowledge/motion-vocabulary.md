@@ -27,7 +27,7 @@
 | `globalF0` | 镜头首帧在整片时间轴上的 0-based 帧号 | 同上 |
 | `f0` | 某元素的入场帧（相对镜头，1-based） | `src/shots/plan.mjs:279` `beatFrames` |
 | `subFrom` | 本镜头**首块字幕**的相对起始帧 | `src/shots/plan.mjs:314-332` `shotCaptions` / `firstSubLocal` |
-| `exitAt` | 离场开始帧 = `max(1, len − hold)` | `src/shots/plan.mjs:35-40` `exitPlan` |
+| `exitAt` | 离场开始帧 = `max(1, len − EXIT_TAIL)`（离场动画末 `EXIT_TAIL=8` 帧结束在镜头末帧） | `src/shots/plan.mjs:41-46` `exitPlan` |
 
 执行者：字幕块与镜头帧号同源这件事由 `scripts/verify-render-layer.mjs:179-188`（§5 字幕块与镜头帧号同源）钉住——它断言 5 件元素配 2 块字幕时全部落进 `BEAT_WINDOW`、入场帧不为负、跨到第二块后仍逐件错峰。
 
@@ -37,7 +37,7 @@
 
 ## 1. 帧数预算：`BEAT` 表里哪些数真在画面里
 
-`src/visual/easing.mjs:124-145` 是唯一一张帧预算表。**但它只是表**：一个键只有在被 `BEAT.X` 读到时才影响画面。逐键核对结果：
+`src/visual/easing.mjs:124-150` 是唯一一张帧预算表。**但它只是表**：一个键只有在被 `BEAT.X` 读到时才影响画面。逐键核对结果：
 
 | 键 | 值 | 谁读它 | 门禁 |
 |---|---|---|---|
@@ -46,6 +46,7 @@
 | `DRAW_ON` | 22 | `src/shots/SemanticShots.jsx:278`（描边 `drawOn`） | — |
 | `COUNTER` | 20 | `:242`（数字主角 `countTo`）、`:365`（配角数字） | — |
 | `EXIT_HOLD_MIN` / `EXIT_HOLD_MAX` | 30 / 45 | `src/shots/plan.mjs:36-37`（夹紧）、`:284`（入场帧不得晚于 `len − EXIT_HOLD_MIN`） | `verify-render-layer.mjs:122` 断言缺省停留落在 30–45 |
+| `FOCUS_RISE` | 11 | `src/shots/stage-kit.jsx:106`（`export const FOCUS_RISE = BEAT.FOCUS_RISE`，作为 `focusWalk`/`isPast` 的爬坡默认值）+ `src/shots/plan.mjs:483`（`tileFocus` 的末拍上限 = `exitAt − EXIT_HOLD_MAX − FOCUS_RISE`，给末拍落位留出爬坡余量） | — |
 | `EXIT_ACCEL_P` | 1.6 | `exitDrop` 的**默认参数** `p = BEAT.EXIT_ACCEL_P`（`easing.mjs:165`），两个调用点都只传 `len`，所以确实生效：`SemanticShots.jsx:65`、`Primitives.jsx:581` | — |
 | `CAMERA_MIN` | 20 | ⚠ 运镜长度用的是 `CAMERA_LIMITS.min`（`src/visual/camera.mjs:15`），不是这个键。`BEAT.CAMERA_MIN` 目前只出现在 `verify-render-layer.mjs:240` 的 PASS 输出字段里 | 无实质执行者 |
 | `CAMERA_MAX` / `CAMERA_CLEAR` | 45 / 30 | `CAMERA_CLEAR` 只在 `verify-render-layer.mjs:70` 用作兜底慢推的断言上界；真正的清场约束是 `CAMERA_LIMITS.clear` | 见 §5 |
@@ -98,10 +99,12 @@
 
 | 规则 | 值 | 执行者 |
 |---|---|---|
-| 末拍落位后必须停 30–45 帧再走 | `BEAT.EXIT_HOLD_MIN/MAX` | `exitPlan`（`plan.mjs:35-40`）夹紧 `settle_frames`；`scripts/verify-repair.mjs` 与 `verify-render-layer.mjs:120-124` 断言 |
-| 离场动画：α = 1 − t^1.6，Δ = 440·(n/11)² | `exitDrop(n, 12)` | `SemanticShots.jsx:65`（整层包在离场 div 里）、`Primitives.jsx:581` |
+| 末拍落位后到离场起点停 30–45 帧（hold）；离场起点 = `len − EXIT_TAIL(8)` | `BEAT.EXIT_HOLD_MIN/MAX`、`BEAT.EXIT_TAIL` | `exitPlan`（`plan.mjs:41-46`）夹紧 `settle_frames` 得 hold、并按 `len − EXIT_TAIL` 定 `exitAt`；`scripts/verify-repair.mjs` 与 `verify-render-layer.mjs:120-124` 断言 |
+| 离场动画：α = 1 − t^1.6，Δ = 440·(n/11)² | `exitDrop(n, exitTail)`（`exitTail = plan.exit.exitTail = EXIT_TAIL = 8`） | `SemanticShots.jsx:65`（整层包在离场 div 里）、`Primitives.jsx:581` |
 | 入场帧不得晚于离场起点 | `exitAt` | `plan.mjs:426-429` 记 `beat-after-exit` |
-| 离场前必须停住的**测量口径** | `MOTION.hold_min_frames = 30`、`hold_thr = 1.5`、`exit_brightness_k = 0.9`、`glow_off_frames = 6`（`src/visual/field.mjs:164-180`） | `scripts/motion_check.py` 报 `hold_too_short`；`export-visual-contracts.mjs:80` 断言 `hold_min_frames == CAMERA_LIMITS.clear` |
+| 离场前必须停住的**测量口径** | `MOTION.hold_min_frames = 30`、`hold_thr = 1.5`、`exit_brightness_k = 0.9`、`exit_tail_frames = 20`（亮度尾段窗口）、`glow_off_frames = 6`（`src/visual/field.mjs:164-180`） | `scripts/motion_check.py` 报 `hold_too_short`；`export-visual-contracts.mjs:80` 断言 `hold_min_frames == CAMERA_LIMITS.clear` |
+
+⚠ 末拍稳定期定位（`motion_check.py`）分两步：① 亮度法找到「已明显变暗」的帧判 `exited`；② 离场是**加速下坠 + 淡出**，最早的离场帧亮度还没掉下去，所以再从该帧往回**最多 `exit_tail_frames` 帧**跳过仍在离场的帧（变化 ≥ `hold_thr`），之后才计 hold。上限保证「内容一路动到末帧」这种真缺陷不会被洗掉（`test_measurement.py` 案例 14 是这个的反例自检）。
 
 ⚠ `glow_off_frames = 6` 的语义是「离场前先灭光这 6 帧算离场、不算 hold」。渲染侧没有先灭光（§1 `GLOW_OFF`），所以这条测量口径目前是按「亮度掉到 `exit_brightness_k`」间接生效的。
 
@@ -232,11 +235,11 @@
 ## 可核对规则
 
 1. 镜头内帧号一律 1-based：`N = useCurrentFrame() + 1`，`len = round(duration × fps)` —— `src/shots/SemanticShots.jsx:59` + `src/shots/plan.mjs:26-29`。
-2. 全仓库只有一张帧预算表 `BEAT`，但只有 `SOFT_IN`/`STAGGER`/`DRAW_ON`/`COUNTER`/`EXIT_HOLD_MIN`/`EXIT_HOLD_MAX`/`EXIT_ACCEL_P` 被渲染层读到；分镜里写「淡入 20 帧」不会生效 —— `src/visual/easing.mjs:124-145` 对照 §1 的读取列。
+2. 全仓库只有一张帧预算表 `BEAT`，但只有 `SOFT_IN`/`STAGGER`/`DRAW_ON`/`COUNTER`/`EXIT_HOLD_MIN`/`EXIT_HOLD_MAX`/`FOCUS_RISE`/`EXIT_ACCEL_P` 被渲染层读到；分镜里写「淡入 20 帧」不会生效 —— `src/visual/easing.mjs:124-150` 对照 §1 的读取列。
 3. 配角与主角灯的淡入用 `softOp`（起点 25%）而不是 `fadeIn(0)=0`，否则首帧被测量层判成无内容进而判空场 —— `src/visual/easing.mjs:151-160` + `src/visual/field.mjs:131`。
 4. 元素入场帧相对**它自己那条字幕块**必须落在 −6…+3，逐件错峰 2 帧，每块最多 4 件 —— `src/visual/style.mjs:160` + `src/shots/plan.mjs:278-310`，违规令牌 `beat-window-overflow`（`plan.mjs:424`），不可自修。
 5. 主角入场帧不写死 1：`hero.f0 = max(1, subFrom − 4)` —— `src/shots/plan.mjs:410`，断言在 `scripts/verify-render-layer.mjs:163`。
-6. 末拍落位后停 30–45 帧再离场，且任何入场帧不得晚于 `exitAt` —— `src/shots/plan.mjs:35-40`、`:426-429`。
+6. 末拍落位后到离场起点停 30–45 帧（hold），离场起点 = `len − EXIT_TAIL(8)`，且任何入场帧不得晚于 `exitAt` —— `src/shots/plan.mjs:41-46`、`:426-429`。
 7. 相机名只有一个真源集合，查表必须走 `isCameraPreset()`/`cameraVocabulary()`，`slowPush` 与 `slow_push` 归一后等价 —— `src/visual/camera.mjs:82-96`，同源门在 `scripts/verify-render-layer.mjs:75-111`（§2b）。
 8. 词表 9 名都有画面实现；`static`/`none` 必须产生**不动**的相机，「没声明」才退回 1.0→1.05 慢推 —— `src/visual/camera.mjs:148, 188-197` + `src/shots/plan.mjs:391-394`。
 9. 镜头短到 `duration − 30 < 20` 就不运镜（返回静止机位），绝不把运镜压缩进末拍 —— `src/visual/camera.mjs:113-117, 148-150`，夹具在 `scripts/verify-render-layer.mjs:64-66`。

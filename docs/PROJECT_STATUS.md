@@ -1,10 +1,50 @@
 # 项目当前状态
 
-更新日期：2026-10-09
+更新日期：2026-10-11
 
 ## 总体状态
 
-**状态：基础生产链、双比例质量门禁、语义导演、TTS WordBoundary 主时间轴、镜头评分、画面文字出处门禁与 Skill CLI 已接入；44 镜全部 authored（17 种拓扑），每镜绑定组私有舞台。`verify:fast` 34/34 PASS。17 种拓扑已各渲一帧逐张核对并修掉 7 个真实缺陷（此前一帧都没渲过）。当前主要差距：画面审美水准、3 镜密度不达标、真实帧基准缺失、尚未引入语义视觉模型。**
+**状态：16:9 生产链已实测端到端 PASS（2026-10-11 终验）：全量重渲 10179 帧 ×2 → 六项测量（motion_16x9 blocking 0 / 44 镜）→ QC → repair(not-needed) → deliver(v0.3, 29 文件, 含 render_hashes 打包对账) → `verify:production` PASS（`ACCEPT_RATIOS=16x9`）。`verify:fast` 36/36 PASS。当前主要差距（均在验收范围外或已声明边界）：9:16 画面质量（motion 18 条 blocking，按用户决策出界）、authored 镜头无生成器（换主题必须重做镜头）、净室 SKILL COMPLETE 未达成、画面审美依赖人工复核。详见 [ACCEPTANCE_REPORT](ACCEPTANCE_REPORT.md)（实测 PASS 版）。**
+
+## 终验轮（2026-10-11）做的事
+
+1. **修复 5 条 motion 阻断**（E）：`BEAT.FOCUS_RISE=11` 单真源 + `tileFocus` 末拍预留 `EXIT_HOLD_MAX+FOCUS_RISE` + SplitRows 消费 `focusWalk` 的 `k[idx]` → 重渲后 motion_16x9 **PASS（blocking 0 / 44 镜全覆盖）**。
+2. **净室新主题实测**（§12，HTTP caching / MDN）：走通 Research(13 claims)→narration(8 段)→TTS→asr→IR→pilot→渲染(8 镜×2)→16:9 测量，停在其 9:16 motion 门（fail-fast 生效）；顺手修了链上两个真实缺陷（F：`run-production` 误食异项目 script.json；G：`skill.mjs` narration 格式）。
+3. **交付完整性补洞**（H）：终验抓到「旧交付包配新渲染照样过生产门」→ `deliver` 写入 `render_hashes`+包指纹，`verify:production` 回验，负向实验（删字段/翻字节）实测拦截。
+4. **验收范围机制**：`ACCEPT_RATIOS` 五门统一（qc/verify-qc/verify-production/deliver/verify-delivery），范围外照跑照记、显式降级，16:9 不可移出。
+5. **文档**：`ACCEPTANCE_REPORT.md` 重写为实测 PASS 版；PARITY 补终验数字与 2026-10-11 缺陷表（E–I）；README/SKILL 补净室边界。
+
+## 本轮（2026-10-10）做的事 —— 对 a2e 的源码级对标 + 门禁硬化
+
+依据总任务书《对 anything2explainer 进行完整源码级研究…》与用户三条硬约束（不跑耗时成片 / 最快但不容忍降质 / 全自主决策）执行。
+
+### 1. 四项机制修复（FIX A–D，均有实测证据）
+
+| # | 缺陷 | 修法 | 实测 |
+|---|---|---|---|
+| A | 内容区空白帧：镜区间用 `[句from−8, 句to+2]`，句间留白落到幕底 | `beat-graph.mjs` 按 a2e 分镜表衔接规则改成 `[本句 from−8, 同章下一句 from−9]`（首尾相接） | 内容区空白 **14.7%(1492/10117) → 1.4%(144 帧)**（仅 3 处章界由 ChapterCard 覆盖） |
+| B | 每镜末尾残留 18–33 帧纯幕底：离场起点 `len − hold` 太早 | `exitPlan` → `exitAt = max(1, len − BEAT.EXIT_TAIL(8))`；`SemanticShots`/`camera.mjs` 同步 | 离场结束对齐镜头末帧 |
+| C | `motion_check` 对末拍稳定期误判（把仍在离场的帧当静止） | 亮度法定位后再往回最多 `EXIT_TAIL` 帧跳过离场帧；`test_measurement.py` 加反例自检 | 内容动到末帧仍报 `hold_too_short` 的反例被正确拒绝 |
+| D | QC 对缺失测量文件静默 `continue`，44 镜产物配 4 镜旧测量照样过门 | `qc.mjs` 缺件改阻断；`verify-production.mjs` 加覆盖度 + 区间漂移断言 | 反例实测：陈旧 4 镜产物 → `测量覆盖不足：motion_16x9 量了 4 个镜头，IR 有 44 个` |
+
+### 2. 口径收尾（FIX A/B 引发的门漂移）
+
+- `verify:timeline-source` 判据从「镜 start == 句 from」改为按 a2e 衔接规则派生（`from − SHOT_LEAD` / `next.from − SHOT_LEAD − 1` / `to + SHOT_TAIL`），末端漂移期望值改为 `BEAT.SHOT_TAIL`。
+- 重导出 `fixtures/visual_contracts.json`（`CAMERA_LIMITS` 新增 `exit: 8`）修复 `verify:visual-contracts` / `verify:measure:quick` 漂移。
+- 同步 `motion-vocabulary.md` / `composition-and-light.md` / `lessons.md` 的 `exitAt` 口径与 `narration-and-storyboard.md` §6.1「一段=一镜」（旧文误读为「一句=一镜」）。
+
+### 3. 强制交付文档（总任务书 §11）
+
+- `docs/ARCHITECTURE.md`（11.3）
+- `docs/PRODUCTION_METHOD.md`（11.4，13 阶段 × 6 要素：输入/输出/执行机制/判断标准/失败路径/验证方法）
+- `docs/ANYTHING2EXPLAINER_PARITY.md`（11.5，由 `REFERENCE_PARITY.md` `git mv` 而来，8 列证据表：源功能/a2e 证据/本仓实现/差距/补齐方式/状态/测试证据/剩余缺口）
+- `docs/ACCEPTANCE_REPORT.md`（11.7，含 commit SHA、环境版本、实际命令、PASS/FAIL/BLOCKED/SKIPPED、Gate 1–10 对照、产物位置、QC/Repair 结果、剩余风险）
+
+### 4. 结果
+
+`verify:fast` **36/36 PASS**；`verify:timeline-source` / `verify:visual-contracts` / `verify:render-layer` / `verify:narrative` / `plan-audit`(88 scenes) / `test:measurement` / `perf:probe`(4.89 fps) 全绿。`verify:production` 当时 **BLOCKED**（输入指纹过期）——已在 2026-10-11 终验全量重渲后转 **PASS**（见文首与 `docs/ACCEPTANCE_REPORT.md`）。
+
+当时记录的待修内容缺陷（`scene-001` 真帧 `motion_too_low`，静止 3.9s）及其余 4 条 hold 阻断，已在 2026-10-11 终验轮以 FIX E（FOCUS_RISE 机制 + SplitRows 焦点交接）修复，motion_16x9 实测 **PASS blocking 0**。
 
 当前主干已经覆盖：
 

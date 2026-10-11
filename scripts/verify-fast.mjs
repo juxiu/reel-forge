@@ -48,6 +48,9 @@ const checks = [
   // 悄悄退化成「扫到 0 条所以永远绿」的（详见 docs/knowledge/research-brief.md §4）。
   // 输入全是 tracked 的 fixtures + src/shots，不联网、不渲染，秒级，没有理由不进 fast。
   "verify:text-provenance",
+  // a2e 硬纪律「每块字幕中文 ≤16 字」：超预算的正确修法是回 narration.txt 调 | 切分，
+  // 不是靠缩号硬塞。读 timeline.json 秒级，不渲染。
+  "verify:subtitle-budget",
   // 分组数与 still 数量（基础 6 / 高光 ≥10）的真源门：八个调用点里任何一处把 6/8/44 写回去、
   // 或把取值函数换成常量就变红。它守着的是下面两道蓝图门的前提，所以必须在蓝图门之前跑。
   "verify:limits",

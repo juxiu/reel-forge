@@ -75,7 +75,6 @@ ffmpeg -version
 ~~~bash
 git clone https://github.com/juxiu/reel-forge.git
 cd reel-forge
-git checkout feat/visual-benchmark-skill
 
 npm install
 pip install -r requirements.txt
@@ -90,7 +89,7 @@ npm run verify:authored-shots
 
 这两项不需要运行产物。
 
-**渲染、<code>verify:e2e</code> 与后续所有质量门需要 TTS 产物**（<code>public/audio.mp3</code>、<code>script/timeline.json</code>、<code>script/timeline.md</code>、<code>script/timeline-source.json</code>、<code>分镜表.md</code>）。这些由 <code>npm run tts</code> 与 <code>scripts/render_storyboard.py</code> 生成，已在 <code>.gitignore</code> 中排除——因为 <code>src/remotion/index.jsx</code> 会 import 时间轴、<code>&lt;Audio&gt;</code> 依赖配音文件，入库会造成"仓库里的样片产物与真实运行产物不同步"。
+**渲染、<code>verify:e2e</code> 与后续所有质量门需要 TTS 产物**（<code>public/audio.wav</code>、<code>script/timeline.json</code>、<code>script/timeline.md</code>、<code>script/timeline-source.json</code>、<code>分镜表.md</code>）。这些由 <code>npm run tts</code> 与 <code>scripts/render_storyboard.py</code> 生成，已在 <code>.gitignore</code> 中排除——因为 <code>src/remotion/index.jsx</code> 会 import 时间轴、<code>&lt;Audio&gt;</code> 依赖配音文件，入库会造成"仓库里的样片产物与真实运行产物不同步"。
 
 全新 clone 的正确顺序：
 
@@ -566,7 +565,7 @@ npm run visual-regression -- \
 
 ## 22. Shot Score
 
-Shot Score 汇总：
+Shot Score 的**阻断分只由分镜结构算**（IR 自带，确定性、跨机器同结果）：
 
 ~~~text
 semantic
@@ -575,14 +574,9 @@ motion
 composition
 light
 safety
-reference_similarity
-visual_complexity
-text_density
-hero_consistency
-layout_stability
 ~~~
 
-当前权重：
+当前权重（代码里按权重和归一，所以加/删维度不会让阈值语义漂移）：
 
 | 指标 | 权重 |
 | --- | ---: |
@@ -592,11 +586,6 @@ layout_stability
 | composition | 0.12 |
 | light | 0.06 |
 | safety | 0.10 |
-| reference_similarity | 0.14 |
-| visual_complexity | 0.05 |
-| text_density | 0.03 |
-| hero_consistency | 0.04 |
-| layout_stability | 0.04 |
 
 阈值：
 
@@ -606,11 +595,13 @@ reference  = 0.82
 excellent  = 0.90
 ~~~
 
-reference similarity 不替代结构化视觉规则。
+硬门是 <code>shot-score-too-low</code>（结构分低于 0.72）。结构完好但 variant 为 generic 的镜头得 0.774（semantic 记 0.45）；generic 且无运镜则掉到 0.674，会被拦下。
 
-<code>reference_similarity</code> 只作为加权分的一个维度参与，**不作为硬门**——原因见第21 节的基准口径说明。硬门是 <code>shot-score-too-low</code>（总分低于 0.72）。
-
-当没有视觉回归报告时，该维度使用默认值 <code>0.72</code>；此时的总分**偏乐观**，不能当作已测量的质量分。
+<code>reference_similarity</code>、<code>visual_complexity</code>、<code>text_density</code>、<code>hero_consistency</code>、<code>layout_stability</code> 来自
+<code>visual_regression</code>，那一层是 <code>advisory / blocking:false</code>（64×36 合成参考图 + 确定性像素描述符，与画面质量反向相关）。
+它们只随报告**记录**，**不进阻断分**：判据一旦依赖「某层可选报告在不在」，就会出现「跑过测量的比没跑测量的更容易红」这类假红。
+视觉回归的位移监控由第 21 节的报告与 <code>verify:visual-regression</code> 负责。
+<code>scripts/verify-shot-score.mjs</code> 里有一条不变量断言守着这件事：naive 地把视觉维度折回 score 会当场变红。
 
 ## 23. QC
 

@@ -29,7 +29,7 @@ script/narration.txt                     ← 作者写；定稿后不许再改�
    ├─→ script/timeline-source.json       全片词级时间戳
    ├─→ artifacts/<pid>/audio/voice-manifest.json
    ├─→ fixtures/captions.json            ⚠ 另一条字幕流，由词边界**自动重新分组**（见 §5.4）
-   └─→ public/audio.mp3
+   └─→ public/audio.wav
 script/storyboard_src.md                 ← 作者写，帧号一律用令牌
    │ scripts/render_storyboard.py（把令牌换成真实帧号）
    ▼
@@ -98,7 +98,7 @@ fixtures/render-ir-16x9.json / 9x16.json + src/shots/Gn/SCnn.jsx
 | 每句字数 | 中文 **≤35 字**；英文 ≤20 词 | ⚠ **无执行者**（没有任何代码读 `segment.text` 的长度） |
 | 每个字幕块 | 中文 **≤16 字**；英文 ≤48 字符（实测 49 字就要缩字号、>70 折两行） | ⚠ 对**解说词的 `\|` 块**无执行者。`SUBTITLE_BUDGET={zh:16,en:48}`（`src/visual/textfit.mjs:65`）零调用（`style-guide.md` §10）；渲染层字幕只会先缩到 34px 再折两行、两行仍超宽**不产生任何令牌**。唯一真的按 16 字切分的是**另一条字幕流** `captionsFromWords(maxCharsZh=16)`（`src/captions/pipeline.mjs:16-21`、`:51`）——见 §5.4 |
 | 章名长度 | 中文 ≤6 字；英文按槽宽 `1280/章数`、≤14 字符最稳 | ⚠ 无执行者（`:26` 原样收章名） |
-| 段落构成 | 2–4 句一段，**一段 = 一个镜头** | ✗ **与门冲突**：本仓库是「一句 = 一镜」，见 §6.1 |
+| 段落构成 | 2–4 句一段，**一段 = 一个镜头** | ✅ 已实现：`fixtures/script.json` 的 `segment` 就是 a2e 的「段」（一段含 2–4 句、多块字幕），`scene` 与 `segment` 严格 1:1（`src/visual/narrative.mjs` 阻断门 + `selfcheck`）。⚠ 旧文把它读成「1 句 = 1 镜」——那是把 `段` 叫成了 `句`，见 §6.1 |
 | 章数 | <3 分钟单章；3–5 分钟 3–4 章且每章 ≥60 s；5–8 分钟 4–6 章 | ⚠ 无执行者；单章兜底是真的（`:128`：没有 `# CHAPTER` 行时合成 `[{n:1,title:"",from:1}]`） |
 | 2–3 分钟中文篇幅 | ≈650–880 字 / 24–32 句（上游英文同档：280–420 词 / 24–32 句·镜头） | ⚠ 无执行者（见上一节的 `duration_target_s`） |
 | 语速 | 中文 ≈5.5 字/秒（edge `+0%`）；英文 edge 2.96 词/秒、kokoro 2.30 词/秒 | 数据可核对但无判据：`TTS/TIMELINE PASS` 打印 `speech_seconds` 与 `total_seconds`（`:160`） |
@@ -193,15 +193,15 @@ fixtures/render-ir-16x9.json / 9x16.json + src/shots/Gn/SCnn.jsx
 
 ## 6. 已知破口（按「要不要现在改」排序）
 
-### 6.1 一句 = 一镜是结构性的，和 SKILL.md 的承诺相反
+### 6.1 「一段 = 一镜」已达成（旧文误读为「一句 = 一镜」）
 
-`SKILL.md` §样片级硬规则「视觉」写着「镜头按画面单元组织，不为每句机械切镜」，但三处执行者把它钉成 **1 句 = 1 镜**：
+`SKILL.md` §样片级硬规则「视觉」写着「镜头按画面单元组织，不为每句机械切镜」。**这条与实现是一致的**，旧文之所以报冲突，是把 `segment` 叫成了「句」：
 
-- `src/director/pipeline.mjs:58`：`script.segments.map((segment, index) => beatToScene(graph.beats[index], segment))` —— 导演层直接按 segment 下标生成 scene。
-- `src/visual/narrative.mjs`：`(renderIR.scenes||[]).length !== segments.length` → `scene-narration-coverage-mismatch`（阻断门 `verify:narrative`）。
-- `scripts/selfcheck.py:65-66`：镜头数 ≠ 句数即失败。
+- `fixtures/script.json` 的 `segment` **本身就是 a2e 的「段」**：`seg-001` 的 text 是「一次摘要认证牵涉到的角色,比想象的多。,客户端、服务端、代理、时钟、缓存,缺一环就校验不过。,先把这张关系网摆出来。」——一段含 3 句、对应 5 块字幕（`script/timeline.json` `sentences[0].subs`）。
+- 三处执行者钉的是「**一段 = 一镜**」而不是「一句 = 一镜」：`src/director/pipeline.mjs:58`（按 segment 下标生成 scene）、`src/visual/narrative.mjs`（`scenes.length !== segments.length` → `scene-narration-coverage-mismatch`，阻断门 `verify:narrative`）、`scripts/selfcheck.py:65-66`。
+- 所以「2–4 句合成一个镜头、长句用竖线分块」在本仓库**已经成立**；`≥120 帧/镜` 的判据正是靠「一段多句」才凑得出来。
 
-所以「一段 2–4 句合成一个镜头」在本仓库**目前做不到**，而 ≥120 帧/镜 的判据又反过来要求句子足够长。两个改法：(a) 承认现状，把 `SKILL.md` 那句改成「一句一镜，长句用竖线分块」；(b) 引入 `segment → scene` 的合并层（导演 + 两道门 + `materialize-ir` 同批改）。本轮按「先不执行，只写实现」只记录，未改——因为 (b) 会影响画面。
+（唯一遗留的真实问题不是这条，而是 §6.2 的时长目标无执行者。）
 
 ### 6.2 时长目标没有任何执行者
 
@@ -235,7 +235,7 @@ fixtures/render-ir-16x9.json / 9x16.json + src/shots/Gn/SCnn.jsx
 
 1. 解说词只有四类行会进时间轴：`# CHAPTER n 名`、`## gap N`、空行（段末）、其余非空行（一句）；其他 `#` 开头整行忽略 —— `scripts/tts_build.mjs:16-36`。
 2. 竖线只切字幕块不影响朗读，中文无分隔拼回、英文补空格 —— `scripts/tts_build.mjs:101-102`。
-3. 停顿帧数：片头 45 / 段内句 10 / 段前 30 / 章前 45 / 片尾 60，全部可由同名环境变量覆盖，`FPS` 写死 30 —— `scripts/tts_build.mjs:9-14`；段前停顿加在**下一句**上（`:30`）。
+3. 停顿帧数：片头 45 / 段内句 10 / 段前 30 / 章前 45 / 片尾 90，全部可由同名环境变量覆盖，`FPS` 写死 30 —— `scripts/tts_build.mjs:9-17`；段前停顿加在**下一句**上（`:33`）。第 1 章**同样**吃章前 45（`:205-210`，对齐 a2e：遍历到 chapter 标记就 `t += CHAPTER_GAP/FPS`），所以片头区间实为 45(LEAD)+45(CHAPTER_GAP)=90 帧。
 4. 章标题行会重置段前停顿标记，所以「空行 + 章节行」只得到 `CHAPTER_GAP` —— `scripts/tts_build.mjs:26`。
 5. 没有 `# CHAPTER` 行时自动合成单章 `{n:1,title:"",from:1}` —— `scripts/tts_build.mjs:128`；这是 2–3 分钟校验片的默认形态。
 6. 句帧号：`from = round((offset+首词.start)×30)+1`、`to = max(from, round((offset+末词.end)×30))`，1-based —— `scripts/tts_build.mjs:112-113`。

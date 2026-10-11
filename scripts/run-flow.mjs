@@ -2,7 +2,14 @@ import{run as spawn}from"../src/runtime/spawn.mjs";
 // 每一步都单独报「命令起不来」和「退出码非 0」：老写法把 status=null 当成 1 退出，
 // Windows 上 python3 不存在时会表现成「某步失败」，看不出是环境缺工具。
 const run=cmd=>{const r=spawn(cmd[0],cmd.slice(1),{stdio:"inherit"});if(r.error){console.error(cmd[0]+" 无法启动: "+r.error+"；参数: "+cmd.slice(1).join(" "));process.exit(127)}if(r.status!==0)process.exit(r.status??1)};
-run(["node","scripts/run-production.mjs"]);run(["node","scripts/tts_build.mjs"]);run(["node","scripts/asr_second_pass.mjs"]);run(["python3","scripts/render_storyboard.py"]);run(["python3","scripts/selfcheck.py"]);run(["node","scripts/materialize-ir.mjs"]);run(["node","scripts/build-groups.mjs"]);run(["node","scripts/materialize-shots.mjs"]);
+run(["node","scripts/run-production.mjs"]);run(["node","scripts/tts_build.mjs"]);
+// sync-script 必须紧跟 tts：tts 写出的 captions.json 是按**词流自动分组**的（会跨句界），
+// 只有 sync-script 把它按 timeline.sentences[].subs 重写成句内对齐的字幕块。
+// ⚠ 事故（2026-10-11）：这条链此前漏了 sync-script，于是「跑完一键链」的仓库状态让
+//   verify:timeline-source 直接红（43 块字幕不落在任何句子区间内）—— README/PRODUCTION_METHOD
+//   都把这一步写成必跑，链里却没有它。派生顺序也不能反：materialize-ir 读 script.json。
+run(["node","scripts/sync-script.mjs"]);
+run(["node","scripts/asr_second_pass.mjs"]);run(["python3","scripts/render_storyboard.py"]);run(["python3","scripts/selfcheck.py"]);run(["node","scripts/materialize-ir.mjs"]);run(["node","scripts/build-groups.mjs"]);run(["node","scripts/materialize-shots.mjs"]);
 // 测量判据导出：Python 侧的 frame_metrics/motion_check 只读这份 JSON，
 // 所以它必须在任何 QC 之前重新生成 —— 否则改了渲染常量却拿旧判据验收，PASS 是假的。
 run(["node","scripts/export-visual-contracts.mjs"]);

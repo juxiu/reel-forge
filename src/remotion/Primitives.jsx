@@ -53,7 +53,7 @@ export {FONT_HEAVY, FONT_TECH, FONT_WIDE, FONT_ORB, FONT_MONO, FONT_EN, PURPLE, 
 export const CText = ({cx, cy, size, children, color = WHITE, weight = 700, family = FONT_HEAVY, letterSpacing = 0, opacity = 1, dy = -2, scaleX = 1, shadow, stroke, tabular = false, align = 'center', maxW, emScale, style}) => {
   let fontSize = size;
   const em = emScale ?? emFor(family);
-  if (maxW) fontSize = fitSize(String(children ?? ''), maxW, size, size * 0.78, em, letterSpacing);
+  if (maxW) fontSize = fitSize(String(children ?? ''), maxW, size, undefined, em, letterSpacing);
   return (
     <div
       style={{
@@ -96,7 +96,7 @@ export const emFor = (family) => {
 /** 左上角锚定的文本标签。 */
 export const Label = ({x, y, children, color = WHITE, size = 26, weight = 800, family = FONT_HEAVY, align = 'left', opacity = 1, maxW, letterSpacing = 0, scaleX = 1, style}) => {
   const em = emFor(family);
-  const fontSize = maxW ? fitSize(String(children ?? ''), maxW, size, size * 0.78, em, letterSpacing) : size;
+  const fontSize = maxW ? fitSize(String(children ?? ''), maxW, size, undefined, em, letterSpacing) : size;
   return (
     <div
       style={{
@@ -671,17 +671,37 @@ export const TitleCard = ({N, f0 = 1, big, rest, tagline, en, lastFrame}) => {
   );
 };
 
-/** 片尾：署名区，位于最后一镜头之后（⚠ endingFade 会吃掉末拍动作，留 ≥30 帧）。 */
+/**
+ * 片尾：署名区，位于最后一镜头之后（⚠ endingFade 会吃掉末拍动作，留 ≥30 帧）。
+ *
+ * ⚠ 事故（2026-10-11，整片渲染在第一帧就崩）：
+ *   `timeline.credit` 已从**字符串**升级成声明式对象 `{kicker,title,byline,note}`
+ *   （对齐 a2e `VIDEO.credit`，由 tts_build 从 project.json 透传），
+ *   这个组件却还把 credit 当 React 子节点直接渲染 → React error #31
+ *   （objects are not valid as a React child: object with keys {kicker,title,byline,note}）。
+ *   现在两种形状都收：字符串（旧 fixture / 旧 timeline）与对象（新口径），
+ *   对象版布局对齐 a2e `overlay/Overlay.tsx` 的 EndCredit（kicker → title → byline → 分隔线 → note → builtBy）。
+ */
 export const EndingCredit = ({N, from, to, credit, builtBy = 'built by reel-forge'}) => {
   const d = useDesign();
   if (N < from) return null;
   const op = fadeIn(N - from, 18) * (1 - c01((N - to) / 12));
+  const c = typeof credit === 'string' ? {title: credit} : credit || null;
+  if (!c && !builtBy) return null;
   const cy = d.height / 2;
   return (
     <>
       <div style={{position: 'absolute', left: 0, top: 0, width: W, height: d.height, background: Rgba('#000000', 0.72), opacity: op}} />
-      {credit ? <CText cx={W / 2} cy={cy - 26} size={56} weight={900} family={FONT_HEAVY} scaleX={0.85} opacity={op}>{credit}</CText> : null}
-      {builtBy ? <CText cx={W / 2} cy={cy + 46} size={26} color={GREY} weight={500} family={FONT_EN} letterSpacing={3} opacity={op * 0.9}>{builtBy}</CText> : null}
+      {c ? (
+        <>
+          {c.kicker ? <CText cx={W / 2} cy={cy - 62} size={26} color={GREY} weight={500} letterSpacing={4} opacity={op}>{c.kicker}</CText> : null}
+          {c.title ? <CText cx={W / 2} cy={cy - 10} size={56} weight={900} family={FONT_HEAVY} scaleX={0.85} opacity={op}>{c.title}</CText> : null}
+          {c.byline ? <CText cx={W / 2} cy={cy + 44} size={26} color={GREY} weight={500} family={FONT_HEAVY} opacity={op}>{c.byline}</CText> : null}
+          <div style={{position: 'absolute', left: W / 2 - 80, top: cy + 80, width: 160, height: 2, background: 'rgba(255,255,255,0.35)', transform: `scaleX(${c01((N - from - 6) / 16)})`}} />
+          {c.note ? <CText cx={W / 2} cy={cy + 116} size={22} color={GREY} weight={500} opacity={op}>{c.note}</CText> : null}
+        </>
+      ) : null}
+      {builtBy ? <CText cx={W / 2} cy={cy + (c ? 164 : 24)} size={22} color={GREY_MID} weight={500} family={FONT_EN} letterSpacing={2} opacity={op * 0.9}>{builtBy}</CText> : null}
     </>
   );
 };

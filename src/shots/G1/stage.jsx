@@ -46,16 +46,22 @@ function Radial({plan, N, recipe}) {
   const size = Number(recipe.hero_size) || 210;
   const items = plan.items.filter((it) => it.kind !== "flow");
   const marks = marksOf(plan, st);
-  const k = focusWalk(marks, N);
+  const k = focusWalk(marks, N, plan.focusSlots);
   const spokes = drawOn(N - IN, BEAT.DRAW_ON);
   return (
     <>
       <Svg>
         {items.map((it, i) => {
           const a = (Math.PI * 2 * i) / Math.max(1, items.length);
-          const sx = Math.round(hub.cx + Math.cos(a) * st.rx);
-          const sy = Math.round(hub.cy + Math.sin(a) * st.ry);
-          return <LineArrow key={`sp${it.id}`} x1={hub.cx} y1={hub.cy} x2={sx} y2={sy} progress={spokes} color={k[i] > 0.5 ? PURPLE_LIGHT : GREY_LINE} width={k[i] > 0.5 ? 2.5 : 2} head={0} opacity={0.32 + 0.5 * k[i]} />;
+          const dx = Math.cos(a) * st.rx;
+          const dy = Math.sin(a) * st.ry;
+          const len = Math.hypot(dx, dy);
+          // 辐条从主角光晕边缘起画、止于卫星图标前：穿过主角的线会透过半透明 HeroGlow 露出来。
+          const r0 = size / 2 + 12;
+          const r1 = Math.max(r0 + 2, len - 50);
+          const ux = dx / len;
+          const uy = dy / len;
+          return <LineArrow key={`sp${it.id}`} x1={hub.cx + ux * r0} y1={hub.cy + uy * r0} x2={hub.cx + ux * r1} y2={hub.cy + uy * r1} progress={spokes} color={k[i] > 0.5 ? PURPLE_LIGHT : GREY_LINE} width={k[i] > 0.5 ? 2.5 : 2} head={0} opacity={0.32 + 0.5 * k[i]} />;
         })}
       </Svg>
       <Core cx={hub.cx} cy={hub.cy} size={size} N={N} f0={IN} icon={st.icon} label={st.label} />
@@ -86,45 +92,63 @@ function Split2Col({plan, N, recipe}) {
   const st = recipe.stage;
   const IN = entryOf(plan, st);
   const items = plan.items;
+  const marks = marksOf(plan, st);
+  const k = focusWalk(marks, N, plan.focusSlots);
   const left = items.filter((_, i) => i % 2 === 0);
   const right = items.filter((_, i) => i % 2 === 1);
+  // 本镜是 SC02 独有的：整片 44 镜里唯一没有作者 focus 的镜头，也是最长的一镜（323 帧）。
+  // 没有焦点拍表就没有贯穿全镜的动作，实测末段静止 3.9s 被判 motion_too_low（medium/阻断）。
+  // SC02.jsx 因此补了 focus，这里按**全局 item 下标**取槽：左栏第 i 行 = 槽 2i，右栏 = 槽 2i+1。
+  // 两个列框是画面上最大的实心块（514×392，约占内容区 39%），把 fill/描边/光晕交给焦点做整块步进，
+  // 行级再叠一层 dim —— 这是本镜后半段的持续变化来源。
+  const leftHot = left.some((_, i) => k[i * 2] > 0.5);
+  const rightHot = right.some((_, i) => k[i * 2 + 1] > 0.5);
   const colW = 470;
   const lx = 110;
   const rx = 700;
   const arrow = drawOn(N - IN, BEAT.DRAW_ON);
+  const HILITE = "rgba(102,45,248,0.09)";
   return (
     <>
-      <Box x={lx - 22} y={AREA.t + 4} w={colW + 44} h={392} border={GREY} radius={14} opacity={softOp(N - IN, BEAT.FADE_IN)} />
-      <Box x={rx - 22} y={AREA.t + 4} w={colW + 44} h={392} border={PURPLE} radius={14} glow opacity={softOp(N - IN, BEAT.FADE_IN) * 0.9} />
+      <Box x={lx - 22} y={AREA.t + 4} w={colW + 44} h={392} border={leftHot ? PURPLE : GREY} fill={leftHot ? HILITE : "rgba(0,0,0,0)"} radius={14} glow={leftHot} opacity={softOp(N - IN, BEAT.FADE_IN)} />
+      <Box x={rx - 22} y={AREA.t + 4} w={colW + 44} h={392} border={PURPLE} fill={rightHot ? HILITE : "rgba(0,0,0,0)"} radius={14} glow opacity={softOp(N - IN, BEAT.FADE_IN) * 0.9} />
       <Svg>
         <LineArrow x1={lx + colW} y1={380} x2={rx - 14} y2={380} progress={arrow} color={PURPLE_LIGHT} width={3} head={12} glow />
       </Svg>
-      <CText cx={lx + colW / 2} cy={AREA.t - 6} size={30} weight={800} color={GREY_LIGHT}>{st.left_label}</CText>
+      <CText cx={lx + colW / 2} cy={AREA.t - 6} size={30} weight={800} color={leftHot ? WHITE : GREY_LIGHT}>{st.left_label}</CText>
       <CText cx={rx + colW / 2} cy={AREA.t - 6} size={30} weight={800} color={WHITE}>{st.right_label}</CText>
-      {left.map((it, i) => (
-        <div key={it.id}>
-          <SoftIn N={N} f0={it.f0}>
-            <div style={{...abs(lx, 250 + i * 74, colW, 60), display: "flex", alignItems: "center"}}>
-              <div style={{width: 46, height: 46, flex: "0 0 46px"}}>
-                <Glyph kind={it.icon} cx={23} cy={23} s={44} reveal={1} />
+      {left.map((it, i) => {
+        const idx = i * 2;
+        const hot = k[idx] > 0.5;
+        return (
+          <div key={it.id}>
+            <SoftIn N={N} f0={it.f0}>
+              <div style={{...abs(lx, 250 + i * 74, colW, 60), display: "flex", alignItems: "center", opacity: 1 - 0.4 * isPast(idx, marks, N, plan.focusSlots)}}>
+                <div style={{width: 46, height: 46, flex: "0 0 46px"}}>
+                  <Glyph kind={it.icon} cx={23} cy={23} s={44} active={hot} reveal={1} />
+                </div>
+                <MonoText x={62} y={14} size={26} color={hot ? WHITE : GREY_LIGHT}>{it.text}</MonoText>
               </div>
-              <MonoText x={62} y={14} size={26} color={GREY_LIGHT}>{it.text}</MonoText>
-            </div>
-          </SoftIn>
-        </div>
-      ))}
-      {right.map((it, i) => (
-        <div key={it.id}>
-          <SoftIn N={N} f0={it.f0}>
-            <div style={{...abs(rx, 250 + i * 74, colW, 60), display: "flex", alignItems: "center"}}>
-              <div style={{width: 46, height: 46, flex: "0 0 46px"}}>
-                <Glyph kind={it.icon} cx={23} cy={23} s={44} active reveal={1} />
+            </SoftIn>
+          </div>
+        );
+      })}
+      {right.map((it, i) => {
+        const idx = i * 2 + 1;
+        const hot = k[idx] > 0.5;
+        return (
+          <div key={it.id}>
+            <SoftIn N={N} f0={it.f0}>
+              <div style={{...abs(rx, 250 + i * 74, colW, 60), display: "flex", alignItems: "center", opacity: 1 - 0.4 * isPast(idx, marks, N, plan.focusSlots)}}>
+                <div style={{width: 46, height: 46, flex: "0 0 46px"}}>
+                  <Glyph kind={it.icon} cx={23} cy={23} s={44} active reveal={1} />
+                </div>
+                <MonoText x={62} y={14} size={26} color={WHITE}>{it.text}</MonoText>
               </div>
-              <MonoText x={62} y={14} size={26} color={WHITE}>{it.text}</MonoText>
-            </div>
-          </SoftIn>
-        </div>
-      ))}
+            </SoftIn>
+          </div>
+        );
+      })}
     </>
   );
 }
@@ -137,7 +161,7 @@ function Ranked3({plan, N, recipe}) {
   const st = recipe.stage;
   const items = plan.items;
   const marks = marksOf(plan, st);
-  const k = focusWalk(marks, N);
+  const k = focusWalk(marks, N, plan.focusSlots);
   const rowH = 108;
   const top = 226;
   const x = 150;
@@ -151,7 +175,7 @@ function Ranked3({plan, N, recipe}) {
         return (
           <div key={it.id}>
             <SoftIn N={N} f0={it.f0}>
-              <Box x={x} y={y} w={w} h={rowH} border={chosen ? PURPLE : GREY} radius={12} glow={chosen} bloom={!chosen} opacity={1 - 0.45 * isPast(i, marks, N)} />
+              <Box x={x} y={y} w={w} h={rowH} border={chosen ? PURPLE : GREY} radius={12} glow={chosen} bloom={!chosen} opacity={1 - 0.45 * isPast(i, marks, N, plan.focusSlots)} />
               <div style={{...abs(x + 24, y + (rowH - 72) / 2, 72, 72), display: "flex", alignItems: "center", justifyContent: "center"}}>
                 <Glyph kind={it.icon} cx={36} cy={36} s={66} active={chosen} reveal={1} />
               </div>
@@ -178,10 +202,12 @@ function Rail4({plan, N, recipe}) {
   const IN = entryOf(plan, st);
   const items = plan.items;
   const marks = marksOf(plan, st);
-  const k = focusWalk(marks, N);
+  const k = focusWalk(marks, N, plan.focusSlots);
   const railX = 1078;
-  const top = 214;
-  const gap = 106;
+  // top/gap 204/96：第 4 行框底落在 538，caption（TechSub 26px，字形盒 545–571）不再压框。
+  // 原 214/106 时末行框底 578，与 caption 重叠 33px（f1370 实测）。
+  const top = 204;
+  const gap = 96;
   const trackProgress = clamp01((N - IN) / (BEAT.DRAW_ON + items.length * 6));
   return (
     <>
@@ -199,7 +225,7 @@ function Rail4({plan, N, recipe}) {
         return (
           <div key={it.id}>
             <SoftIn N={N} f0={it.f0}>
-              <div style={{...abs(150, y, 800, 92), display: "flex", alignItems: "center", opacity: 1 - 0.45 * isPast(i, marks, N)}}>
+              <div style={{...abs(150, y, 800, 92), display: "flex", alignItems: "center", opacity: 1 - 0.45 * isPast(i, marks, N, plan.focusSlots)}}>
                 <div style={{width: 64, height: 64, flex: "0 0 64px"}}>
                   <Glyph kind={it.icon} cx={32} cy={32} s={60} active={k[i] > 0.5} reveal={1} />
                 </div>
@@ -225,7 +251,7 @@ function DualPanel({plan, N, recipe}) {
   const IN = entryOf(plan, st);
   const items = plan.items;
   const marks = marksOf(plan, st);
-  const k = focusWalk(marks, N);
+  const k = focusWalk(marks, N, plan.focusSlots);
   const pw = 470;
   const py = AREA.t + 16;
   const ph = 336;
@@ -233,27 +259,34 @@ function DualPanel({plan, N, recipe}) {
   const rx = 690;
   const seam = drawOn(N - IN, BEAT.DRAW_ON);
   const winner = st.winner;
+  // 焦点在左右两块之间交接：470×336 的整块 fill + 描边步进是本镜后半段的持续变化来源。
+  // 此前这里只把焦点用在一条 Track 的光点颜色上（面积 ~0），末段实测 2.9s 静止贴着实判线的上界。
+  const hotL = k[0] > 0.5;
+  const hotR = k[1] > 0.5;
+  const HILITE = "rgba(102,45,248,0.09)";
+  const fade = softOp(N - IN, BEAT.FADE_IN);
   return (
     <>
-      <Box x={lx} y={py} w={pw} h={ph} border={GREY} radius={14} opacity={softOp(N - IN, BEAT.FADE_IN)} />
-      <Box x={rx} y={py} w={pw} h={ph} border={PURPLE} radius={14} glow opacity={softOp(N - IN, BEAT.FADE_IN) * 0.9} />
+      <Box x={lx} y={py} w={pw} h={ph} border={hotL ? PURPLE_LIGHT : GREY} fill={hotL ? HILITE : "rgba(0,0,0,0)"} radius={14} glow={hotL} bloom={!hotL} opacity={fade * (1 - 0.3 * isPast(0, marks, N, plan.focusSlots))} />
+      <Box x={rx} y={py} w={pw} h={ph} border={PURPLE} fill={hotR ? HILITE : "rgba(0,0,0,0)"} radius={14} glow opacity={fade * 0.9 * (1 - 0.3 * isPast(1, marks, N, plan.focusSlots))} />
       <Svg>
         <line x1={640} y1={py - 18} x2={640} y2={py + ph + 18} stroke={GREY_LINE} strokeWidth={2} opacity={seam} />
       </Svg>
-      <CText cx={lx + pw / 2} cy={py - 34} size={30} weight={800} color={GREY_LIGHT}>{items[0]?.text}</CText>
+      <CText cx={lx + pw / 2} cy={py - 34} size={30} weight={800} color={hotL ? WHITE : GREY_LIGHT}>{items[0]?.text}</CText>
       <CText cx={rx + pw / 2} cy={py - 34} size={30} weight={800} color={WHITE}>{items[1]?.text}</CText>
       {[items[0], items[1]].map((it, side) => {
         if (!it) return null;
         const bx = side === 0 ? lx : rx;
         const act = side === winner;
+        const hot = side === 0 ? hotL : hotR;
         return (
           <div key={it.id}>
             <div style={{...abs(bx + pw / 2 - 84, py + 84, 168, 168), display: "flex", alignItems: "center", justifyContent: "center"}}>
-              <Glyph kind={st.icons?.[side] || it.icon} cx={84} cy={84} s={160} active={act} reveal={clamp01((N - it.f0) / BEAT.DRAW_ON)} />
+              <Glyph kind={st.icons?.[side] || it.icon} cx={84} cy={84} s={160} active={act || hot} reveal={clamp01((N - it.f0) / BEAT.DRAW_ON)} />
             </div>
             <div style={{...abs(bx + 40, py + 268, pw - 80, 48), display: "flex", alignItems: "center", justifyContent: "center"}}>
               {act ? <Check cx={pw / 2 - 80} cy={24} size={38} color={PURPLE_LIGHT} progress={drawOn(N - it.f0 - 12, 14)} /> : null}
-              <Label x={act ? 20 : 0} y={10} size={26} color={act ? WHITE : GREY} maxW={pw - 120} align="center">{st.notes?.[side]}</Label>
+              <Label x={act ? 20 : 0} y={10} size={26} color={act || hot ? WHITE : GREY} maxW={pw - 120} align="center">{st.notes?.[side]}</Label>
             </div>
           </div>
         );
@@ -274,7 +307,7 @@ function BeforeAfter({plan, N, recipe}) {
   const IN = entryOf(plan, st);
   const items = plan.items;
   const marks = marksOf(plan, st);
-  const k = focusWalk(marks, N);
+  const k = focusWalk(marks, N, plan.focusSlots);
   const py = 306;
   const p1x = 348;
   const p2x = 796;
@@ -290,20 +323,20 @@ function BeforeAfter({plan, N, recipe}) {
           几乎不可读（实测「原文」糊成一团）。参照片的斜置平面里放的是矢量形状，不是文字。
           所以：文案留在平面上方（可读），平面内部放几道横向线条示意「一张躺平的纸」——
           这既补了密度，又不会被形变破坏。*/}
-      <TiltPlane cx={p1x} cy={py} w={pw} h={210} skew={-20} sy={0.46} stroke={GREY_MID} sw={2} fill="rgba(0,0,0,0.86)" opacity={softOp(N - IN, BEAT.FADE_IN)}>
+      <TiltPlane cx={p1x} cy={py} w={pw} h={210} skew={-20} sy={0.46} stroke={k[0] > 0.5 ? PURPLE_LIGHT : GREY_MID} sw={2} fill={k[0] > 0.5 ? "rgba(38,18,86,0.86)" : "rgba(0,0,0,0.86)"} opacity={softOp(N - IN, BEAT.FADE_IN) * (1 - 0.35 * isPast(0, marks, N, plan.focusSlots))}>
         {[0, 1, 2, 3].map((r) => (
           <div key={r} style={{position: 'absolute', left: 46, top: 60 + r * 34, width: pw - 92 - r * 26, height: 7, background: GREY, opacity: 0.5 - r * 0.07}} />
         ))}
       </TiltPlane>
-      <TiltPlane cx={p2x} cy={py} w={pw} h={210} skew={-20} sy={0.46} stroke={PURPLE} sw={2.5} fill="rgba(0,0,0,0.9)" opacity={softOp(N - IN - 14, BEAT.FADE_IN)}>
+      <TiltPlane cx={p2x} cy={py} w={pw} h={210} skew={-20} sy={0.46} stroke={PURPLE} sw={2.5} fill={k[1] > 0.5 ? "rgba(52,24,116,0.9)" : "rgba(0,0,0,0.9)"} opacity={softOp(N - IN - 14, BEAT.FADE_IN) * (1 - 0.35 * isPast(1, marks, N, plan.focusSlots))}>
         {[0, 1, 2].map((r) => (
           <div key={r} style={{position: 'absolute', left: 46, top: 66 + r * 38, width: pw - 92 - r * 30, height: 8, background: PURPLE_LIGHT, opacity: 0.75 - r * 0.12}} />
         ))}
       </TiltPlane>
       {/* 平面上的标签：左右各一个，跟平面一起倾斜也不会糊（字在平面外，保留可读性）*/}
       <div style={{...abs(p1x - 150, 214, 300, 52), display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-        <Glyph kind={st.from_icon || items[0]?.icon || "doc"} cx={26} cy={26} s={40} reveal={clamp01((N - IN) / BEAT.DRAW_ON)} />
-        <CText cx={168} cy={26} size={36} weight={800} color={GREY_LIGHT} maxW={240}>{items[0]?.text}</CText>
+        <Glyph kind={st.from_icon || items[0]?.icon || "doc"} cx={26} cy={26} s={40} active={k[0] > 0.5} reveal={clamp01((N - IN) / BEAT.DRAW_ON)} />
+        <CText cx={168} cy={26} size={36} weight={800} color={k[0] > 0.5 ? WHITE : GREY_LIGHT} maxW={240}>{items[0]?.text}</CText>
       </div>
       <div style={{...abs(p2x - 150, 214, 300, 52), display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
         <Glyph kind={st.to_icon || items[1]?.icon || "lock"} cx={26} cy={26} s={40} active reveal={clamp01((N - IN - 14) / BEAT.DRAW_ON)} />

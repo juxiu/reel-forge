@@ -1,5 +1,7 @@
 import fs from "node:fs";
+import crypto from "node:crypto";
 import {packageDelivery} from "../src/delivery/package.mjs";
+import {releaseFingerprint} from "../src/release/fingerprint.mjs";
 
 const project = JSON.parse(fs.readFileSync(process.env.PROJECT_FILE || "fixtures/project.json", "utf8"));
 const base = "artifacts/" + project.project_id + "/";
@@ -51,16 +53,28 @@ if (qc.status !== "PASS") throw new Error("delivery requires PASS QC");
 const provenance = JSON.parse(fs.readFileSync(base + "qc/text_provenance.json", "utf8"));
 if (provenance.status !== "PASS") throw new Error("delivery requires traceable on-screen text");
 // visual-pixel 回归记录仅为 run-to-run 位移，不参与交付判定（清单/脚本 embedding 版本由 verify:visual-benchmark 对撞）。
+// 验收范围：与 qc.mjs / verify-production.mjs 同一口径（用户决策 —— 16:9 是验收基准）。
+// 范围外比例的测量文件照常进包（审计可查），只豁免 PASS 判定。
+const ACCEPT = new Set((process.env.ACCEPT_RATIOS || "16x9,9x16").split(",").map((s) => s.trim()).filter(Boolean));
+if (!ACCEPT.has("16x9")) throw new Error("ACCEPT_RATIOS 必须包含 16x9（16:9 是验收基准，不可移出范围）");
 for (const ratio of ["16x9", "9x16"]) {
   const frame = JSON.parse(fs.readFileSync(base + "qc/frame_metrics_" + ratio + ".json", "utf8"));
   const motion = JSON.parse(fs.readFileSync(base + "qc/motion_" + ratio + ".json", "utf8"));
   const visual = JSON.parse(fs.readFileSync(base + "qc/visual_regression_" + ratio + ".json", "utf8"));
-  if (frame.summary?.status !== "PASS" || motion.summary?.status !== "PASS") {
+  if (ACCEPT.has(ratio) && (frame.summary?.status !== "PASS" || motion.summary?.status !== "PASS")) {
     throw new Error("delivery requires PASS frame/motion metrics: " + ratio);
   }
   if (visual.gate !== "advisory" || visual.blocking !== false) {
     throw new Error("visual regression must stay advisory: " + ratio);
   }
+}
+// 交付包必须能自证「装的是当前这次渲染」：把两支成片的 sha256 与打包时的输入指纹写进 metadata，
+// verify:production 会重算 artifacts/render 的哈希比对 —— 事故（2026-10-11）：渲染更新后旧包
+// 照样过生产门（门只验包内自洽，不验包内 mp4 与当前渲染一致）。
+const renderHashes = {};
+for (const ratio of ["16x9", "9x16"]) {
+  const file = "artifacts/render/reel-forge-" + ratio + ".mp4";
+  renderHashes[file] = crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex");
 }
 
 const result = packageDelivery({
@@ -69,6 +83,9 @@ const result = packageDelivery({
   metadata: {
     contract_version: "0.3",
     ratios: ["16x9", "9x16"],
+    accept_ratios: [...ACCEPT],
+    input_fingerprint: releaseFingerprint().fingerprint,
+    render_hashes: renderHashes,
     qc_status: qc.status,
     visual_regression: "advisory",
     text_provenance: provenance.status,

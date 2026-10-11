@@ -296,6 +296,15 @@ expect("停留不足被抓", "hold_too_short" in [f["token"] for f in s_exit.get
 expect("扣掉灭光帧", s_exit.get("hold_frames", 99) <= 60 - MM["glow_off_frames"], s_exit.get("hold_frames"))
 expect("hold 不达标 exit 1", proc.returncode == 1, proc.returncode)
 
+# ---- 案例 14：内容一路动到离场前 → 校准不得把 hold_too_short 洗掉（反例自检）----
+# 离场的头几帧亮度还没掉够、变化却很大，量具必须跳过它们再计 hold；但**跳过的上限**是文档化的
+# 离场尾段帧数。这里的画面从首帧连续平移到第 108 帧、然后立刻压黑：真正的「落位停留」是 0 帧，
+# 校准若没有上限（或上限过大）就会把整段运动当成离场而误报 OK。
+_proc, s_grind = motion_case("m_grind", move_from=1, move_to=120, black_from=109)
+expect("连续动到离场仍被识别为离场", s_grind.get("exited") is True, s_grind.get("exited"))
+expect("校准没有洗掉真缺陷", "hold_too_short" in [f["token"] for f in s_grind.get("flags", [])], s_grind.get("flags"))
+expect("校准上限受离场尾段帧数约束", s_grind.get("hold_frames", 999) < MM["hold_min_frames"], s_grind.get("hold_frames"))
+
 
 def classified(name, pulse):
     """静止但画面里确有东西在动：均值口径判成静止，像素数口径给出「动的是多大的东西」。"""

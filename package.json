@@ -62,6 +62,8 @@
     "verify:visual-benchmark": "node scripts/verify-visual-benchmark.mjs",
     "verify:visual-regression": "node scripts/verify-visual-regression.mjs",
     "verify:text-provenance": "node scripts/verify-text-provenance.mjs",
+    "verify:subtitle-budget": "node scripts/verify-subtitle-budget.mjs",
+    "perf:probe": "node scripts/perf-probe.mjs",
     "verify:scene-contract": "node scripts/verify-scene-contract.mjs",
     "verify:narrative": "node scripts/verify-narrative.mjs",
     "repair-cycle": "node scripts/repair-cycle.mjs",
@@ -86,7 +88,8 @@
     "verify:tts-parity": "node scripts/verify-tts-parity.mjs",
     "verify:language": "node scripts/verify-language.mjs",
     "verify:tts-native": "node scripts/verify-tts-native.mjs",
-    "verify:shotcraft": "node scripts/verify-shotcraft.mjs"
+    "verify:shotcraft": "node scripts/verify-shotcraft.mjs",
+    "storyboard:gen": "node scripts/storyboard-gen.mjs"
   },
   "dependencies": {
     "@remotion/cli": "4.0.534",

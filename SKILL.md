@@ -91,6 +91,13 @@ Agent 无法读取本地目录时必须明确说明，不能假称引用过卡�
 `npm run checkpoint -- <checkpoint> approved`
 然后使用 `npm run skill -- ... --resume` 继续。停止时保留 workspace，完整结束后再恢复原 demo fixture。
 
+⚠ 链中「Research → 解说稿」这一步依赖 agent：`createAgentProvider()` 只在设置了 `AGENT_COMMAND`
+（外部 Agent 服务）时才存在。没有它时，链会用盘上属于本项目的 `fixtures/script.json` 直接前进
+（`project_id` 必须一致，否则按「缺失」处理）；两者都没有会明确停在
+`script missing and no agent provider configured`。镜头源码 `src/shots/G*/SC*.jsx` 与
+`reference-shot-blueprint.json` 是**按主题 authored** 的，没有确定性生成器 —— 换主题必须重做，
+否则会静默沿用旧主题画面。净室实测见 [docs/ACCEPTANCE_REPORT.md](docs/ACCEPTANCE_REPORT.md)。
+
 ## 完成定义
 双比例成片、Frame Metrics、Motion、画面文字出处（text provenance）、QC、Repair、tts-word-boundary、Delivery checksum、still manifest 与 `verify:production` 全部通过。
 

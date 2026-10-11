@@ -23,7 +23,7 @@ const CHECKPOINT_DEPENDENCIES = {
 const ARTIFACT_PATTERNS = {
   "length-language": ["fixtures/project.json"],
   "narration-signoff": ["fixtures/script.json", "script/narration.txt", "script/storyboard_src.md"],
-  "voiceover": ["script/timeline.json", "script/timeline.md", "public/audio.mp3", "public/audio.wav"],
+  "voiceover": ["script/timeline.json", "script/timeline.md", "public/audio.wav"],
   "pilot-preview": ["artifacts/preview/preview.mp4", "artifacts/preview/manifest.json", "artifacts/preview/preview-manifest.json"],
 };
 

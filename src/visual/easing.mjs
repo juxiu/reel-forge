@@ -136,8 +136,13 @@ export const BEAT = {
   GLOW_ON: 8, // 主角灯亮
   GLOW_OFF: 6, // 主角灯灭（另有 8 帧收尾）
   EXIT_ACCEL_P: 1.6, // 离场加速幂
-  EXIT_HOLD_MIN: 30, // 末拍落位后必须停 30–45 帧
+  // ---- 镜头区间与离场（a2e 分镜表衔接规则的真源）----
+  SHOT_LEAD: 8, // 镜头区间起点 = 本句 from − 8（下一镜头首帧起入场）
+  SHOT_TAIL: 2, // 章末 / 片末 = 末句 to + 2
+  EXIT_TAIL: 8, // 末 8 帧离场：exitAt = len − 8，离场动画必须结束在镜头末帧
+  EXIT_HOLD_MIN: 30, // 末拍落位后必须停 30–45 帧再走（离场起点前）
   EXIT_HOLD_MAX: 45,
+  FOCUS_RISE: 11, // 焦点交接爬坡：起/落各 11 帧，交接瞬间两槽交叠在 0.5 附近
   STILL_MAX_FRAMES: 90, // 最长静止 3 s（>90 帧判缺陷）
   CAMERA_MIN: 20,
   CAMERA_MAX: 45,

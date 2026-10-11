@@ -266,11 +266,15 @@ export const ScaleIcon = ({cx, cy, s = 190, color = WHITE, sw = 2.5, opacity = 1
       {[-1, 1].map((sgn, i) => {
         const px = cx + sgn * arm;
         const py = cy - s * 0.26 + (i ? dy : -dy);
+        // 托盘几何随 s 等比：此前是 ±22/26/44 的硬编码（按主角 s=190 设计），
+        // 缩到槽位图标 s=44 时托盘比横梁还宽 3 倍，两盘重叠成一团乱线（f4039 实测）。
+        const pw = s * 0.116;
+        const pd = s * 0.137;
         return (
           <g key={i}>
-            <line x1={px - 22} y1={py} x2={px} y2={py + 26} stroke={GREY} strokeWidth={2} />
-            <line x1={px + 22} y1={py} x2={px} y2={py + 26} stroke={GREY} strokeWidth={2} />
-            <path d={`M${px - 24} ${py + 26} Q${px} ${py + 44} ${px + 24} ${py + 26}`} {...base(i === 0 && active ? c : color, sw)} />
+            <line x1={px - pw} y1={py} x2={px} y2={py + pd} stroke={GREY} strokeWidth={2} />
+            <line x1={px + pw} y1={py} x2={px} y2={py + pd} stroke={GREY} strokeWidth={2} />
+            <path d={`M${px - s * 0.126} ${py + pd} Q${px} ${py + s * 0.232} ${px + s * 0.126} ${py + pd}`} {...base(i === 0 && active ? c : color, sw)} />
           </g>
         );
       })}

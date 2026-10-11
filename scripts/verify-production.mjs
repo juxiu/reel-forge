@@ -15,15 +15,55 @@ for (const file of required) {
   const full = root + "/" + file;
   if (!fs.existsSync(full) || !fs.statSync(full).size) throw new Error("production artifact missing: " + full);
 }
+// 验收范围：与 qc.mjs 同一个口径（用户决策 —— 16:9 是验收基准；9:16 保持双画幅能力，不投入质量打磨）。
+// 范围外比例仍然强制：成片在位、测量文件在位、覆盖度/区间与当前 IR 一致、visual 必须仍是 advisory；
+// 豁免的只有 frame/motion 的 summary PASS 判定，且豁免结果显式打进 PASS 行，不许静默。
+const ACCEPT = new Set((process.env.ACCEPT_RATIOS || "16x9,9x16").split(",").map((s) => s.trim()).filter(Boolean));
+if (!ACCEPT.has("16x9")) throw new Error("ACCEPT_RATIOS 必须包含 16x9（16:9 是验收基准，不可移出范围）");
+const outOfScope = [];
 for (const ratio of ["16x9","9x16"]) {
   const render = "artifacts/render/reel-forge-" + ratio + ".mp4";
   if (!fs.existsSync(render) || !fs.statSync(render).size) throw new Error("production render missing: " + render);
   const frame = JSON.parse(fs.readFileSync(root + "/qc/frame_metrics_" + ratio + ".json","utf8"));
   const motion = JSON.parse(fs.readFileSync(root + "/qc/motion_" + ratio + ".json","utf8"));
   const visual = JSON.parse(fs.readFileSync(root + "/qc/visual_regression_" + ratio + ".json","utf8"));
-  if (frame.summary?.status !== "PASS") throw new Error("frame metrics not PASS: " + ratio);
-  if (motion.summary?.status !== "PASS") throw new Error("motion metrics not PASS: " + ratio);
+  if (ACCEPT.has(ratio)) {
+    if (frame.summary?.status !== "PASS") throw new Error("frame metrics not PASS: " + ratio);
+    if (motion.summary?.status !== "PASS") throw new Error("motion metrics not PASS: " + ratio);
+  } else {
+    outOfScope.push({ratio, frame: frame.summary?.status || "?", motion: motion.summary?.status || "?"});
+  }
   if (visual.gate !== "advisory" || visual.blocking !== false) throw new Error("visual regression must stay advisory: " + ratio);
+
+  // ---- 测量覆盖度：量到的镜头集必须与 IR 一致 ----
+  // ⚠ 事故记录：QC 曾经只报「status: PASS」，不证明它量的是**这版 IR 的每一个镜头**。
+  //   2026-10-08 的 4 镜测量一路配着 44 镜的 IR 报 PASS —— status 是 PASS，但只 PASS 了 4 个镜头。
+  //   「量过的都对」不等于「该量的都量了」，这里把后者补上。
+  const ir = JSON.parse(fs.readFileSync("fixtures/render-ir-" + ratio + ".json","utf8"));
+  const fps = Number(ir.fps) || 30;
+  const want = new Map((ir.scenes || []).map((s) => {
+    const from = Math.round(Number(s.start) * fps);
+    const to = Math.max(from, Math.ceil((Number(s.start) + Number(s.duration)) * fps) - 1);
+    return [s.id, {from, to}];
+  }));
+  for (const [name, measured] of [["motion", motion], ["frame_metrics", frame]]) {
+    const got = measured.summary?.scenes || [];
+    if (got.length !== want.size) {
+      throw new Error(
+        `测量覆盖不足：${name}_${ratio} 量了 ${got.length} 个镜头，IR 有 ${want.size} 个` +
+        "（测量文件是旧 输入跑出来的，重跑 render → QC 再交付）",
+      );
+    }
+    for (const scene of got) {
+      const ref = want.get(scene.id);
+      if (!ref) throw new Error(`测量覆盖越界：${name}_${ratio} 量到 IR 里没有的镜头 ${scene.id}`);
+      if (scene.from !== ref.from || scene.to !== ref.to) {
+        throw new Error(
+          `测量区间漂移：${name}_${ratio} ${scene.id} 量为 [${scene.from},${scene.to}]，IR 为 [${ref.from},${ref.to}]`,
+        );
+      }
+    }
+  }
 }
 // 阻断项：画面文字必须可溯源到解说词 / 调研（a2e 硬性原则 2「事实有出处」）。
 const provenance = JSON.parse(fs.readFileSync(root + "/qc/text_provenance.json", "utf8"));
@@ -66,6 +106,28 @@ const manifestPath = "artifacts/delivery/" + project.project_id + "/delivery-man
 if (!fs.existsSync(manifestPath)) throw new Error("delivery manifest missing");
 const manifest = JSON.parse(fs.readFileSync(manifestPath,"utf8"));
 if (manifest.metadata?.qc_status !== "PASS") throw new Error("delivery QC metadata not PASS");
+// ---- 打包对账：交付包必须装的是「当前这次渲染」 ----
+// ⚠ 事故（2026-10-11，发现于本次终验）：渲染更新后旧包照样过生产门 —— 门只验包内
+//   sha256 自洽，从不问「包里的 mp4 是不是 QC 量的那一版」。这里用 deliver 写进 metadata 的
+//   render_hashes（打包时 artifacts/render 成片的哈希）与 input_fingerprint 做两道回验：
+//   a) 成片哈希对不上 → 渲染在打包后被更新，必须重新 deliver；
+//   b) 包指纹对不上 → 输入在打包后被改过，同样必须重新 deliver。
+//   旧版清单没有这些字段时直接判失败（不支持无对账能力的旧包装作新包）。
+const recordedHashes = manifest.metadata?.render_hashes;
+if (!recordedHashes || typeof recordedHashes !== "object" || !Object.keys(recordedHashes).length) {
+  throw new Error("delivery manifest 未记录 render_hashes（旧版清单），重跑 npm run deliver");
+}
+for (const [file, hash] of Object.entries(recordedHashes)) {
+  if (!fs.existsSync(file)) throw new Error("packaged render source missing: " + file);
+  const actual = crypto.createHash("sha256").update(fs.readFileSync(file)).digest("hex");
+  if (actual !== hash) throw new Error("交付包与当前渲染不一致：" + file + " 在打包后被更新，重跑 npm run deliver");
+}
+if (!manifest.metadata?.input_fingerprint) {
+  throw new Error("delivery manifest 未记录 input_fingerprint（旧版清单），重跑 npm run deliver");
+}
+if (manifest.metadata.input_fingerprint !== current.fingerprint) {
+  throw new Error("交付包已过期：打包时的输入指纹与当前不一致，重跑 npm run deliver");
+}
 for (const entry of manifest.files || []) {
   const file = "artifacts/delivery/" + project.project_id + "/" + entry.name;
   if (!fs.existsSync(file)) throw new Error("delivery artifact missing: " + file);
@@ -75,6 +137,8 @@ for (const entry of manifest.files || []) {
 }
 console.log("production gate PASS", JSON.stringify({
   project_id:project.project_id,
+  accept_ratios:[...ACCEPT],
+  out_of_scope:outOfScope.length?outOfScope:undefined,
   alignment_mode:asr.alignment_mode,
   timeline_source:"tts-word-boundary",
   qc:qc.status,

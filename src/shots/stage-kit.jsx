@@ -85,25 +85,64 @@ export const Glyph = ({kind, cx, cy, s, active = false, reveal, opacity = 1, blo
  *   整组的焦点交接会自动跟着首句走，不会因为写死绝对帧而整组错拍。
  */
 export const entryOf = (plan, st) => Number(plan?.hero?.f0) || Number(st?.in) || 1;
-export const marksOf = (plan, st) => (st?.focus || []).map((o) => entryOf(plan, st) + Number(o));
 
 /**
- * 紫色焦点在若干槽之间游走：marks[i] 是第 i 槽成为焦点的帧。
- * 11 帧爬坡上升、下一槽激活后 11 帧回落 —— 任一帧至多一个槽满紫（交接瞬间交叠在 0.5 附近）。
- * 纪律「紫只给当前重点」就靠这一处实现，各拓扑不再各写一套。
+ * 焦点拍表（绝对帧号）。**优先用 plan 里铺满整镜的 tileFocus 结果**。
+ *
+ * ⚠ 为什么要换口径：作者写在 recipe.stage.focus 里的偏移是**相对入场帧、只覆盖镜头前段**的
+ *   （典型 [0,40,80]，加起来约 110 帧），而镜头有 150–323 帧。末拍之后画面上只剩幕底呼吸，
+ *   motion_check 实测变化 0.02–0.12（still_thr = 0.35 以下）→ 每镜都报 motion_too_low（阻断）。
+ *   plan.mjs 的 tileFocus 把作者的分格节奏按周期铺满整镜，这里直接消费结果；
+ *   plan 没给（非 authored 镜、或旧计划）时才回退到「入场帧 + 相对偏移」的老口径。
  */
-export function focusWalk(marks, N, rise = 11) {
-  const k = marks.map((m, i) => {
-    const up = clamp01((N - m) / rise);
-    const next = marks[i + 1];
+export const marksOf = (plan, st) => {
+  const tiled = plan?.focusMarks;
+  if (Array.isArray(tiled) && tiled.length) return tiled;
+  return (st?.focus || []).map((o) => entryOf(plan, st) + Number(o));
+};
+
+/** 焦点爬坡帧数：起/落各 11 帧，交接瞬间两槽交叠在 0.5 附近。
+ *  真源在 BEAT.FOCUS_RISE —— plan.mjs 铺焦点拍表时要按同一个数字预留末拍落位窗口。 */
+export const FOCUS_RISE = BEAT.FOCUS_RISE;
+
+/**
+ * 紫色焦点在若干**槽**之间游走。
+ *
+ * @param marks 焦点拍表（绝对帧号，可能跨多轮循环 —— 长度 ≥ slots）
+ * @param N     当前镜内 1-based 帧号
+ * @param slots 槽数（= plan.focusSlots，取「作者焦点数」与「图元数」的较大者）
+ * @returns k[] 每个槽的紫度（0–1）；拍表第 j 拍驱动槽 j % slots。
+ *
+ * 11 帧爬坡上升、下一拍激活后 11 帧回落 —— 任一帧至多一个槽满紫，纪律「紫只给当前重点」靠这一处实现。
+ * 拍表铺满整镜后，末拍之后的段落也持续有槽在交接，画面因此全镜都有大面积步进变化。
+ */
+export function focusWalk(marks, N, slots = marks.length, rise = FOCUS_RISE) {
+  const n = Math.max(1, Math.round(Number(slots) || marks.length || 1));
+  const k = new Array(n).fill(0);
+  for (let j = 0; j < marks.length; j++) {
+    const up = clamp01((N - marks[j]) / rise);
+    const next = marks[j + 1];
     const down = next === undefined ? 0 : clamp01((N - next) / rise);
-    return up * (1 - down);
-  });
-  return k.some((v) => v > 0) ? k : k.map(() => 0);
+    const v = up * (1 - down);
+    const slot = j % n;
+    if (v > k[slot]) k[slot] = v;
+  }
+  return k;
 }
 
-/** 槽 i 是否已成为「过去」（注意力交给下一个时降到 0.5，而不是清场——这是承接做法）。 */
-export const isPast = (i, marks, N) => (marks[i + 1] === undefined ? 0 : clamp01((N - marks[i + 1]) / 11));
+/**
+ * 槽 i 是否已成为「过去」（注意力交给下一拍时降到 0.6 倍，而不是清场——这是承接做法）。
+ * 取「最后一个已到、且槽序为 i 的拍」的下一拍作为回落基准；拍表循环时下一轮会自然把它复位。
+ */
+export const isPast = (i, marks, N, slots = marks.length, rise = FOCUS_RISE) => {
+  const n = Math.max(1, Math.round(Number(slots) || marks.length || 1));
+  let j = -1;
+  for (let t = 0; t < marks.length; t++) if (marks[t] <= N && t % n === i) j = t;
+  if (j < 0) return 0;
+  const next = marks[j + 1];
+  if (next === undefined) return 0;
+  return clamp01((N - next) / rise);
+};
 
 // ---------------------------------------------------------------- 私有图元
 
@@ -139,7 +178,8 @@ export const Core = ({cx, cy, size, N, f0, icon = "shield", label = "", iconScal
       })}
       {label ? (
         <SoftIn N={N} f0={f0 + 16}>
-          <TechSub cx={cx} cy={cy + half + 66}>{label}</TechSub>
+          {/* 22px：主角副标签收窄，底部两侧卫星的标签（radial/orbit 椭圆 ±60°）不再与它角碰 */}
+          <TechSub cx={cx} cy={cy + half + 66} size={22}>{label}</TechSub>
         </SoftIn>
       ) : null}
     </>
@@ -255,19 +295,19 @@ export function Pipeline3({plan, N, recipe}) {
   const st = recipe.stage;
   const IN = entryOf(plan, st);
   const items = plan.items;
-  const k = focusWalk(marksOf(plan, st), N);
+  const k = focusWalk(marksOf(plan, st), N, plan.focusSlots);
   // 3 个框 + 2 个间隙必须落在 cameraSafe.x89–1191 内：3*bw + 2*gap ≤ 1102。
   // 之前bw=344/gap=96 → 总宽 1224，左框被切出画外，画面密度反而下降。
-  const bw = 298;
-  const gap = 96;
-  const y = 312;
+  const bw = 318;
+  const gap = 74;
+  const y = 330;
   const x0 = 640 - (bw * items.length + gap * (items.length - 1)) / 2 + bw / 2;
   const arrow = drawOn(N - IN, BEAT.DRAW_ON);
   return (
     <>
       <Svg>
         {items.slice(0, -1).map((it, i) => (
-          <LineArrow key={`a${it.id}`} x1={x0 + i * (bw + gap) + bw / 2 + 14} y1={y} x2={x0 + (i + 1) * (bw + gap) - bw / 2 - 14} y2={y} progress={arrow} color={GREY_MID} width={2.5} head={11} />
+          <LineArrow key={`a${it.id}`} x1={x0 + i * (bw + gap) + bw / 2 + 14} y1={y} x2={x0 + (i + 1) * (bw + gap) - bw / 2 - 14} y2={y} progress={arrow} color={GREY_MID} width={3} head={11} />
         ))}
       </Svg>
       {items.map((it, i) => {
@@ -275,26 +315,28 @@ export function Pipeline3({plan, N, recipe}) {
         return (
           <div key={it.id}>
             <SoftIn N={N} f0={it.f0}>
-              <div style={{position: "absolute", inset: 0, opacity: 1 - 0.45 * isPast(i, marksOf(plan, st), N)}}>
-                <Box x={cx - bw / 2} y={y - 92} w={bw} h={184} border={k[i] > 0.5 ? PURPLE : GREY} radius={14} glow={k[i] > 0.5} bloom={k[i] <= 0.5} />
+              <div style={{position: "absolute", inset: 0, opacity: 1 - 0.45 * isPast(i, marksOf(plan, st), N, plan.focusSlots)}}>
+                <Box x={cx - bw / 2} y={y - 115} w={bw} h={230} border={k[i] > 0.5 ? PURPLE : GREY} radius={14} glow={k[i] > 0.5} bloom={k[i] <= 0.5} />
                 {/*步骤徽章：序号压在左上角，给这一镜一个可读的「走到第几步」。*/}
-                <div style={{...abs(cx - bw / 2 + 16, y - 76, 32, 32), boxSizing: "border-box", borderRadius: 17, background: "#000", border: `2px solid ${k[i] > 0.5 ? PURPLE : GREY}`, opacity: softOp(N - it.f0 - 6, 8)}}>
-                  <CText cx={16} cy={16} size={19} weight={800} color={k[i] > 0.5 ? WHITE : GREY} dy={-1}>{i + 1}</CText>
+                <div style={{...abs(cx - bw / 2 + 16, y - 99, 36, 36), boxSizing: "border-box", borderRadius: 19, background: "#000", border: `2px solid ${k[i] > 0.5 ? PURPLE : GREY}`, opacity: softOp(N - it.f0 - 6, 8)}}>
+                  <CText cx={18} cy={18} size={21} weight={800} color={k[i] > 0.5 ? WHITE : GREY} dy={-1}>{i + 1}</CText>
                 </div>
-                <div style={{...abs(cx - bw / 2 + 54, y - 56, 72, 72), display: "flex", alignItems: "center", justifyContent: "center"}}>
-                  <Glyph kind={it.icon} cx={36} cy={36} s={68} active={k[i] > 0.5} reveal={1} />
+                {/*框内四带：图标(-72..20) / 标签(24..61) / 副行(62..98) / 进度条(104..112)，互不相压。*/}
+                <div style={{...abs(cx - bw / 2 + 48, y - 72, 92, 92), display: "flex", alignItems: "center", justifyContent: "center"}}>
+                  <Glyph kind={it.icon} cx={46} cy={46} s={88} active={k[i] > 0.5} reveal={1} />
                 </div>
-                <Label x={cx - bw / 2 + 24} y={y + 8} size={30} color={k[i] > 0.5 ? WHITE : GREY_LIGHT} maxW={bw - 48}>{it.text}</Label>
+                <Label x={cx - bw / 2 + 24} y={y + 24} size={32} color={k[i] > 0.5 ? WHITE : GREY_LIGHT} maxW={bw - 48}>{it.text}</Label>
                 {/*副行：这一格到底做什么。recipe 用 stage.subs 提供；缺省就不画，
                     免得为了凑密度塞占位文字 —— 那是另一种假的丰富。*/}
                 {st.subs?.[i] ? (
-                  <TechSub cx={cx} cy={y + 52} hud={false}>{st.subs[i]}</TechSub>
+                  <TechSub cx={cx} cy={y + 80} size={30} hud={false}>{st.subs[i]}</TechSub>
                 ) : null}
-                {/*格内进度条：随入场推进，给静态版面一件持续动作。*/}
-                <div style={{...abs(cx - bw / 2 + 24, y + 76, (bw - 48) * clamp01((N - it.f0) / 26), 5), background: k[i] > 0.5 ? PURPLE : GREY, opacity: 0.9}} />
+                {/*格内进度条：随入场推进，给静态版面一件持续动作；底轨常亮，进度段紫色。*/}
+                <div style={{...abs(cx - bw / 2 + 24, y + 104, bw - 48, 8), background: GREY, opacity: 0.85}} />
+                <div style={{...abs(cx - bw / 2 + 24, y + 104, (bw - 48) * clamp01((N - it.f0) / 26), 8), background: k[i] > 0.5 ? PURPLE_LIGHT : PURPLE, opacity: 0.95}} />
               </div>
             </SoftIn>
-            {i < items.length - 1 ? <Track x1={cx + bw / 2 + 10} x2={cx + bw + gap - 10} y={y + 52} N={N} f0={it.f0 + 10} color={k[i] > 0.5 ? PURPLE_LIGHT : GREY_LINE} /> : null}
+            {i < items.length - 1 ? <Track x1={cx + bw / 2 + 10} x2={cx + bw + gap - 10} y={y + 66} N={N} f0={it.f0 + 10} color={k[i] > 0.5 ? PURPLE_LIGHT : GREY_LINE} /> : null}
           </div>
         );
       })}
@@ -309,7 +351,7 @@ export function CauseChain({plan, N, recipe}) {
   const IN = entryOf(plan, st);
   const items = plan.items;
   const marks = marksOf(plan, st);
-  const k = focusWalk(marks, N);
+  const k = focusWalk(marks, N, plan.focusSlots);
   const x = 200;
   const w = 880;
   const top = 200;
@@ -327,7 +369,7 @@ export function CauseChain({plan, N, recipe}) {
         return (
           <div key={it.id}>
             <SoftIn N={N} f0={it.f0}>
-              <div style={{position: "absolute", inset: 0, opacity: 1 - 0.45 * isPast(i, marks, N)}}>
+              <div style={{position: "absolute", inset: 0, opacity: 1 - 0.45 * isPast(i, marks, N, plan.focusSlots)}}>
                 <Box x={x} y={y} w={w} h={76} border={k[i] > 0.5 ? PURPLE : GREY} radius={10} bloom={k[i] <= 0.5} />
                 <div style={{...abs(x + 20, y + 8, 60, 60), display: "flex", alignItems: "center", justifyContent: "center"}}>
                   <Glyph kind={it.icon} cx={30} cy={30} s={56} active={k[i] > 0.5} reveal={1} />
@@ -348,40 +390,47 @@ export function CiteSide({plan, N, recipe}) {
   const st = recipe.stage;
   const IN = entryOf(plan, st);
   const items = plan.items;
+  // 焦点也走这一镜：主张占槽 0，来源卡依次占 1..n。铺满整镜的拍表让「主张 ↔ 出处」一路交接，
+  // 主体框（430×150 / 400×78）整块换色 + dim 是这一镜的大面积步进变化来源。
+  const marks = marksOf(plan, st);
+  const k = focusWalk(marks, N, plan.focusSlots);
   const main = items[0];
   const rest = items.slice(1);
   const cardW = 400;
   const cardH = 78;
   const top = 220;
   const gap = 108;
+  const mainHot = k[0] > 0.5;
   return (
     <>
       {main ? (
         <SoftIn N={N} f0={main.f0}>
-          <div style={{position: "absolute", inset: 0}}>
-            <Box x={110} y={280} w={430} h={150} border={PURPLE} radius={14} glow />
+          <div style={{position: "absolute", inset: 0, opacity: 1 - 0.35 * isPast(0, marks, N, plan.focusSlots)}}>
+            <Box x={110} y={280} w={430} h={150} border={mainHot ? PURPLE : GREY} radius={14} glow={mainHot} bloom={!mainHot} />
             <div style={{...abs(134, 300, 92, 92), display: "flex", alignItems: "center", justifyContent: "center"}}>
-              <Glyph kind={st.main_icon || "shield"} cx={46} cy={46} s={86} active reveal={1} />
+              <Glyph kind={st.main_icon || "shield"} cx={46} cy={46} s={86} active={mainHot} reveal={1} />
             </div>
-            <Label x={246} y={344} size={30} color={WHITE} maxW={270}>{main.text}</Label>
-            <Track x1={552} y1={356} x2={686} y2={356} N={N} f0={main.f0 + 12} />
+            <Label x={246} y={344} size={30} color={mainHot ? WHITE : GREY_LIGHT} maxW={270}>{main.text}</Label>
+            <Track x1={552} y1={356} x2={686} y2={356} N={N} f0={main.f0 + 12} color={mainHot ? PURPLE_LIGHT : GREY_LINE} />
           </div>
         </SoftIn>
       ) : null}
       {rest.map((it, i) => {
         const y = top + i * gap;
+        const idx = i + 1;
+        const hot = k[idx] > 0.5;
         return (
           <div key={it.id}>
             <SoftIn N={N} f0={it.f0}>
-              <div style={{position: "absolute", inset: 0, opacity: softOp(N - it.f0, BEAT.SOFT_IN)}}>
-                <Box x={700} y={y} w={cardW} h={cardH} border={GREY} radius={10} />
+              <div style={{position: "absolute", inset: 0, opacity: softOp(N - it.f0, BEAT.SOFT_IN) * (1 - 0.35 * isPast(idx, marks, N, plan.focusSlots))}}>
+                <Box x={700} y={y} w={cardW} h={cardH} border={hot ? PURPLE : GREY} radius={10} glow={hot} bloom={!hot} />
                 <div style={{...abs(716, y + 15, 48, 48), display: "flex", alignItems: "center", justifyContent: "center"}}>
-                  <Glyph kind={st.cite_icons?.[i] || it.icon || "doc"} cx={24} cy={24} s={44} reveal={1} />
+                  <Glyph kind={st.cite_icons?.[i] || it.icon || "doc"} cx={24} cy={24} s={44} active={hot} reveal={1} />
                 </div>
-                <Label x={782} y={y + 39 - 15} size={27} color={GREY_LIGHT} maxW={cardW - 104}>{it.text}</Label>
+                <Label x={782} y={y + 39 - 15} size={27} color={hot ? WHITE : GREY_LIGHT} maxW={cardW - 104}>{it.text}</Label>
               </div>
             </SoftIn>
-            <ChainArrows points={[[545, 356], [640, y + cardH / 2], [700, y + cardH / 2]]} N={N} f0={it.f0 - 6} per={7} color={GREY_MID} width={2} head={8} />
+            <ChainArrows points={[[545, 356], [640, y + cardH / 2], [700, y + cardH / 2]]} N={N} f0={it.f0 - 6} per={7} color={hot ? PURPLE_LIGHT : GREY_MID} width={2} head={8} />
           </div>
         );
       })}
@@ -396,7 +445,7 @@ export function Terminal({plan, N, recipe}) {
   const IN = entryOf(plan, st);
   const items = plan.items;
   const marks = marksOf(plan, st);
-  const k = focusWalk(marks, N);
+  const k = focusWalk(marks, N, plan.focusSlots);
   const x = 150;
   const y = 200;
   const w = 980;
@@ -423,7 +472,7 @@ export function Terminal({plan, N, recipe}) {
         const shown = Math.max(0, Math.min(String(it.text).length, typed - i * 34));
         return (
           <div key={it.id}>
-            <div style={{...abs(x + 30, ry, w - 60, rowH - 6), display: "flex", alignItems: "center", opacity: softOp(n, BEAT.SOFT_IN) * (1 - 0.4 * isPast(i, marks, N))}}>
+            <div style={{...abs(x + 30, ry, w - 60, rowH - 6), display: "flex", alignItems: "center", opacity: softOp(n, BEAT.SOFT_IN) * (1 - 0.4 * isPast(i, marks, N, plan.focusSlots))}}>
               <div style={{width: 16, height: 16, flex: "0 0 16px", borderRadius: 8, background: k[i] > 0.5 ? PURPLE_LIGHT : GREY_MID, marginRight: 20}} />
               <MonoText x={66} y={9} size={25} color={k[i] > 0.5 ? WHITE : GREY_LIGHT}>{String(it.text).slice(0, shown)}</MonoText>
             </div>
@@ -442,21 +491,33 @@ export function Orbit({plan, N, recipe}) {
   const IN = entryOf(plan, st);
   const items = plan.items.filter((it) => it.kind !== "flow");
   const marks = marksOf(plan, st);
-  const k = focusWalk(marks, N);
+  const k = focusWalk(marks, N, plan.focusSlots);
   const cx = st.cx ?? 640;
   const cy = st.cy ?? 380;
   const rx = st.rx ?? 400;
   const ry = st.ry ?? 178;
   const size = Number(recipe.hero_size) || 210;
   const spin = (N - IN) * 1.6;
+  // 连线一律从主角光晕边缘起画：穿过主角的线会透过半透明 HeroGlow 露出来。
+  const r0 = size / 2 + 12;
+  const spinA = (spin * Math.PI) / 180;
+  const spinX = Math.cos(spinA) * rx;
+  const spinY = Math.sin(spinA) * ry;
+  const spinLen = Math.hypot(spinX, spinY);
   return (
     <>
       <Svg>
         <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="none" stroke={GREY_LINE} strokeWidth={2} strokeDasharray="18 12" opacity={softOp(N - IN, BEAT.FADE_IN)} />
-        <LineArrow x1={cx} y1={cy} x2={cx + Math.cos((spin * Math.PI) / 180) * rx} y2={cy + Math.sin((spin * Math.PI) / 180) * ry} progress={1} color={Rgba(PURPLE_LIGHT, 0.5)} width={2} head={0} />
+        <LineArrow x1={cx + (spinX / spinLen) * r0} y1={cy + (spinY / spinLen) * r0} x2={cx + spinX} y2={cy + spinY} progress={1} color={Rgba(PURPLE_LIGHT, 0.5)} width={2} head={0} />
         {items.map((it, i) => {
           const a = (Math.PI * 2 * i) / Math.max(1, items.length);
-          return <LineArrow key={`l${it.id}`} x1={cx} y1={cy} x2={cx + Math.cos(a) * rx} y2={cy + Math.sin(a) * ry} progress={drawOn(N - IN, BEAT.DRAW_ON)} color={k[i] > 0.5 ? PURPLE_LIGHT : GREY_LINE} width={k[i] > 0.5 ? 2.5 : 1.8} head={0} opacity={0.3 + 0.5 * k[i]} />;
+          const dx = Math.cos(a) * rx;
+          const dy = Math.sin(a) * ry;
+          const len = Math.hypot(dx, dy);
+          const r1 = Math.max(r0 + 2, len - 50);
+          const ux = dx / len;
+          const uy = dy / len;
+          return <LineArrow key={`l${it.id}`} x1={cx + ux * r0} y1={cy + uy * r0} x2={cx + ux * r1} y2={cy + uy * r1} progress={drawOn(N - IN, BEAT.DRAW_ON)} color={k[i] > 0.5 ? PURPLE_LIGHT : GREY_LINE} width={k[i] > 0.5 ? 2.5 : 1.8} head={0} opacity={0.3 + 0.5 * k[i]} />;
         })}
       </Svg>
       <Core cx={cx} cy={cy} size={size} N={N} f0={IN} icon={st.icon} label={st.label} />
@@ -474,7 +535,7 @@ export function SplitRows({plan, N, recipe}) {
   const IN = entryOf(plan, st);
   const items = plan.items;
   const marks = marksOf(plan, st);
-  const k = focusWalk(marks, N);
+  const k = focusWalk(marks, N, plan.focusSlots);
   const left = items.filter((_, i) => i % 2 === 0);
   const right = items.filter((_, i) => i % 2 === 1);
   const colW = 480;
@@ -496,16 +557,21 @@ export function SplitRows({plan, N, recipe}) {
       ].map(({list, x, off}) =>
         list.map((it, i) => {
           const idx = i * 2 + off;
-          const focus = off === (st.winner ?? 1) ? 1 : 0;
+          // ⚠ 以前 focus 只由 winner 列恒定决定（off === winner ? 1 : 0），不消费 focusWalk 的 k[idx]：
+          //   焦点拍表铺满整镜后，紫色从未在行间交接，isPast 的 0.4 级 dim 又只有 ~0.2 的灰度差
+          //   （低于 still_thr 0.35）→ 那一镜连着 4.5 s 零变化，motion_check 判「真静」。
+          //   照 CompareTable 的写法：winner 列是 base 底色，每一拍再把当前行整块翻成紫 + 亮灯。
+          const base = off === (st.winner ?? 1);
+          const hot = k[idx] > 0.5;
           return (
             <div key={it.id}>
               <SoftIn N={N} f0={it.f0}>
-                <div style={{position: "absolute", inset: 0, opacity: 1 - 0.4 * isPast(idx, marks, N)}}>
-                  <Box x={x} y={top + i * rowH} w={colW} h={rowH - 14} border={focus ? PURPLE : GREY} radius={10} glow={focus} bloom={!focus} />
+                <div style={{position: "absolute", inset: 0, opacity: 1 - 0.4 * isPast(idx, marks, N, plan.focusSlots)}}>
+                  <Box x={x} y={top + i * rowH} w={colW} h={rowH - 14} border={hot ? PURPLE_LIGHT : base ? PURPLE : GREY} radius={10} glow={hot} bloom={!base && !hot} />
                   <div style={{...abs(x + 18, top + i * rowH + 12, 48, 48), display: "flex", alignItems: "center", justifyContent: "center"}}>
-                    <Glyph kind={it.icon} cx={24} cy={24} s={44} active={focus} reveal={1} />
+                    <Glyph kind={it.icon} cx={24} cy={24} s={44} active={base || hot} reveal={1} />
                   </div>
-                  <Label x={x + 86} y={top + i * rowH + 35 - 15} size={28} color={focus ? WHITE : GREY_LIGHT} maxW={colW - 110}>{it.text}</Label>
+                  <Label x={x + 86} y={top + i * rowH + 35 - 15} size={28} color={base || hot ? WHITE : GREY_LIGHT} maxW={colW - 110}>{it.text}</Label>
                 </div>
               </SoftIn>
             </div>
@@ -523,7 +589,7 @@ export function Ballot({plan, N, recipe}) {
   const IN = entryOf(plan, st);
   const items = plan.items;
   const marks = marksOf(plan, st);
-  const k = focusWalk(marks, N);
+  const k = focusWalk(marks, N, plan.focusSlots);
   const pick = st.pick ?? items.length - 1;
   const cw = 300;
   const gap = 46;
@@ -535,7 +601,7 @@ export function Ballot({plan, N, recipe}) {
       {items.map((it, i) => {
         const cx = x0 + i * (cw + gap);
         const chosen = i === pick;
-        const op = 1 - 0.4 * isPast(i, marks, N);
+        const op = 1 - 0.4 * isPast(i, marks, N, plan.focusSlots);
         return (
           <div key={it.id}>
             <SoftIn N={N} f0={it.f0}>
@@ -568,11 +634,11 @@ export function LayerStack({plan, N, recipe}) {
   const IN = entryOf(plan, st);
   const items = plan.items;
   const marks = marksOf(plan, st);
-  const k = focusWalk(marks, N);
+  const k = focusWalk(marks, N, plan.focusSlots);
   const w = 720;
-  const h = 74;
-  const gap = 22;
-  const top = 224;
+  const h = 68;
+  const gap = 16;
+  const top = 216;
   const x0 = 200;
   const step = st.indent ?? 92;
   return (
@@ -586,9 +652,9 @@ export function LayerStack({plan, N, recipe}) {
         return (
           <div key={it.id}>
             <SoftIn N={N} f0={it.f0}>
-              <div style={{position: "absolute", inset: 0, opacity: 1 - 0.4 * isPast(i, marks, N)}}>
+              <div style={{position: "absolute", inset: 0, opacity: 1 - 0.4 * isPast(i, marks, N, plan.focusSlots)}}>
                 <Box x={x} y={y} w={w} h={h} border={k[i] > 0.5 ? PURPLE : GREY} radius={10} glow={k[i] > 0.5} bloom={k[i] <= 0.5} />
-                <div style={{...abs(x + 20, y + 13, 48, 48), display: "flex", alignItems: "center", justifyContent: "center"}}>
+                <div style={{...abs(x + 20, y + 10, 48, 48), display: "flex", alignItems: "center", justifyContent: "center"}}>
                   <Glyph kind={it.icon} cx={24} cy={24} s={44} active={k[i] > 0.5} reveal={1} />
                 </div>
                 <Label x={x + 88} y={y + h / 2 - 16} size={29} color={k[i] > 0.5 ? WHITE : GREY_LIGHT} maxW={w - 116}>{it.text}</Label>
@@ -597,6 +663,7 @@ export function LayerStack({plan, N, recipe}) {
           </div>
         );
       })}
+      {/* 行高×行数收得很紧（4 行末行底 = 216+3*84+68 = 536），caption 固定 560 不再压进末行 */}
       <Note cx={640} cy={AREA.b - 60}>{st.caption}</Note>
     </>
   );
@@ -608,7 +675,7 @@ export function CompareTable({plan, N, recipe}) {
   const IN = entryOf(plan, st);
   const items = plan.items;
   const marks = marksOf(plan, st);
-  const k = focusWalk(marks, N);
+  const k = focusWalk(marks, N, plan.focusSlots);
   const winner = st.winner ?? 1;
   const cw = 300;
   const gap = 40;
@@ -630,21 +697,27 @@ export function CompareTable({plan, N, recipe}) {
               <Box x={0} y={0} w={cw} h={56} border={side === winner ? PURPLE : GREY} radius={10} glow={side === winner} bloom={side !== winner} />
               <CText cx={cw / 2} cy={28} size={28} weight={800} color={side === winner ? WHITE : GREY_LIGHT}>{side === 0 ? st.left_label : st.right_label}</CText>
             </div>
-            {Array.from({length: rows}, (_, r) => items[r * 2 + side]).map((it, r) =>
-              it ? (
+            {Array.from({length: rows}, (_, r) => items[r * 2 + side]).map((it, r) => {
+              if (!it) return null;
+              // 逐行焦点：item 的下标就是槽号（行内 = r*2+side）。整行框换色 + dim 是该镜的大面积步进变化。
+              const idx = r * 2 + side;
+              const base = side === winner;
+              const hot = k[idx] > 0.5;
+              return (
                 <div key={it.id}>
                   <SoftIn N={N} f0={it.f0}>
-                    <div style={{...abs(cx - cw / 2, top + 66 + r * rowH, cw, rowH - 12), display: "flex", alignItems: "center", opacity: softOp(N - it.f0, BEAT.SOFT_IN) * (side === winner ? 1 : 0.82)}}>
-                      <Box x={0} y={0} w={cw} h={rowH - 12} border={side === winner ? PURPLE : GREY} radius={8} bloom={side !== winner} />
+                    <div style={{...abs(cx - cw / 2, top + 66 + r * rowH, cw, rowH - 12), display: "flex", alignItems: "center", opacity: softOp(N - it.f0, BEAT.SOFT_IN) * (base ? 1 : 0.82) * (1 - 0.3 * isPast(idx, marks, N, plan.focusSlots))}}>
+                      <Box x={0} y={0} w={cw} h={rowH - 12} border={hot ? PURPLE_LIGHT : base ? PURPLE : GREY} radius={8} glow={hot} bloom={!base && !hot} />
                       <div style={{width: 44, height: 44, flex: "0 0 44px", marginLeft: 16}}>
-                        <Glyph kind={it.icon} cx={22} cy={22} s={40} active={side === winner} reveal={1} />
+                        <Glyph kind={it.icon} cx={22} cy={22} s={40} active={base || hot} reveal={1} />
                       </div>
-                      <Label x={54} y={16} size={27} color={side === winner ? WHITE : GREY_LIGHT} maxW={cw - 130}>{it.text}</Label>
+                      {/* 图标盒到 60，文字从 62 起；maxW 放宽到 cw-76，Label 内置 fitSize 自动缩号 */}
+                      <Label x={62} y={16} size={27} color={base || hot ? WHITE : GREY_LIGHT} maxW={cw - 76}>{it.text}</Label>
                     </div>
                   </SoftIn>
                 </div>
-              ) : null,
-            )}
+              );
+            })}
           </React.Fragment>
         );
       })}
@@ -659,41 +732,54 @@ export function Reshape({plan, N, recipe}) {
   const IN = entryOf(plan, st);
   const items = plan.items;
   const marks = marksOf(plan, st);
-  const k = focusWalk(marks, N);
+  const k = focusWalk(marks, N, plan.focusSlots);
   const cy = 342;
   const lx = 336;
   const rx = 824;
-  const s = 176;
+  const s = 208;
   const press = clamp01((N - IN - 26) / 30);
-  const shrink = 1 - 0.4 * press;
+  const shrink = 1 - 0.3 * press;
   const grow = 0.55 + 0.45 * press;
+  // 形变在 IN+26…IN+56 就演完了，之后只剩呼吸 —— 焦点拍表把「原来的形 ↔ 变成的形 ↔ 结果」铺满整镜，
+  // 两个 208×208 的大形整块换色 / dim 就是这一镜后半段的大面积步进变化。
+  const fromHot = k[0] > 0.5;
+  const toHot = k[1] > 0.5;
   // ⚠ 整段只用**相对各自 wrapper 的坐标**。
   //   这里原来把 wrapper 定位到 (lx-s/2, cy-s/2)，里面的 Box / Glyph 又各写一遍同样的绝对值，
   //   等于偏移两次：两个形被推到画外、图元与文字散在别处，画面上只剩一根箭头。
   //   「wrapper 已定位，内部就用相对坐标」这条现在由 scripts/verify-relative-coords.mjs 静态守住。
   return (
     <>
-      <div style={{...abs(lx - s / 2, cy - s / 2, s, s), transform: `scale(${shrink.toFixed(3)})`, transformOrigin: `${lx}px ${cy}px`, opacity: 1 - 0.35 * press}}>
-        <Box x={0} y={0} w={s} h={s} border={GREY} radius={12} />
-        <Glyph kind={st.from_icon || items[0]?.icon || "doc"} cx={s / 2} cy={s / 2 - 16} s={96} reveal={clamp01((N - IN) / BEAT.DRAW_ON)} />
-        {st.from_sub ? <CText cx={s / 2} cy={s / 2 + 54} size={24} weight={600} color={GREY} maxW={s - 28}>{st.from_sub}</CText> : null}
-        <div style={{position: 'absolute', left: 22, top: s - 30, width: s - 44, height: 4, background: GREY, opacity: 0.55}} />
+      <div style={{...abs(lx - s / 2, cy - s / 2, s, s), transform: `scale(${shrink.toFixed(3)})`, transformOrigin: `${lx}px ${cy}px`, opacity: (1 - 0.35 * press) * (1 - 0.4 * isPast(0, marks, N, plan.focusSlots))}}>
+        <Box x={0} y={0} w={s} h={s} border={fromHot ? PURPLE_LIGHT : GREY} radius={12} glow={fromHot} />
+        <Glyph kind={st.from_icon || items[0]?.icon || "doc"} cx={s / 2} cy={s / 2 - 16} s={112} active={fromHot} reveal={clamp01((N - IN) / BEAT.DRAW_ON)} />
+        <div style={{position: 'absolute', left: 22, top: s - 30, width: s - 44, height: 4, background: fromHot ? PURPLE_LIGHT : GREY, opacity: 0.55}} />
         <div style={{position: 'absolute', left: 22, top: s + 12, width: s}}>
-          <CText cx={s / 2} cy={20} size={32} weight={800} color={GREY_LIGHT} maxW={s}>{items[0]?.text}</CText>
+          <CText cx={s / 2} cy={20} size={32} weight={800} color={fromHot ? WHITE : GREY_LIGHT} maxW={s}>{items[0]?.text}</CText>
         </div>
+        {/*副标放形下（标签再下一行）：形是圆角矩形/圆，副标放形内底部必然压到描边*/}
+        {st.from_sub ? (
+          <div style={{position: 'absolute', left: 0, top: s + 56, width: s}}>
+            <CText cx={s / 2} cy={13} size={24} weight={600} color={GREY} maxW={s + 40}>{st.from_sub}</CText>
+          </div>
+        ) : null}
       </div>
       <Svg>
         <LineArrow x1={lx + s / 2 + 30} y1={cy} x2={rx - s / 2 - 30} y2={cy} progress={drawOn(N - IN - 6, BEAT.DRAW_ON)} color={PURPLE_LIGHT} width={3} head={13} glow />
       </Svg>
       <Track x1={lx + s / 2 + 30} x2={rx - s / 2 - 30} y={cy + 62} N={N} f0={IN + 10} />
-      <div style={{...abs(rx - s / 2, cy - s / 2, s, s), transform: `scale(${grow.toFixed(3)})`, transformOrigin: `${rx}px ${cy}px`}}>
-        <Box x={0} y={0} w={s} h={s} border={PURPLE} radius={s / 2} glow />
-        <Glyph kind={st.to_icon || items[1]?.icon || "lock"} cx={s / 2} cy={s / 2 - 16} s={96} active reveal={clamp01((N - IN - 20) / BEAT.DRAW_ON)} />
-        {st.to_sub ? <CText cx={s / 2} cy={s / 2 + 54} size={24} weight={600} color={GREY_LIGHT} maxW={s - 40}>{st.to_sub}</CText> : null}
+      <div style={{...abs(rx - s / 2, cy - s / 2, s, s), transform: `scale(${(grow * (1 + 0.05 * k[1])).toFixed(3)})`, transformOrigin: `${rx}px ${cy}px`, opacity: 1 - 0.35 * isPast(1, marks, N, plan.focusSlots)}}>
+        <Box x={0} y={0} w={s} h={s} border={toHot ? PURPLE_LIGHT : PURPLE} radius={s / 2} glow />
+        <Glyph kind={st.to_icon || items[1]?.icon || "lock"} cx={s / 2} cy={s / 2 - 16} s={112} active reveal={clamp01((N - IN - 20) / BEAT.DRAW_ON)} />
         <div style={{position: 'absolute', left: 30, top: s - 30, width: s - 60, height: 4, background: PURPLE, opacity: 0.9}} />
         <div style={{position: 'absolute', left: 0, top: s + 12, width: s}}>
           <CText cx={s / 2} cy={20} size={32} weight={800} color={WHITE} maxW={s}>{items[1]?.text}</CText>
         </div>
+        {st.to_sub ? (
+          <div style={{position: 'absolute', left: 0, top: s + 56, width: s}}>
+            <CText cx={s / 2} cy={13} size={24} weight={600} color={GREY_LIGHT} maxW={s + 40}>{st.to_sub}</CText>
+          </div>
+        ) : null}
       </div>
       {items[2] ? (
         <SoftIn N={N} f0={items[2].f0}>
@@ -714,7 +800,7 @@ export function Ladder({plan, N, recipe}) {
   const IN = entryOf(plan, st);
   const items = plan.items;
   const marks = marksOf(plan, st);
-  const k = focusWalk(marks, N);
+  const k = focusWalk(marks, N, plan.focusSlots);
   const lx = 300;
   const rx = 980;
   const top = 208;
@@ -732,7 +818,7 @@ export function Ladder({plan, N, recipe}) {
       {items.map((it, i) => (
         <div key={it.id}>
           <SoftIn N={N} f0={it.f0}>
-            <div style={{...abs(lx + 26, top + i * gap - 28, rx - lx - 52, 56), display: "flex", alignItems: "center", opacity: 1 - 0.4 * isPast(i, marks, N)}}>
+            <div style={{...abs(lx + 26, top + i * gap - 28, rx - lx - 52, 56), display: "flex", alignItems: "center", opacity: 1 - 0.4 * isPast(i, marks, N, plan.focusSlots)}}>
               <div style={{width: 46, height: 46, flex: "0 0 46px"}}>
                 <Glyph kind={it.icon} cx={23} cy={23} s={42} active={k[i] > 0.5} reveal={1} />
               </div>
