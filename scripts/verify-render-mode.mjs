@@ -44,7 +44,11 @@ const workflows = path.join(".github", "workflows");
 const workflowFiles = fs.existsSync(workflows)
   ? fs.readdirSync(workflows).filter((file) => /\.(yml|yaml)$/i.test(file))
   : [];
-assert.deepEqual(workflowFiles, [], "GitHub Actions workflow YAML files should remain absent in this temporary CI-disabled branch");
+assert.ok(workflowFiles.includes("verify-fast.yml"), "PR/main fast verification workflow must be present");
+const fastWorkflow = read(path.join(workflows, "verify-fast.yml"));
+assert.match(fastWorkflow, /pull_request:/, "fast verification must run on pull requests");
+assert.match(fastWorkflow, /branches:\s*\[main\]/, "fast verification must run on main pushes");
+assert.match(fastWorkflow, /npm run verify:fast/, "fast verification workflow must execute the real fast gate");
 
 console.log("render mode PASS", JSON.stringify({
   activeRatios: project.target_ratios,
