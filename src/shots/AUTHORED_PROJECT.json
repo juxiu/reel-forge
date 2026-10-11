@@ -4,5 +4,9 @@
   "source_urls": [
     "https://www.rfc-editor.org/rfc/rfc9530.html"
   ],
-  "note": "The checked-in src/shots/G*/SC*.jsx and group stage modules are curated for this exact sample only."
+  "note": "The checked-in src/shots/G*/SC*.jsx and group stage modules are curated for this exact sample only.",
+  "language": "zh",
+  "target_ratios": [
+    "16:9"
+  ]
 }
