@@ -3,12 +3,34 @@ import path from "node:path";
 import {maxShotsPerGroup} from "../src/build/limits.mjs";
 
 const ir = JSON.parse(fs.readFileSync("fixtures/render-ir-16x9.json", "utf8"));
+const project = JSON.parse(fs.readFileSync("fixtures/project.json", "utf8"));
+if (!project.project_id || project.project_id !== ir.project_id) {
+  throw new Error("project identity mismatch: fixtures/project.json and render IR must identify the same project");
+}
 const maxPerGroup = maxShotsPerGroup();
-// 正整数校验原来在 :6（本地写的一份），现在由 limits.mjs 的 maxShotsPerGroup() 统一抛。
-
 const root = "src/shots";
-const groups = [];
+const authoredProjectFile = path.join(root, "AUTHORED_PROJECT.json");
+const authoredProject = fs.existsSync(authoredProjectFile)
+  ? JSON.parse(fs.readFileSync(authoredProjectFile, "utf8"))
+  : null;
 
+// Reuse the checked-in authored pack only for its exact topic/source identity.
+// Otherwise route to IR-driven fallback wrappers instead of silently importing a previous topic.
+const authoredPackMatches = Boolean(
+  authoredProject &&
+  authoredProject.project_id === project.project_id &&
+  authoredProject.request === project.request &&
+  JSON.stringify(authoredProject.source_urls || []) === JSON.stringify(project.source_urls || [])
+);
+function explicitlyTaggedForProject(file) {
+  if (!fs.existsSync(file)) return false;
+  const header = fs.readFileSync(file, "utf8").split(/\r?\n/).slice(0, 8).join("\n");
+  return header.includes("@reel-forge-project: " + project.project_id);
+}
+
+const groups = [];
+let authoredCount = 0;
+let fallbackCount = 0;
 for (let i = 0; i < ir.scenes.length; i += maxPerGroup) {
   const id = "G" + String(groups.length + 1);
   const scenes = ir.scenes.slice(i, i + maxPerGroup);
@@ -17,73 +39,68 @@ for (let i = 0; i < ir.scenes.length; i += maxPerGroup) {
   const imports = [];
   const exports = [];
   const entries = [];
+  const sceneSources = [];
 
   for (let j = 0; j < scenes.length; j++) {
     const scene = scenes[j];
     const shotId = "SC" + String(i + j + 1).padStart(2, "0");
     const shotFile = path.join(dir, shotId + ".jsx");
+    const authored = fs.existsSync(shotFile) &&
+      (authoredPackMatches || explicitlyTaggedForProject(shotFile));
+    const componentFile = authored ? shotId + ".jsx" : "fallback-" + shotId + ".jsx";
 
-    if (!fs.existsSync(shotFile)) {
-      fs.writeFileSync(
-        shotFile,
-        [
-          'import React from "react";',
-          'import {ExplainerShot} from "../Shot.jsx";',
-          'export const SHOT_RECIPE = { shot_id: "' + shotId + '", variant: "' + (scene.variant || "generic") + '", settle_frames: 30 };',
-          'export function ' + shotId + '({scene}) { return <ExplainerShot scene={scene} recipe={SHOT_RECIPE} />; }',
-          "",
-        ].join("\n"),
-      );
+    if (authored) {
+      authoredCount++;
+    } else {
+      fallbackCount++;
+      fs.writeFileSync(path.join(dir, componentFile), [
+        "// Generated fallback for project " + JSON.stringify(project.project_id) + ".",
+        "// Active scene data supplies copy/variant; stale authored files are intentionally not imported.",
+        'import React from "react";',
+        'import {ExplainerShot} from "../Shot.jsx";',
+        'export const SHOT_RECIPE = { shot_id: ' + JSON.stringify(shotId) + ', variant: ' + JSON.stringify(scene.variant || "generic") + ', settle_frames: 30 };',
+        'export function ' + shotId + '({scene}) { return <ExplainerShot scene={scene} recipe={SHOT_RECIPE} />; }',
+        "",
+      ].join("\n"));
     }
 
-    imports.push('import {' + shotId + '} from "./' + shotId + '.jsx";');
-    exports.push('export {' + shotId + '} from "./' + shotId + '.jsx";');
-    entries.push('  "' + scene.id + '": ' + shotId + ',');
+    imports.push('import {' + shotId + '} from "./' + componentFile + '";');
+    exports.push('export {' + shotId + '} from "./' + componentFile + '";');
+    entries.push('  ' + JSON.stringify(scene.id) + ": " + shotId + ",");
+    sceneSources.push({scene_id: scene.id, shot_id: shotId, source: componentFile, mode: authored ? "authored" : "fallback"});
   }
 
-  fs.writeFileSync(
-    path.join(dir, "index.jsx"),
+  fs.writeFileSync(path.join(dir, "index.jsx"),
     imports.join("\n") + "\n" + exports.join("\n") + "\n\n" +
-      "export const SHOTS_" + id + " = {\n" + entries.join("\n") + "\n};\n",
-  );
+    "export const SHOTS_" + id + " = {\n" + entries.join("\n") + "\n};\n");
 
-  // BUILD_NOTES 是人 / build-agent 的构建记录：任务书要求往里写 motion_check 数字、主角尺寸、是否高光、
-  // 运镜次数（src/agents/task-brief.mjs 的 build-agent 规则）。旧写法每次 materialize 都**整篇重写**，
-  // 把那些记录抹掉；而它在全仓零读者（grep 确认），抹掉也没有任何东西变红 —— 见 agent-protocol §3.2 与 §8 第 5 条。
-  // 现在的口径：不存在才建，已存在只**追加**机器这一段。追加不毁内容，也不假装它是人写的。
-  // ⚠ 这一段仍然没有门守（BUILD_NOTES 零读者本身就是记录过的事实）；改这里请同步那两节。
   const notesFile = path.join(dir, "BUILD_NOTES.md");
-  const machine = "- " + id + " 由 scripts/materialize-shots.mjs 登记 " + scenes.length + " 镜："
-    + scenes.map((scene, n) => "SC" + String(i + n + 1).padStart(2, "0") + "(" + scene.id + ")").join(" ");
-  if (!fs.existsSync(notesFile)) fs.writeFileSync(notesFile, [
-    "# " + id + " 构建记录", "",
-    "镜头数：" + scenes.length, "",
-    "每个镜头独立组件，共用 ExplainerShot 图元；已有 authored scene 不会被覆盖（BUILD_NOTES 自身除外：它只追加）。", "",
-    "## 机器登记", machine,
-  ].join("\n") + "\n");
-  else fs.appendFileSync(notesFile, machine + "\n");
-
-  groups.push({id, scene_ids: scenes.map((scene) => scene.id), status: "generated"});
+  const machine = "- " + id + " 登记 " + scenes.length + " 镜：" +
+    sceneSources.map((entry) => entry.shot_id + "(" + entry.scene_id + ":" + entry.mode + ")").join(" ");
+  if (!fs.existsSync(notesFile)) {
+    fs.writeFileSync(notesFile, [
+      "# " + id + " 构建记录", "", "镜头数：" + scenes.length, "",
+      "活动镜头明确标记为 authored 或 fallback；未认证的旧主题镜头不会被静默导入。", "",
+      "## 机器登记", machine,
+    ].join("\n") + "\n");
+  } else {
+    fs.appendFileSync(notesFile, machine + "\n");
+  }
+  groups.push({id, scene_ids: scenes.map((scene) => scene.id), scene_sources: sceneSources, status: "generated"});
 }
 
 const registryImports = groups.map((group) =>
   'import * as ' + group.id + ' from "./' + group.id + '/index.jsx";'
 ).join("\n");
-
 const registryEntries = [];
 for (const group of groups) {
   for (const sceneId of group.scene_ids) {
     const number = Number(sceneId.split("-").at(-1));
-    registryEntries.push(
-      '  "' + sceneId + '": ' + group.id + '.SC' + String(number).padStart(2, "0") + ','
-    );
+    registryEntries.push('  ' + JSON.stringify(sceneId) + ": " + group.id + ".SC" + String(number).padStart(2, "0") + ',');
   }
 }
-
-fs.writeFileSync(
-  path.join(root, "registry.jsx"),
-  registryImports + "\n\nexport const SHOT_REGISTRY = {\n" +
-    registryEntries.join("\n") + "\n};\n",
-);
-
-console.log("shot materialization PASS", groups.length + " groups");
+fs.writeFileSync(path.join(root, "registry.jsx"),
+  registryImports + "\n\nexport const SHOT_REGISTRY = {\n" + registryEntries.join("\n") + "\n};\n");
+console.log("shot materialization PASS", JSON.stringify({
+  project_id: project.project_id, groups: groups.length, authored: authoredCount, fallback: fallbackCount,
+}));
