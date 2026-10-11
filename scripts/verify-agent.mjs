@@ -7,7 +7,7 @@ import {runNamedAgent, runNamedAgents} from "../src/agents/orchestrator.mjs";
 import {buildTaskBrief} from "../src/agents/task-brief.mjs";
 
 /**
- * Agent 层门禁：provider 的输入输出形态、信封三态、契约真不真、以及「agent 输出有没有消费者」这件事。
+ * Agent 层门禁：provider 的输入输出形态、信封三态、契约真不真、以及研究/导演评审是否被生产门消费。
  *
  * 为什么要有这一道：`src/agents/orchestrator.mjs` 与 `src/providers/agent/` 此前**没有任何测试**
  * （grep 确认 `runNamedAgent` 只出现在三个生产者里）。于是这几条只能靠读代码相信：
@@ -17,7 +17,7 @@ import {buildTaskBrief} from "../src/agents/task-brief.mjs";
  *   · 超时会杀子进程，而不是让 build-groups/qc 挂到永远。
  * 这里全部用本地临时脚本当真 provider 跑，不联网、不装东西、不渲染。
  *
- * ⚠ 第 3 节是**变更探测器**，不是质量门：它钉住的是「本文所述消费面为零」这个事实。
+ * 第 5 节钉住内容评审的唯一消费点；增删消费者时必须同步 docs/knowledge/agent-protocol.md §2。
  *    谁把 agent 输出接成了判定依据，它就红，并要求同步改 `docs/knowledge/agent-protocol.md` §2。
  */
 
@@ -154,7 +154,7 @@ check("批量在 strict 下逐条抛（错误信息保留角色名）", batchStr
 
 // ---- 5) 消费面静态核对（本文 §2 的事实，改了必须同步文档） ----
 const SELF = "scripts/verify-agent.mjs";
-const AGENT_OUTPUT_WRITERS = ["scripts/qc.mjs", "scripts/build-groups.mjs", "scripts/run-production.mjs", SELF];
+const AGENT_OUTPUT_WRITERS = ["scripts/qc.mjs", "scripts/build-groups.mjs", SELF];
 // 形状知情者：verify-contracts 会**读数组来校验信封形状**，但它不消费内容、不参与判定。
 // 允许它，但要把允许的理由钉死成一条断言：它必须还是那个 `each:"agent_reviews"` 的形状校验项。
 // 谁把它改成「按 agent 结论决定 PASS/FAIL」，这条先红，然后上面那条也会红。
