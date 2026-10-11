@@ -21,6 +21,8 @@ for (const name of ["length-language","narration-signoff","voiceover","pilot-pre
 }
 NODE
 fi
+# Deterministic director/source gate runs before any full-video render; high-risk shots need fingerprint-bound independent review.
+node scripts/preflight/validate-director.mjs
 mkdir -p artifacts/render artifacts/frames/16x9 artifacts/frames/9x16
 # 抽帧工具缺席就别跑完两遍渲染才发现没帧可测（Remotion 全片渲染是这条流程里最贵的一步）。
 for TOOL in ffmpeg; do
