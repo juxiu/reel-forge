@@ -340,7 +340,6 @@ export function Pipeline3({plan, N, recipe}) {
           </div>
         );
       })}
-      <Note cx={640} cy={AREA.b - 60}>{st.caption}</Note>
     </>
   );
 }
@@ -380,7 +379,6 @@ export function CauseChain({plan, N, recipe}) {
           </div>
         );
       })}
-      <Note cx={640} cy={AREA.b - 60}>{st.caption}</Note>
     </>
   );
 }
@@ -434,7 +432,6 @@ export function CiteSide({plan, N, recipe}) {
           </div>
         );
       })}
-      <Note cx={640} cy={AREA.b - 60}>{st.caption}</Note>
     </>
   );
 }
@@ -480,7 +477,6 @@ export function Terminal({plan, N, recipe}) {
           </div>
         );
       })}
-      <Note cx={640} cy={Math.min(AREA.b - 60, y + h + 26)}>{st.caption}</Note>
     </>
   );
 }
@@ -542,7 +538,12 @@ export function SplitRows({plan, N, recipe}) {
   const lx = 100;
   const rx = 700;
   const rowH = 84;
-  const top = 226;
+  // ⚠ 列头（Note=TechSub 26px，cy = top−44 → 字形顶 ≈ top−59）必须躲开流程轨带：
+  //   push 满幅 s≈1.16 时顶部内容上抬 ≈ (360−y)·0.16，rest 字形顶 ≤192 必撞胶囊
+  //   （成片 SC42 实测「客户端代价」被轨压住）。字形顶在满推下 ≥176 → top ≥ 261。
+  //   单行时整体下移到 300 让构图在内容区里立得住；两行 265（末行框底 419，contentBottom 620 之上）。
+  const rows = Math.max(left.length, right.length);
+  const top = rows === 1 ? 300 : 265;
   const seam = drawOn(N - IN, BEAT.DRAW_ON);
   return (
     <>
@@ -578,7 +579,6 @@ export function SplitRows({plan, N, recipe}) {
           );
         }),
       )}
-      <Note cx={640} cy={AREA.b - 60}>{st.caption}</Note>
     </>
   );
 }
@@ -623,7 +623,6 @@ export function Ballot({plan, N, recipe}) {
           </div>
         );
       })}
-      <Note cx={640} cy={y + h + 40}>{st.caption}</Note>
     </>
   );
 }
@@ -663,8 +662,7 @@ export function LayerStack({plan, N, recipe}) {
           </div>
         );
       })}
-      {/* 行高×行数收得很紧（4 行末行底 = 216+3*84+68 = 536），caption 固定 560 不再压进末行 */}
-      <Note cx={640} cy={AREA.b - 60}>{st.caption}</Note>
+      {/* 行高×行数收得很紧（4 行末行底 = 216+3*84+68 = 536），距 contentBottom 620 仍有余量 */}
     </>
   );
 }
@@ -721,7 +719,6 @@ export function CompareTable({plan, N, recipe}) {
           </React.Fragment>
         );
       })}
-      <Note cx={640} cy={Math.min(AREA.b - 60, top + 66 + rows * rowH + 26)}>{st.caption}</Note>
     </>
   );
 }
@@ -789,7 +786,6 @@ export function Reshape({plan, N, recipe}) {
           </div>
         </SoftIn>
       ) : null}
-      <Note cx={640} cy={AREA.b - 60}>{st.caption}</Note>
     </>
   );
 }
@@ -827,7 +823,6 @@ export function Ladder({plan, N, recipe}) {
           </SoftIn>
         </div>
       ))}
-      <Note cx={640} cy={AREA.b - 60}>{st.caption}</Note>
     </>
   );
 }

@@ -173,7 +173,10 @@ export const CHAPTER_GAP = 45;
 export function design(width, height) {
   const s = width / W;
   const logicalH = Math.round(height / s);
-  // band 全部由 logicalH 推导：16:9 时 s=1、logicalH=720，还原样片的 y637–690 / y687–720
+  // band 全部由 logicalH 推导：16:9 时 s=1、logicalH=720；字幕带 630–683、进度条 687–720。
+  // ⚠ 旧值 subBottom=690 与 barTop=687 重叠 3px，44px 字幕的 4px 描边再下渗 ~5px，
+  //   字幕墨迹直接盖住进度条章名标签顶部（成片 QC 实测）——所以下沿收到 683，
+  //   与 barTop 之间留 ≥2px 描边空隙；上沿同步上移保住 53px 带高（一行 44px×1.18=51.9 仍装得下）。
   const bands = {
     hudTop: 28,
     hudBottom: 79, // 28 + 51
@@ -181,9 +184,9 @@ export function design(width, height) {
     railBottom: 162,
     contentTop: 175, // 有流程轨时 y<175 不放内容
     contentTopNoRail: 100,
-    contentBottom: logicalH - 100, // = subTop − 17
-    subTop: logicalH - 83, // 16:9 → 637
-    subBottom: logicalH - 30, // 16:9 → 690
+    contentBottom: logicalH - 100, // = subTop − 10
+    subTop: logicalH - 90, // 16:9 → 630
+    subBottom: logicalH - 37, // 16:9 → 683（= barTop − 4）
     barTop: logicalH - 33, // 16:9 → 687
     barBottom: logicalH,
     left: 60,

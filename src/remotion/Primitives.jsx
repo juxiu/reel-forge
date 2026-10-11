@@ -520,26 +520,41 @@ export const Rail = ({spec, N}) => {
 
 /**
  * 章节进度条：章体半透明、当前位置白线；条在 y = barTop 起、高 = barBottom − barTop（16:9 → y687、高 33）。
- * 章体按 `chapters.length` 等宽分章（章多时章名要短：槽宽 = 1280 ÷ 章数）。
+ * ⚠ 槽宽按**章帧数比例**分，不再等宽：等宽槽时章内填充速率 = 章时长比，而白线按全片时间线性走，
+ *   章长不等时两层恒错位（成片 QC 缺陷：CH03 章卡已出、白线却超前章槽起点 ~7%）。
+ *   这里让槽边界与白线共用同一张「帧 → x」分段映射（xs）：白线位置 = N 在该映射下的像，
+ *   于是白线永远骑在紫色填充边界上 —— 章内同步推进，章间留白（归上一章槽尾）同步停驻。
  * ⚠ 条后方不要压暗角，半透明条会被压暗（样片 QC 记录）。
  */
 export const ProgressBar = ({chapters = [], totalFrames = 1, N, labelSkew = -10, labelSize = 24}) => {
   const d = useDesign();
   const count = Math.max(1, chapters.length);
-  const slot = W / count;
   const starts = chapters.map((c, i) => c.from ?? Math.round((i / count) * totalFrames) + 1);
   const barH = d.bands.barBottom - d.bands.barTop;
-  const played = (N - starts[0]) / Math.max(1, totalFrames - starts[0]);
+  // 章节卡占「上一章末 +3 … 本章首 −9」；本章从 from−3 起算，避免卡片期间条不动或先走。
+  const begins = starts.map((from, i) => (i === 0 ? from : from - 3));
+  const ends = starts.map((from, i) => (i + 1 < starts.length ? starts[i + 1] : totalFrames));
+  const spans = ends.map((to, i) => Math.max(1, to - begins[i]));
+  const total = spans.reduce((a, b) => a + b, 0);
+  const xs = [0];
+  spans.forEach((sp, i) => xs.push(xs[i] + (W * sp) / total));
+  // N 的映射位置：落在哪一章就按该章槽位线性取；N 早于首章（片头静音）/晚于末章（片尾署名）时被 clamp01 收在两端。
+  let seg = 0;
+  for (let i = count - 1; i > 0; i--) {
+    if (N >= begins[i]) {
+      seg = i;
+      break;
+    }
+  }
+  const played = (xs[seg] + (xs[seg + 1] - xs[seg]) * clamp01((N - begins[seg]) / spans[seg])) / W;
   return (
     <div style={{position: 'absolute', left: 0, top: d.bands.barTop, width: W, height: barH, opacity: 0.52}}>
       <div style={{position: 'absolute', left: 0, top: 0, width: W, height: '100%', background: Rgba('#F3F3F3', 0.32)}} />
       {starts.map((from, i) => {
-        const to = i + 1 < starts.length ? starts[i + 1] : totalFrames;
-        // 章节卡占「上一章末 +3 … 本章首 −9」；本章从 from−3 起算，避免卡片期间条不动或先走
-        const begin = i === 0 ? from : from - 3;
-        const p = clamp01((N - begin) / Math.max(1, to - begin));
+        const p = clamp01((N - begins[i]) / spans[i]);
+        const slotW = xs[i + 1] - xs[i];
         return (
-          <div key={i} style={{position: 'absolute', left: i * slot + 2, width: (slot - 4) * p, top: 0, height: '100%', background: Rgba('#BEAAFA', 0.52)}}>
+          <div key={i} style={{position: 'absolute', left: xs[i] + 2, width: (slotW - 4) * p, top: 0, height: '100%', background: Rgba('#BEAAFA', 0.52)}}>
             {chapters[i]?.title ? (
               <div
                 style={{
@@ -548,7 +563,7 @@ export const ProgressBar = ({chapters = [], totalFrames = 1, N, labelSkew = -10,
                   top: 4,
                   fontFamily: FONT_HEAVY,
                   fontWeight: 800,
-                  fontSize: fitSize(String(chapters[i].title), slot - 20, labelSize, labelSize * 0.7, EM_HEAVY),
+                  fontSize: fitSize(String(chapters[i].title), slotW - 20, labelSize, labelSize * 0.7, EM_HEAVY),
                   color: N >= from ? WHITE : GREY,
                   whiteSpace: 'pre',
                   transform: `skewX(${labelSkew}deg)`,
@@ -561,18 +576,18 @@ export const ProgressBar = ({chapters = [], totalFrames = 1, N, labelSkew = -10,
         );
       })}
       {starts.slice(1).map((from, i) => (
-        <div key={`d${i}`} style={{position: 'absolute', left: (i + 1) * slot - 2, top: 0, width: 4, height: '100%', background: '#000'}} />
+        <div key={`d${i}`} style={{position: 'absolute', left: xs[i + 1] - 2, top: 0, width: 4, height: '100%', background: '#000'}} />
       ))}
-      <div style={{position: 'absolute', left: clamp(W * c01(played), 0, W - 3), top: -4, width: 3, height: (d.bands.barBottom - d.bands.barTop) + 8, background: WHITE, boxShadow: '0 0 12px rgba(102,45,248,.65)'}} />
+      <div style={{position: 'absolute', left: clamp(W * c01(played), 0, W - 3), top: -4, width: 3, height: barH + 8, background: WHITE, boxShadow: '0 0 12px rgba(102,45,248,.65)'}} />
     </div>
   );
 };
 
 /**
- * 字幕：44px 白字黑边 4px、y637–690、maxW 1160、居中。
+ * 字幕：44px 白字黑边 4px、y630–683（下沿与进度条 687 之间留描边空隙）、maxW 1160、居中。
  * 超预算的处理顺序是「先缩字号到 78%，再折两行」，两行仍装不下就是文案缺陷 ——
  * 两行字幕压进内容区在 QC 里一律按缺陷处理，不要靠这里兜。
- * ⚠ 字幕带与进度条带（y637–720）永不放画面内容；入场轨迹不得穿过字幕带。
+ * ⚠ 字幕带与进度条带（y630–720）永不放画面内容；入场轨迹不得穿过字幕带。
  */
 export const Subtitle = ({text, N, from, to, size = SUBTITLE_SIZE, maxLines = 2}) => {
   const d = useDesign();

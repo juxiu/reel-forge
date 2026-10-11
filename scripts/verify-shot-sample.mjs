@@ -27,8 +27,8 @@ import {run} from "../src/runtime/spawn.mjs";
  *     exitLate  末拍区间内 —— 与 exit 比对，抓「落位即切」
  *
  * ⚠ 判据被自己的错误骗过两次，这里把教训写死：
- *   1. 「字幕带 637–690 不能有内容」是**错的** —— 字幕文字自己就在这个带里。
- *      该查的是内容区下沿到字幕带之间的**空隙** 620–637。
+ *   1. 「字幕带 630–683 不能有内容」是**错的** —— 字幕文字自己就在这个带里。
+ *      该查的是内容区下沿到字幕带之间的**空隙** 620–630。
  *   2. 「四边亮像素要低」也是**反的** —— cameraSafe 的设计意图正是内容不贴边，
  *      边空是正确结果；该抓的是内容贴到画幅**最外沿**（出血），所以判的是边**高**。
  *   3. 判动静必须用**逐像素平均差**，不能用「亮像素占比之差」：占比只统计「多亮了多少
@@ -48,7 +48,7 @@ const MOMENTS = arg("moments", "enter,mid,exit,exitLate").split(",").filter(Bool
 const OUT = arg("out", "artifacts/shot-sample");
 
 const EMPTY_MAX = 0.004;
-const GAP_BAND = [620, 637];
+const GAP_BAND = [620, 630];
 const GAP_MAX = 0.02;
 const BLEED_MAX = 0.16;
 const CONTENT = [175, 620];

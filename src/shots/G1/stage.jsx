@@ -188,7 +188,6 @@ function Ranked3({plan, N, recipe}) {
           </div>
         );
       })}
-      <TechSub cx={640} cy={top + 3 * (rowH + 22) + 16}>{st.caption}</TechSub>
     </>
   );
 }
@@ -204,10 +203,11 @@ function Rail4({plan, N, recipe}) {
   const marks = marksOf(plan, st);
   const k = focusWalk(marks, N, plan.focusSlots);
   const railX = 1078;
-  // top/gap 204/96：第 4 行框底落在 538，caption（TechSub 26px，字形盒 545–571）不再压框。
-  // 原 214/106 时末行框底 578，与 caption 重叠 33px（f1370 实测）。
-  const top = 204;
-  const gap = 96;
+  // top/gap 232/92：可见框顶 = top−32 = 200 —— pan 满幅 s≈1.11 时上抬 ≈17.6px 落在 182，
+  // 仍避开流程轨带（118–162）与 contentTop 175；旧值 204/96 的可见框顶 172，pan 一下就到 151，
+  // 直插轨带与胶囊相压（成片 SC04 实测）。第 4 行框底 540，距 contentBottom 620 有余量。
+  const top = 232;
+  const gap = 92;
   const trackProgress = clamp01((N - IN) / (BEAT.DRAW_ON + items.length * 6));
   return (
     <>
@@ -236,7 +236,6 @@ function Rail4({plan, N, recipe}) {
           </div>
         );
       })}
-      <TechSub cx={614} cy={AREA.b - 60}>{st.caption}</TechSub>
     </>
   );
 }
@@ -291,7 +290,6 @@ function DualPanel({plan, N, recipe}) {
           </div>
         );
       })}
-      <TechSub cx={640} cy={py + ph + 44}>{st.caption}</TechSub>
       <Track x1={lx + 30} x2={rx - 30} y={AREA.b - 60} N={N} f0={IN + 18} color={k[winner] > 0.4 ? PURPLE_LIGHT : GREY_LINE} />
     </>
   );
@@ -357,7 +355,6 @@ function BeforeAfter({plan, N, recipe}) {
       <div style={{...abs(p2x + pw / 2 + 10, py - 6, 60, 60), opacity: softOp(N - IN - 40, 12)}}>
         <Check cx={30} cy={30} size={52} color={PURPLE_LIGHT} progress={drawOn(N - IN - 40, 16)} />
       </div>
-      <TechSub cx={640} cy={AREA.b - 60}>{st.caption}</TechSub>
     </>
   );
 }

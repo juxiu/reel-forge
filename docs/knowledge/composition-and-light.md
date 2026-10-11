@@ -51,14 +51,14 @@ bands 实测值与读取状态：
 | `contentTop` 175 | 175 | 175 | ✅ `SemanticShots.jsx:36`（内容上界，恒用这一档）、`camera.mjs:130`（`scroll` 取景上界）、contracts 的 `qc_zone.with_rail`——注意后者由 `export-visual-contracts.mjs:233-240` **就地按同一份 bands 重算**，没有调用 `field.mjs:189` 那个同名 helper（见 §10） |
 | `contentTopNoRail` 100 | 100 | 100 | ✅ `camera.mjs:203`（相机取景基准）、`field.mjs:186`（QC 取景区上界） |
 | `contentBottom` `logicalH−100` | 620 | 2176 | ✅ `SemanticShots.jsx:37`、`camera.mjs:131, 204`、`field.mjs:186` |
-| `subTop` `logicalH−83` | 637 | 2193 | ✅ `Primitives.jsx:516`（字幕带）、`:385`、`:405-406`（幕底渐变止于字幕上方）；`camera.mjs:215` 在 `cameraViewRect()` 内，而该函数零调用点 → 不算活读者 |
-| `subBottom` `logicalH−30` | 690 | 2246 | ✅ `Primitives.jsx:517` |
-| `barTop` `logicalH−33` | 687 | 2243 | ✅ `Primitives.jsx:459`（条体）、`:491`（当前位置白线）；`Fx.jsx:416, 420` 的 `Vignette` 底带止位（该图元未被装配） |
-| `barBottom` | 720 | 2276 | ✅ `Primitives.jsx:456, 491`（都只用于算 `barBottom − barTop`） |
+| `subTop` `logicalH−90` | 630 | 2186 | ✅ `Primitives.jsx:606`（字幕带）、`:392`、`:412-413`（幕底渐变止于字幕上方）；`camera.mjs:215` 在 `cameraViewRect()` 内，而该函数零调用点 → 不算活读者 |
+| `subBottom` `logicalH−37` | 683 | 2239 | ✅ `Primitives.jsx:607`（= barTop − 4：旧值 690 与 barTop 687 重叠 3px，字幕描边盖住章名标签 —— 成片 QC 实测后收口） |
+| `barTop` `logicalH−33` | 687 | 2243 | ✅ `Primitives.jsx:551`（条体）、`:533`（条高）；`Fx.jsx:416, 420` 的 `Vignette` 底带止位（该图元未被装配） |
+| `barBottom` | 720 | 2276 | ✅ `Primitives.jsx:533`（只用于算 `barBottom − barTop`） |
 | `left` 60 / `right` 1220 | 同左 | 同左 | ✅ `plan.mjs:110`（主角可用宽 `right − left = 1160`） |
 | `cameraSafe` x89–1191 / y122–607 | **不随 `logicalH` 变** | 同左 | ⚠ **无执行者**（见 §10） |
 
-> ⚠ **字幕带 + 进度条带（16:9 的 y637–720）是画面内容禁放区**。执行者是 `layoutBands` 的 `contentBottom = logicalH − 100`（= `subTop − 17`）与 `scripts/verify-render-layer.mjs:169`（authored 元素 `y` 越出 `[contentTopNoRail−200, contentBottom+40]` 即 FAIL）。
+> ⚠ **字幕带 + 进度条带（16:9 的 y630–720）是画面内容禁放区**。执行者是 `layoutBands` 的 `contentBottom = logicalH − 100`（= `subTop − 10`）与 `scripts/verify-render-layer.mjs:169`（authored 元素 `y` 越出 `[contentTopNoRail−200, contentBottom+40]` 即 FAIL）。
 >
 > ⚠ `src/visual/style.mjs:203-210` 的 `SAFE` / `safeArea()` 是旧签名兼容层，全仓库零调用；构图只用上面的 bands。
 

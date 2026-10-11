@@ -29,16 +29,16 @@ const {buildPlan, shotFrames, exitPlan, beatFrames, KNOWN_ICONS} = await import(
 const wide = design(1280, 720);
 eq(wide.s, 1, '16:9 缩放系数应为 1（逻辑像素=实际像素）');
 eq(wide.height, 720, '16:9 逻辑高度');
-eq(wide.bands.subTop, 637, '16:9 字幕带上沿 y637');
-eq(wide.bands.subBottom, 690, '16:9 字幕带下沿 y690');
+eq(wide.bands.subTop, 630, '16:9 字幕带上沿 y630');
+eq(wide.bands.subBottom, 683, '16:9 字幕带下沿 y683（= barTop − 4，描边不压进度条）');
 eq(wide.bands.barTop, 687, '16:9 进度条带 y687');
-eq(wide.bands.contentBottom, 620, '内容区下边 = subTop − 17');
+eq(wide.bands.contentBottom, 620, '内容区下边 = subTop − 10');
 eqJson([wide.bands.left, wide.bands.right], [60, 1220], '左右安全区 x60–1220');
 
 const tall = design(720, 1280);
 eq(tall.s, 0.5625, '9:16 按宽度映射 s=0.5625');
 eq(tall.height, 2276, '9:16 逻辑高度 2276');
-eq(tall.bands.subTop, 2193, '9:16 字幕带仍贴底（logicalH−83）');
+eq(tall.bands.subTop, 2186, '9:16 字幕带仍贴底（logicalH−90）');
 ok(tall.bands.contentBottom < tall.bands.subTop, '9:16 内容区不得压进字幕带');
 
 // ---- 2) 运镜：帧数预算 + 必须在末拍前停住 ----
