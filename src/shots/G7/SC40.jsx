@@ -1,3 +1,4 @@
+// reel-forge-source: {"project_id":"digest-explainer","script_id":"seg-040","script_sha256":"878d7c9fdb347284a6aa3f53f1a2d208a2a28543927886c98a058ca71105573d"}
 import React from "react";
 import {ExplainerShot} from "../Shot.jsx";
 import {G7_STAGE} from "./stage.jsx";
