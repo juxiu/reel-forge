@@ -1,10 +1,13 @@
 import fs from "node:fs";
+import crypto from "node:crypto";
 import path from "node:path";
 
 const root = process.cwd();
 const readJson = (file) => JSON.parse(fs.readFileSync(path.join(root, file), "utf8"));
 const findings = [];
 let generatedShotbook = null;
+let sourceFingerprint = null;
+let reviewEvidence = null;
 const add = (severity, gate, rule, shotId, evidence, suggestedFix) => findings.push({
   findingId: `DIR-${String(findings.length + 1).padStart(4, "0")}`,
   shotId: shotId ?? null, severity, gate, rule, evidence, suggestedFix,
@@ -29,6 +32,12 @@ if (findings.some((f) => f.severity === "BLOCKER")) {
     const portrait = readJson(portraitPath);
     const script = readJson(scriptPath);
     const timeline = readJson(timelinePath);
+    sourceFingerprint = crypto.createHash("sha256").update([irPath, portraitPath, scriptPath, timelinePath, registryPath].map((p) => p + "\\0" + fs.readFileSync(path.join(root, p))).join("\\0")).digest("hex");
+    const reviewPath = path.join(root, "artifacts", ir.project_id || "unknown-project", "preflight", "visual-review.json");
+    if (fs.existsSync(reviewPath)) {
+      try { reviewEvidence = JSON.parse(fs.readFileSync(reviewPath, "utf8")); }
+      catch { add("BLOCKER", "GATE-5", "visual-review-evidence-invalid", null, "visual-review.json is malformed", "Replace it with a valid independent review record"); }
+    }
     const registryText = fs.readFileSync(path.join(root, registryPath), "utf8");
     const scenes = ir.scenes;
     const portraitScenes = portrait.scenes;
@@ -81,8 +90,13 @@ if (findings.some((f) => f.severity === "BLOCKER")) {
       }
       const score = risk(s);
       const level = score >= 50 ? "high" : score >= 25 ? "medium" : "low";
-      if (level === "high") add("REVIEW", "GATE-5", "high-risk-shot-review", id, `Risk score ${score}/100; static checks cannot prove motion/layout quality`, "Generate entry/reveal/exit keyframes or a short preview and request independent director review");
-      else if (level === "medium") add("WARN", "GATE-5", "medium-risk-shot-review", id, `Risk score ${score}/100`, "Review entry, reveal and exit states with low-cost keyframes");
+      if (level === "high") {
+        const approved = reviewEvidence?.status === "approved"
+          && reviewEvidence?.sourceFingerprint === sourceFingerprint
+          && Array.isArray(reviewEvidence?.reviewedShots)
+          && reviewEvidence.reviewedShots.some((r) => r.shotId === id && r.status === "approved" && r.evidence);
+        if (!approved) add("REVIEW", "GATE-5", "high-risk-shot-review", id, `Risk score ${score}/100; static checks cannot prove motion/layout quality; fingerprint=${sourceFingerprint}`, "Generate entry/reveal/exit keyframes, then record independent review in artifacts/<project_id>/preflight/visual-review.json with this sourceFingerprint");
+      } else if (level === "medium") add("WARN", "GATE-5", "medium-risk-shot-review", id, `Risk score ${score}/100`, "Review entry, reveal and exit states with low-cost keyframes");
       if (!s.continuityIds && !s.transitionIntent) add("WARN", "GATE-1", "continuity-intent-unresolved", id, "No explicit continuity/transition contract in current IR", "Add continuity metadata to authored director decisions; do not infer visual continuity from adjacency");
       const segment = Number.isInteger(s.source_ref?.segment_index) ? scriptSegments[s.source_ref.segment_index] : null;
       const startFrame = Math.round(Number(s.start || 0) * fps);
@@ -145,6 +159,8 @@ function writeReport(ir, scenes, stats) {
     sourceOfTruth: ["fixtures/render-ir-16x9.json", "fixtures/render-ir-9x16.json", "fixtures/script.json", "script/timeline.json", "src/shots/registry.jsx"],
     checksExecuted: ["required-inputs", "scene-id-uniqueness", "registry-mapping", "script-segment-mapping", "story-purpose", "visual-recipe", "element-presence", "timing-bounds", "scene-overlap", "timeline-presence", "cross-ratio-identity", "risk-scoring"],
     fullRenderExecuted: false,
+    sourceFingerprint,
+    visualReviewEvidence: "artifacts/<project_id>/preflight/visual-review.json; approvals expire whenever any source input fingerprint changes",
     visualEvidence: {generated: false, requiredFor: [...new Set(findings.filter((f) => f.severity === "REVIEW").map((f) => f.shotId))]},
     stats: stats || {sceneCount: scenes?.length || 0},
     findings,
