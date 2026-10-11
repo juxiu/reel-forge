@@ -5,7 +5,7 @@ import {run as spawn, runAsync} from "../src/runtime/spawn.mjs";
 /**
  * 镜头级调试闭环：只渲染一个镜头的片段 → 抽成 PNG 帧 → 只对该镜头跑真判据。
  *
- * 为什么要有这个文件：全片渲染是这条流程里最贵的一步（双比例 ~40 分钟），
+ * 为什么要有这个文件：全片渲染是这条流程里最贵的一步，
  * 但调效果时 99% 的改动只影响一两个镜头。这里把「镜头号」直接映射成
  * 「片段渲染 + 抽帧 + frame_metrics/motion_check 单镜头判定」，把日常循环压到分钟级。
  *
@@ -15,8 +15,6 @@ import {run as spawn, runAsync} from "../src/runtime/spawn.mjs";
  *
  * 用法：
  *   npm run debug:shot -- scene-001
- *   npm run debug:shot -- scene-012 9x16
- *   npm run debug:shot -- scene-012 --ratio 9x16   （PowerShell 下 flag 可能被 npm 吞掉，用位置参数更稳）
  *
  * 产物（artifacts/ 已被 .gitignore 忽略）：
  *   artifacts/debug/<ratio>/<scene-id>/frames/         抽好的 PNG 帧，可直接翻看画面
@@ -25,12 +23,12 @@ import {run as spawn, runAsync} from "../src/runtime/spawn.mjs";
  */
 
 const argv = process.argv.slice(2);
-const RATIOS = ["16x9", "9x16"];
+const RATIOS = ["16x9"];
 const isRatio = (a) => RATIOS.includes(a);
 
 // npm 转发 `--ratio` 这类 flag 在 Windows/PowerShell 下并不可靠：实测 `npm run x -- a --ratio b`
 // 到脚本时 `--ratio` 已被吞掉、只剩裸值 b（`--ratio=9x16` 同样会被吞）。所以画幅同时接受
-// `--ratio 9x16`、`--ratio=9x16` 与位置参数 `9x16` 三种写法，镜头号取第一个非画幅的位置参数。
+// `--ratio 16x9`、`--ratio=16x9` 与位置参数 `16x9` 三种写法，镜头号取第一个非画幅的位置参数。
 const eqRatio = argv.find((a) => a.startsWith("--ratio="));
 const ratioFlagAt = argv.indexOf("--ratio");
 const positional = argv.filter((a) => !a.startsWith("--"));
@@ -41,11 +39,11 @@ const ratio =
   "16x9";
 
 if (!sceneId) {
-  console.error("用法：npm run debug:shot -- <scene-id> [--ratio 16x9|9x16]（画幅也可写成位置参数：… <scene-id> 9x16）");
+  console.error("用法：npm run debug:shot -- <scene-id> [--ratio 16x9]（当前仅支持 16:9）");
   process.exit(2);
 }
 if (!isRatio(ratio)) {
-  console.error(`画幅只支持 16x9 / 9x16（收到 ${ratio}）`);
+  console.error(`当前仅支持 16x9（收到 ${ratio}）；9:16 渲染暂时停用`);
   process.exit(2);
 }
 
