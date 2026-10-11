@@ -175,8 +175,15 @@ function checkFilm(ir, label) {
     eq(JSON.stringify(again.items) + JSON.stringify(again.issues), JSON.stringify(plan.items) + JSON.stringify(plan.issues), `${tag} 同一输入两次构建结果不同（确定性被破坏）`);
   }
 }
-checkFilm(irWide, '16x9');
-checkFilm(irTall, '9x16');
+// 单画幅模式：口径与 plan-audit / verify-imports 一致。render-ir-9x16.json 是休眠 fixture
+// （旧主题 44 镜，materialize-ir 不再刷新），scene id 与当前生产源无关，
+// checkFilm 对它只会产出 beat 出窗一类的假阳性。范围外比例跳过并在 PASS 行显式标注。
+const ACCEPT_FILMS = new Set(['16x9']);
+const skippedFilms = [];
+for (const [ir, label] of [[irWide, '16x9'], [irTall, '9x16']]) {
+  if (ACCEPT_FILMS.has(label)) checkFilm(ir, label);
+  else skippedFilms.push(label);
+}
 
 // ---- 5) 字幕块与镜头帧号同源 ----
 {
@@ -239,4 +246,4 @@ if (fails.length) {
   for (const f of fails) console.error(' - ' + f);
   process.exit(1);
 }
-console.log('RENDER LAYER GATE PASS', JSON.stringify({scenes: (irWide.scenes || []).length + (irTall.scenes || []).length, icons: KNOWN_ICONS.length, beats: BEAT.CAMERA_MIN}));
+console.log('RENDER LAYER GATE PASS', JSON.stringify({accept_ratios: [...ACCEPT_FILMS], skipped_irs: skippedFilms, scenes: (irWide.scenes || []).length + (skippedFilms.includes('9x16') ? 0 : (irTall.scenes || []).length), icons: KNOWN_ICONS.length, beats: BEAT.CAMERA_MIN}));

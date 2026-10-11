@@ -21,13 +21,15 @@ export const SHOT_RECIPE = {
   stage: {
     kind: "reshape",
     focus: [0, 38],
+    // to_icon grid→shield：网格线塞进圆形 = 审计问题 3「方格纸被圈住」；shield=能力/专长，
+    // 与「把专长打包成能力」的语义对位，圆形内只留一枚居中图标。
     from_icon: "person",
-    to_icon: "grid",
+    to_icon: "shield",
     from_sub: "每个场景各造一个",
     to_sub: "长出专才分支",
     items: [
       {id: "f", icon: "person", text: "碎片技能"},
-      {id: "t", icon: "grid", text: "通用能力"},
+      {id: "t", icon: "shield", text: "通用能力"},
     ],
   },
 };

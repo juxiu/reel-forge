@@ -121,13 +121,14 @@ const spoken = items
   .filter((item) => item.type !== "chapter")
   .map((item, index) => {
     const chunks = item.text.split("|").map((value) => value.trim()).filter(Boolean);
-    const cleanText = chunks.join(language === "en" ? " " : ",");
-    // a2e 连读风格：合成前剥离句读标点（实测同句 12.7s→10.6s，4.2→5.0 字/秒，对齐 a2e 的
-    // 5.5 字/秒量级）。标点停顿三重叠加是语速慢的主因：块内原有标点 + join 的逗号 + edge-tts
-    // 对每个句读的 0.3–0.5s 气口。字幕/溯源仍用 cleanText 原文——只有送进合成器的文本去标点。
-    const strip = (value) => value.replace(/[，。、！？；：,.!?;:]/g, "");
-    const spokenText = strip(cleanText);
-    const spokenChunks = chunks.map(strip);
+    const cleanText = chunks.join(language === "en" ? " " : "，");
+    // v2 修订（2026-10-12，用户审计问题 1+2）：**保留句读标点**送合成。旧口径「去标点换语速」
+    // 把整句变成无标点长串，edge-tts 失去全部停顿与语调线索——字幕 4–5 块 vs 语音一口气、
+    // 句末无降调、全片又快又平。断句归还标点，语速仍由 rate（+8%）控制。
+    // 词边界对齐天然兼容带标点文本：alignedChunks 对 word 原文剥标点后在带标点 text 里
+    // indexOf 定位，块匹配按原文（含标点）进行——送合成与做对齐的是同一份文本，无形态错位。
+    const spokenText = cleanText;
+    const spokenChunks = chunks;
     return {
       index,
       item,
@@ -214,8 +215,8 @@ for (const entry of synthResults) {
   if (!words.length) throw new Error("no real word timing for sentence " + (entry.index + 1));
   const offset = cursorSeconds;
   for (const word of words) allWords.push({...word, start: Number(word.start) + offset, end: Number(word.end) + offset});
-  // 词边界对齐必须在**去标点空间**做：words 的 timings 对应的是 spokenText，
-  // alignedChunks 用 text.indexOf(chunk) 对位，chunk 也得是同一形态（去标点）。
+  // 词边界对齐：words 的 timings 对应 spokenText；alignedChunks 对 word 原文剥标点后在
+  // text 里 indexOf 定位——文本带不带标点都成立（两份文本同源，无形态错位）。
   const timings = alignedChunks(spokenText, spokenChunks, words, result.manifest.duration_s);
   const from = Math.round((offset + Number(words[0].start)) * FPS) + 1;
   const to = Math.max(from, Math.round((offset + Number(words.at(-1).end)) * FPS));

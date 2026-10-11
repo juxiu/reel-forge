@@ -176,9 +176,11 @@ export const Box = ({x, y, w, h, border = GREY_LINE, fill = 'rgba(0,0,0,0)', rad
       boxSizing: 'border-box',
       border: `${sw}px solid ${border}`,
       borderRadius: radius,
-      background: fill,
+      // 高亮分级（STYLE_BIBLE §4）：glow=主高亮 = 描边 + 紫色内衬 + 白字（调用处），
+      // 光晕收敛为单层；次层级（base/winner 列）= 纯描边不加内衬，由调用处以 border 表达。
+      background: glow ? 'rgba(102,48,248,.10)' : fill,
       filter: bloom ? 'drop-shadow(0 0 3px rgba(255,255,255,.35))' : undefined,
-      boxShadow: glow ? '0 0 12px 3px rgba(102,45,248,.35), 0 0 42px 14px rgba(102,45,248,.45)' : undefined,
+      boxShadow: glow ? '0 0 14px 2px rgba(102,45,248,.32)' : undefined,
       ...style,
     }}
   >

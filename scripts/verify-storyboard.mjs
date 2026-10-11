@@ -212,22 +212,22 @@ try {
   expect(
     "没有持续动作要失败",
     {match: "missing continuous action: SC02"},
-    produce({caseName: "no-continuous", srcText: mutate("split + camera parallax; continuous: 轨道点行进撑到下一拍", "split + camera parallax")}),
+    produce({caseName: "no-continuous", srcText: mutate("continuous: 下游箭头逐段点亮 + 焦点交接; ", "")}),
   );
   expect(
     "末拍稳定期 <30 帧要失败",
     {match: "insufficient settle hold (<30f): SC02"},
-    produce({caseName: "weak-hold", srcText: mutate("hold: 30f |\n| SC03", "hold: 20f |\n| SC03")}),
+    produce({caseName: "weak-hold", srcText: mutate("hold: 36f |\n| SC03", "hold: 20f |\n| SC03")}),
   );
   expect(
     "白名单外的镜头用 Glitch 要失败",
-    {match: "glitch over whitelist: SC02"},
-    produce({caseName: "glitch-offlist", srcText: mutate("头部却带着一串看不懂的字段。", "头部却带着一串看不懂的字段。(GlitchIn)")}),
+    {match: "glitch over whitelist: SC01"},
+    produce({caseName: "glitch-offlist", srcText: mutate("阶段徽章 + 格内进度条", "阶段徽章 + 格内进度条 (GlitchIn)")}),
   );
   expect(
     "白名单外的镜头用扫光图元要失败",
-    {match: "light-sweep over whitelist: SC02"},
-    produce({caseName: "sweep-offlist", srcText: mutate("头部却带着一串看不懂的字段。", "头部却带着一串看不懂的字段。 + LightSweep")}),
+    {match: "light-sweep over whitelist: SC01"},
+    produce({caseName: "sweep-offlist", srcText: mutate("阶段徽章 + 格内进度条", "阶段徽章 + 格内进度条 + LightSweep")}),
   );
   expect(
     "分镜引用了时间轴没有的句子要出声（不是 KeyError 回溯）",
@@ -237,7 +237,7 @@ try {
   expect(
     "渲染后仍有未解析的花括号要失败",
     {match: "unresolved storyboard tokens", atRender: true},
-    produce({caseName: "leftover-token", srcText: mutate("# Storyboard", "# Storyboard\n\n{NOT_A_TOKEN} 留着")}),
+    produce({caseName: "leftover-token", srcText: mutate("# 分镜表", "# 分镜表\n\n{NOT_A_TOKEN} 留着")}),
   );
   // 帧号漂移：分镜表按基准时间轴渲染，自检却读到一份改过的时间轴 —— 这才是真事故的形状
   // （重跑 TTS 后忘了重跑 storyboard）。用同一份输入两边永远一致，测不到这条。

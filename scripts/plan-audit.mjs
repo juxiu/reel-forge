@@ -62,9 +62,16 @@ function recipeOf(file) {
 const index = shotFileIndex();
 const scenes = [];
 const blocking = [];
+// 临时单画幅模式：口径与 qc.mjs / deliver.mjs / verify-production.mjs / verify-qc.mjs /
+// verify-text-provenance.mjs 一致。9:16 渲染已停用，render-ir-9x16.json 是**休眠 fixture**
+// （镜数/内容属于旧主题，materialize-ir.mjs 不再刷新它），对它出 blocking 只会产出与
+// 本次生产无关的假阻断。范围外比例照跑照记（out_of_scope_blocking 显式列出），不判 FAIL。
+const ACCEPT = new Set(["16x9"]);
+const outOfScope = [];
 for (const ratio of ["16x9", "9x16"]) {
   const file = "fixtures/render-ir-" + ratio + ".json";
   if (!fs.existsSync(file)) continue;
+  const accepted = ACCEPT.has(ratio);
   const ir = JSON.parse(fs.readFileSync(file, "utf8"));
   const d = design(ir.width, ir.height);
   for (const scene of ir.scenes || []) {
@@ -89,8 +96,12 @@ for (const ratio of ["16x9", "9x16"]) {
       issues: plan.issues,
       repairs: items,
     });
-    for (const {token, message, fix, auto, ...data} of items) blocking.push({ratio, node: scene.id, type: token, detail: message, fix, auto, ...data});
-    if (authored && authored.__parse_error) blocking.push({ratio, node: scene.id, type: "recipe-parse-error", detail: `${shotFile} 的 SHOT_RECIPE 不是可求值的对象字面量`, fix: "rewrite-recipe-as-literal", auto: false});
+    for (const {token, message, fix, auto, ...data} of items) {
+      const entry = {ratio, node: scene.id, type: token, detail: message, fix, auto, ...data};
+      if (accepted) blocking.push(entry);
+      else outOfScope.push(entry);
+    }
+    if (authored && authored.__parse_error && accepted) blocking.push({ratio, node: scene.id, type: "recipe-parse-error", detail: `${shotFile} 的 SHOT_RECIPE 不是可求值的对象字面量`, fix: "rewrite-recipe-as-literal", auto: false});
   }
 }
 
@@ -102,6 +113,10 @@ const report = {
   scene_count: scenes.length,
   scenes,
   blocking,
+  out_of_scope_blocking: outOfScope,
+  out_of_scope_note: outOfScope.length
+    ? "ACCEPT_RATIOS=" + [...ACCEPT].join(",") + "：范围外比例的 " + outOfScope.length + " 条不计入 blocking（休眠 fixture，不阻断交付）"
+    : "",
   generated_at: new Date().toISOString(),
 };
 fs.writeFileSync(path.join(outDir, "plan_audit.json"), JSON.stringify(report, null, 2));

@@ -83,7 +83,10 @@ assert.equal(realIr.project_id, realProject.project_id, "真 Render IR 与项目
 // 4a) 时长：长片真实 IR 必须落在项目声明的目标区间内。
 const realDuration = durationTargetReport(realProject, realIr.duration);
 assert.equal(realDuration.status, "PASS", "真实长片时长必须通过：" + JSON.stringify(realDuration.issues));
-assert.ok(realDuration.target_seconds > 300, "长片目标应是长片级别，而不是被压到 40 秒");
+// 目标值必须严格来自 project.json 的 duration_target_s（当前主题 190s），且不得是短视频量级 ——
+// 旧写法硬编码 >300 是 demo（digest-explainer）时代的常量，换主题后永远打不通。
+assert.ok(realDuration.target_seconds === Number(realProject.duration_target_s), "时长目标必须来自 project.json 的 duration_target_s（" + realProject.duration_target_s + "），实得 " + realDuration.target_seconds);
+assert.ok(realDuration.target_seconds > 120, "长片目标应是长片级别（>120s），而不是被压到 40 秒的短视频量级");
 // 负向：同一个真实 IR 用短视频目标必须被拒 —— 证明时长来自真实成片而不是可随手改的 JSON。
 assert.equal(durationTargetReport({...realProject, duration_target_s:40}, realIr.duration).status, "FAIL");
 // 时间线在盘上时，真实 TTS 时间线时长也必须通过，并与 Render IR 自洽。

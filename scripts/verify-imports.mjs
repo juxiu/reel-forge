@@ -189,11 +189,22 @@ for (const f of fontSpecs) {
 }
 
 // ---- renderIR 的每个 scene 都要在 registry 里有组件 ----
+// 临时单画幅模式：口径与 qc.mjs / deliver.mjs / verify-production.mjs / verify-qc.mjs /
+// verify-text-provenance.mjs / plan-audit.mjs 一致。render-ir-9x16.json 是**休眠 fixture**
+// （旧主题 44 镜，materialize-ir.mjs 不再刷新它），registry 只会有当前主题的 scene id，
+// 对它做注册表核对只会产出与本次生产无关的假错误。范围外比例跳过并在 PASS 行显式标注。
+const ACCEPT = new Set(['16x9']);
+const skippedIrs = [];
 const regPath = path.join(SRC, 'shots/registry.jsx');
 const reg = fs.existsSync(regPath) ? fs.readFileSync(regPath, 'utf8') : '';
 for (const irFile of ['fixtures/render-ir-16x9.json', 'fixtures/render-ir-9x16.json']) {
   const abs = path.join(ROOT, irFile);
   if (!fs.existsSync(abs)) continue;
+  const ratio = (irFile.match(/render-ir-([a-z0-9]+)\.json/) || [])[1] || '';
+  if (!ACCEPT.has(ratio)) {
+    skippedIrs.push(irFile);
+    continue;
+  }
   const ir = JSON.parse(fs.readFileSync(abs, 'utf8'));
   const keys = new Set([...reg.matchAll(/['"](scene-[\w-]+)['"]\s*:/g)].map((m) => m[1]));
   for (const scene of ir.scenes || []) {
@@ -216,4 +227,4 @@ if (problems.length) {
   for (const p of [...new Set(problems)]) console.error(' - ' + p);
   process.exit(1);
 }
-console.log('IMPORT GATE PASS', JSON.stringify({files: files.length, checkedExports: exportCache.size, fonts: fontSpecs.length}));
+console.log('IMPORT GATE PASS', JSON.stringify({files: files.length, checkedExports: exportCache.size, fonts: fontSpecs.length, accept_ratios: [...ACCEPT], skipped_irs: skippedIrs}));

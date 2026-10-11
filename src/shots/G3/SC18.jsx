@@ -21,7 +21,9 @@ export const SHOT_RECIPE = {
   stage: {
     kind: "orbit",
     focus: [0, 38, 76],
-    icon: "grid",
+    // 主角图标 grid→branch：网格塞进圆形光晕是噪声（审计问题 3）；本镜语义是
+    // 「一个任务分派给多个技能再协调」，branch（分派/调度）比 grid 更准，且不与轨道节点撞图标。
+    icon: "branch",
     label: "一个任务",
     cx: 640,
     cy: 350,

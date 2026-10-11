@@ -65,16 +65,21 @@ export const DBIcon = ({cx, cy, s = 140, color = WHITE, sw = 2.5, opacity = 1, a
   );
 };
 
-/** 切片卡（检索语料块）。 */
-export const ChunkCard = ({cx, cy, w = 150, h = 92, color = WHITE, sw = 2, opacity = 1, active = false, label, rows = 2, lit = 1}) => {
+/** 切片卡（检索语料块）。
+ *  ⚠ s 优先：走 Icon/Glyph 图标槽时按 s 等比缩放。旧版签名只收 w/h，Glyph 传进来的 s
+ *    被忽略、恒画默认 150×92 —— 在 48px 槽里整卡溢出压到内容卡上（成片 SC04「游离矩形
+ *    压卡 + 空图标槽」的根因，SC11/SC15/SC21 同病）。直传 w/h 的调用不受影响。 */
+export const ChunkCard = ({cx, cy, w, h, s, color = WHITE, sw = 2, opacity = 1, active = false, label, rows = 2, lit = 1}) => {
+  const W = Math.round(w ?? (s ? s * 1.5 : 150));
+  const H = Math.round(h ?? (s ? s * 0.92 : 92));
   const c = active ? PURPLE_LIGHT : color;
-  const x = cx - w / 2;
-  const y = cy - h / 2;
+  const x = cx - W / 2;
+  const y = cy - H / 2;
   return (
     <g opacity={opacity}>
-      <rect x={x} y={y} width={w} height={h} rx={8} {...base(c, sw)} fill={active ? Rgba(PURPLE, 0.14) : '#000'} />
+      <rect x={x} y={y} width={W} height={H} rx={8} {...base(c, sw)} fill={active ? Rgba(PURPLE, 0.14) : '#000'} />
       {Array.from({length: rows}, (_, i) => (
-        <line key={i} x1={x + 14} y1={y + h * (0.36 + i * 0.24)} x2={x + w - 14 - (i % 2) * 26} y2={y + h * (0.36 + i * 0.24)} stroke={clamp01(lit - i * 0.2) > 0.5 ? c : GREY_LINE} strokeWidth={sw * 0.9} strokeLinecap="round" />
+        <line key={i} x1={x + 14} y1={y + H * (0.36 + i * 0.24)} x2={x + W - 14 - (i % 2) * 26} y2={y + H * (0.36 + i * 0.24)} stroke={clamp01(lit - i * 0.2) > 0.5 ? c : GREY_LINE} strokeWidth={sw * 0.9} strokeLinecap="round" />
       ))}
       {label ? <text x={x + 12} y={y + 22} fill={c} fontSize={20} fontFamily="'Exo 2',sans-serif" fontStyle="italic">{label}</text> : null}
     </g>

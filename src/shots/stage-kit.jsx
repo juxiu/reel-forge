@@ -251,7 +251,9 @@ export const Slot = ({x, y, w, h, i, N, f0, focus = 0, past = 0, text = "", icon
   );
 };
 
-/** 轨道上匀速行进的光点：给静态构图一件「持续到下一拍」的动词动作。 */
+/** 轨道上匀速行进的光点：给静态构图一件「持续到下一拍」的动词动作。
+ *  ⚠ 只用于**连接两个元素**的横向轨（工序推进/证据在旁）——游离在构图边缘、
+ *    不连接任何东西的竖向装饰轨已删除（成片审计：SC04/SC02 左缘虚线轴+孤立圆点 = 无信息杂线）。 */
 export const Track = ({x1, x2, y, N, f0, color = PURPLE_LIGHT}) => {
   const op = softOp(N - f0, BEAT.SOFT_IN);
   if (op <= 0) return null;
@@ -261,21 +263,6 @@ export const Track = ({x1, x2, y, N, f0, color = PURPLE_LIGHT}) => {
       {[0, 0.5].map((o, j) => {
         const t = ((N - f0) / 66 + o) % 1;
         return <circle key={j} cx={x1 + (x2 - x1) * t} cy={y} r={j === 0 ? 6 : 4.5} fill={j === 0 ? color : WHITE} opacity={0.35 + 0.65 * Math.sin(Math.PI * t)} />;
-      })}
-    </g>
-  );
-};
-
-/** 竖向轨道（带行进光点）。ladder / layerstack / causechain 用它当纵向持续动作。 */
-export const VTrack = ({x, y1, y2, N, f0, color = PURPLE_LIGHT}) => {
-  const op = softOp(N - f0, BEAT.SOFT_IN);
-  if (op <= 0) return null;
-  return (
-    <g opacity={op}>
-      <line x1={x} y1={y1} x2={x} y2={y2} stroke={GREY_LINE} strokeWidth={2} strokeDasharray="14 10" />
-      {[0, 0.5].map((o, j) => {
-        const t = ((N - f0) / 74 + o) % 1;
-        return <circle key={j} cx={x} cy={y1 + (y2 - y1) * t} r={j === 0 ? 6 : 4.5} fill={j === 0 ? color : WHITE} opacity={0.35 + 0.65 * Math.sin(Math.PI * t)} />;
       })}
     </g>
   );
@@ -358,7 +345,6 @@ export function CauseChain({plan, N, recipe}) {
   return (
     <>
       <Svg>
-        <VTrack x={x - 44} y1={top} y2={top + (items.length - 1) * gap} N={N} f0={IN} />
         {items.map((it, i) => (
           <LineArrow key={`d${it.id}`} x1={x - 44} y1={top + i * gap + 38} x2={x - 44} y2={top + (i + 1) * gap - 38} progress={drawOn(N - it.f0, 12)} color={k[i] > 0.5 ? PURPLE_LIGHT : GREY_LINE} width={2} head={9} />
         ))}
@@ -642,9 +628,6 @@ export function LayerStack({plan, N, recipe}) {
   const step = st.indent ?? 92;
   return (
     <>
-      <Svg>
-        <VTrack x={x0 - 52} y1={top + 30} y2={top + (items.length - 1) * (h + gap) + h - 30} N={N} f0={IN} />
-      </Svg>
       {items.map((it, i) => {
         const x = x0 + i * step;
         const y = top + i * (h + gap);
@@ -735,7 +718,8 @@ export function Reshape({plan, N, recipe}) {
   const rx = 824;
   const s = 208;
   const press = clamp01((N - IN - 26) / 30);
-  const shrink = 1 - 0.3 * press;
+  // 收敛幅度 0.3→0.22：形变语义保留，但左形不至缩到与右形体量失衡（审计：SC22 左轻右重）。
+  const shrink = 1 - 0.22 * press;
   const grow = 0.55 + 0.45 * press;
   // 形变在 IN+26…IN+56 就演完了，之后只剩呼吸 —— 焦点拍表把「原来的形 ↔ 变成的形 ↔ 结果」铺满整镜，
   // 两个 208×208 的大形整块换色 / dim 就是这一镜后半段的大面积步进变化。
@@ -749,7 +733,8 @@ export function Reshape({plan, N, recipe}) {
     <>
       <div style={{...abs(lx - s / 2, cy - s / 2, s, s), transform: `scale(${shrink.toFixed(3)})`, transformOrigin: `${lx}px ${cy}px`, opacity: (1 - 0.35 * press) * (1 - 0.4 * isPast(0, marks, N, plan.focusSlots))}}>
         <Box x={0} y={0} w={s} h={s} border={fromHot ? PURPLE_LIGHT : GREY} radius={12} glow={fromHot} />
-        <Glyph kind={st.from_icon || items[0]?.icon || "doc"} cx={s / 2} cy={s / 2 - 16} s={112} active={fromHot} reveal={clamp01((N - IN) / BEAT.DRAW_ON)} />
+        {/* 图标垂直居中（旧版 cy-16 让图标悬在上半部，下方留大片空白 —— 审计问题 4） */}
+        <Glyph kind={st.from_icon || items[0]?.icon || "doc"} cx={s / 2} cy={s / 2} s={112} active={fromHot} reveal={clamp01((N - IN) / BEAT.DRAW_ON)} />
         <div style={{position: 'absolute', left: 22, top: s - 30, width: s - 44, height: 4, background: fromHot ? PURPLE_LIGHT : GREY, opacity: 0.55}} />
         <div style={{position: 'absolute', left: 22, top: s + 12, width: s}}>
           <CText cx={s / 2} cy={20} size={32} weight={800} color={fromHot ? WHITE : GREY_LIGHT} maxW={s}>{items[0]?.text}</CText>
@@ -767,8 +752,9 @@ export function Reshape({plan, N, recipe}) {
       <Track x1={lx + s / 2 + 30} x2={rx - s / 2 - 30} y={cy + 62} N={N} f0={IN + 10} />
       <div style={{...abs(rx - s / 2, cy - s / 2, s, s), transform: `scale(${(grow * (1 + 0.05 * k[1])).toFixed(3)})`, transformOrigin: `${rx}px ${cy}px`, opacity: 1 - 0.35 * isPast(1, marks, N, plan.focusSlots)}}>
         <Box x={0} y={0} w={s} h={s} border={toHot ? PURPLE_LIGHT : PURPLE} radius={s / 2} glow />
-        <Glyph kind={st.to_icon || items[1]?.icon || "lock"} cx={s / 2} cy={s / 2 - 16} s={112} active reveal={clamp01((N - IN - 20) / BEAT.DRAW_ON)} />
-        <div style={{position: 'absolute', left: 30, top: s - 30, width: s - 60, height: 4, background: PURPLE, opacity: 0.9}} />
+        <Glyph kind={st.to_icon || items[1]?.icon || "lock"} cx={s / 2} cy={s / 2} s={112} active reveal={clamp01((N - IN - 20) / BEAT.DRAW_ON)} />
+        {/* 圆形（radius=s/2）内不放矩形底条：弦线截断圆周的观感 = 审计问题 3「圆被一条弦线截断」。
+            底条只属于左形的圆角矩形语义（底部填充线），右形保持纯圆 + 图标。 */}
         <div style={{position: 'absolute', left: 0, top: s + 12, width: s}}>
           <CText cx={s / 2} cy={20} size={32} weight={800} color={WHITE} maxW={s}>{items[1]?.text}</CText>
         </div>

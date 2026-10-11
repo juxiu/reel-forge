@@ -4,12 +4,12 @@
   "width": 1280,
   "height": 720,
   "fps": 30,
-  "duration": 198.36666666666665,
+  "duration": 209.73333333333335,
   "scenes": [
     {
       "id": "scene-001",
       "start": 2.8333333333333335,
-      "duration": 9.466666666666667,
+      "duration": 10.2,
       "source_ref": {
         "segment_index": 0,
         "script_id": "seg-001"
@@ -66,8 +66,8 @@
     },
     {
       "id": "scene-002",
-      "start": 12.3,
-      "duration": 9.3,
+      "start": 13.033333333333333,
+      "duration": 10.4,
       "source_ref": {
         "segment_index": 1,
         "script_id": "seg-002"
@@ -124,8 +124,8 @@
     },
     {
       "id": "scene-003",
-      "start": 21.6,
-      "duration": 8.7,
+      "start": 23.433333333333334,
+      "duration": 9.833333333333334,
       "source_ref": {
         "segment_index": 2,
         "script_id": "seg-003"
@@ -182,8 +182,8 @@
     },
     {
       "id": "scene-004",
-      "start": 30.3,
-      "duration": 8.333333333333334,
+      "start": 33.266666666666666,
+      "duration": 9.333333333333334,
       "source_ref": {
         "segment_index": 3,
         "script_id": "seg-004"
@@ -240,8 +240,8 @@
     },
     {
       "id": "scene-005",
-      "start": 38.63333333333333,
-      "duration": 7.7,
+      "start": 42.6,
+      "duration": 8.2,
       "source_ref": {
         "segment_index": 4,
         "script_id": "seg-005"
@@ -292,7 +292,7 @@
     },
     {
       "id": "scene-006",
-      "start": 46.333333333333336,
+      "start": 50.8,
       "duration": 5.566666666666666,
       "source_ref": {
         "segment_index": 5,
@@ -347,8 +347,8 @@
     },
     {
       "id": "scene-007",
-      "start": 53.5,
-      "duration": 9,
+      "start": 57.93333333333333,
+      "duration": 10.533333333333333,
       "source_ref": {
         "segment_index": 6,
         "script_id": "seg-007"
@@ -399,8 +399,8 @@
     },
     {
       "id": "scene-008",
-      "start": 62.5,
-      "duration": 8.366666666666667,
+      "start": 68.46666666666667,
+      "duration": 8.6,
       "source_ref": {
         "segment_index": 7,
         "script_id": "seg-008"
@@ -456,8 +456,8 @@
     },
     {
       "id": "scene-009",
-      "start": 70.86666666666666,
-      "duration": 7.633333333333334,
+      "start": 77.06666666666666,
+      "duration": 8.3,
       "source_ref": {
         "segment_index": 8,
         "script_id": "seg-009"
@@ -513,8 +513,8 @@
     },
     {
       "id": "scene-010",
-      "start": 78.5,
-      "duration": 8.066666666666666,
+      "start": 85.36666666666666,
+      "duration": 8.4,
       "source_ref": {
         "segment_index": 9,
         "script_id": "seg-010"
@@ -565,8 +565,8 @@
     },
     {
       "id": "scene-011",
-      "start": 86.56666666666666,
-      "duration": 7.633333333333334,
+      "start": 93.76666666666667,
+      "duration": 7.8,
       "source_ref": {
         "segment_index": 10,
         "script_id": "seg-011"
@@ -617,8 +617,8 @@
     },
     {
       "id": "scene-012",
-      "start": 94.2,
-      "duration": 7.566666666666666,
+      "start": 101.56666666666666,
+      "duration": 8.033333333333333,
       "source_ref": {
         "segment_index": 11,
         "script_id": "seg-012"
@@ -669,8 +669,8 @@
     },
     {
       "id": "scene-013",
-      "start": 103.36666666666666,
-      "duration": 7.8,
+      "start": 111.16666666666667,
+      "duration": 7.966666666666667,
       "source_ref": {
         "segment_index": 12,
         "script_id": "seg-013"
@@ -721,8 +721,8 @@
     },
     {
       "id": "scene-014",
-      "start": 111.16666666666667,
-      "duration": 6.9,
+      "start": 119.13333333333334,
+      "duration": 7.466666666666667,
       "source_ref": {
         "segment_index": 13,
         "script_id": "seg-014"
@@ -773,8 +773,8 @@
     },
     {
       "id": "scene-015",
-      "start": 118.06666666666666,
-      "duration": 7.066666666666666,
+      "start": 126.6,
+      "duration": 7.266666666666667,
       "source_ref": {
         "segment_index": 14,
         "script_id": "seg-015"
@@ -825,8 +825,8 @@
     },
     {
       "id": "scene-016",
-      "start": 125.13333333333334,
-      "duration": 7.666666666666667,
+      "start": 133.86666666666667,
+      "duration": 7.7,
       "source_ref": {
         "segment_index": 15,
         "script_id": "seg-016"
@@ -882,8 +882,8 @@
     },
     {
       "id": "scene-017",
-      "start": 132.8,
-      "duration": 9.566666666666666,
+      "start": 141.56666666666666,
+      "duration": 9.4,
       "source_ref": {
         "segment_index": 16,
         "script_id": "seg-017"
@@ -940,8 +940,8 @@
     },
     {
       "id": "scene-018",
-      "start": 142.36666666666667,
-      "duration": 6.7,
+      "start": 150.96666666666667,
+      "duration": 7.2,
       "source_ref": {
         "segment_index": 17,
         "script_id": "seg-018"
@@ -998,8 +998,8 @@
     },
     {
       "id": "scene-019",
-      "start": 150.66666666666666,
-      "duration": 8.566666666666666,
+      "start": 159.76666666666668,
+      "duration": 9.3,
       "source_ref": {
         "segment_index": 18,
         "script_id": "seg-019"
@@ -1050,8 +1050,8 @@
     },
     {
       "id": "scene-020",
-      "start": 159.23333333333332,
-      "duration": 8.5,
+      "start": 169.06666666666666,
+      "duration": 8.966666666666667,
       "source_ref": {
         "segment_index": 19,
         "script_id": "seg-020"
@@ -1102,8 +1102,8 @@
     },
     {
       "id": "scene-021",
-      "start": 167.73333333333332,
-      "duration": 7.866666666666666,
+      "start": 178.03333333333333,
+      "duration": 8.233333333333333,
       "source_ref": {
         "segment_index": 20,
         "script_id": "seg-021"
@@ -1154,8 +1154,8 @@
     },
     {
       "id": "scene-022",
-      "start": 175.6,
-      "duration": 8.166666666666666,
+      "start": 186.26666666666668,
+      "duration": 7.966666666666667,
       "source_ref": {
         "segment_index": 21,
         "script_id": "seg-022"
@@ -1206,8 +1206,8 @@
     },
     {
       "id": "scene-023",
-      "start": 183.76666666666668,
-      "duration": 7.466666666666667,
+      "start": 194.23333333333332,
+      "duration": 8.1,
       "source_ref": {
         "segment_index": 22,
         "script_id": "seg-023"
@@ -1263,8 +1263,8 @@
     },
     {
       "id": "scene-024",
-      "start": 191.23333333333332,
-      "duration": 7.133333333333334,
+      "start": 202.33333333333334,
+      "duration": 7.4,
       "source_ref": {
         "segment_index": 23,
         "script_id": "seg-024"

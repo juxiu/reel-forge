@@ -351,10 +351,12 @@ export function beatFrames(planSupport, capsOrSubFrom, len = Infinity) {
   // 入场帧上限：末拍落位后还要留 EXIT_HOLD_MIN 帧静止 + 末 EXIT_TAIL 帧离场，才轮到镜头末帧。
   const last = Math.max(1, len - BEAT.EXIT_TAIL - BEAT.EXIT_HOLD_MIN);
   const fit = (v) => Math.max(1, Math.min(Math.round(v), last));
-  /** beat 相对**离它最近的那块字幕**：QC 判的是「这场画面出现时，有没有一句正在说的字幕」，不是「当初排给了哪一块」。 */
+  /** beat 相对**离它最近的那块字幕**：QC 判的是「这场画面出现时，有没有一句正在说的字幕」，不是「当初排给了哪一块」。
+   *  平局取后一块：去标点重合成后相邻字幕块可能只隔 8 帧，锚定在块[n]−4 的元素与块[n−1] 恰好等距，
+   *  此时「比正在播的那块字幕早 4 帧」才是真状态（取前块会把它误报成 +4 出窗）。 */
   const beatOf = (f0) => {
     let best = blocks[0];
-    for (const b of blocks) if (Math.abs(b - f0) < Math.abs(best - f0)) best = b;
+    for (const b of blocks) if (Math.abs(b - f0) <= Math.abs(best - f0)) best = b;
     return f0 - best;
   };
   let bi = 0;

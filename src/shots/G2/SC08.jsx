@@ -21,7 +21,9 @@ export const SHOT_RECIPE = {
   stage: {
     kind: "orbit",
     focus: [0, 38, 76],
-    icon: "grid",
+    // 主角图标 grid→doc：主角站在圆形光晕里，7×7 网格线与圆不对齐 =「方格纸被圈住」（审计问题 3）；
+    // 本镜中心语义是 SKILL.md（三个目录围着它），doc 更准。
+    icon: "doc",
     label: "技能目录",
     cx: 640,
     cy: 350,

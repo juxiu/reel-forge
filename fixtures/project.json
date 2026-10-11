@@ -59,78 +59,30 @@
     }
   ],
   "hud": [
-    {
-      "fromS": "S01",
-      "toS": "S02",
-      "text": "技能的定义",
-      "tech": "Definition"
-    },
-    {
-      "fromS": "S03",
-      "toS": "S04",
-      "text": "与提示词的区别",
-      "tech": "vs Prompt"
-    },
-    {
-      "fromS": "S05",
-      "toS": "S06",
-      "text": "与工具的边界",
-      "tech": "vs Tools"
-    },
-    {
-      "fromS": "S07",
-      "toS": "S08",
-      "text": "一个文件夹",
-      "tech": "Folder"
-    },
-    {
-      "fromS": "S09",
-      "toS": "S10",
-      "text": "SKILL.md",
-      "tech": "Frontmatter"
-    },
-    {
-      "fromS": "S11",
-      "toS": "S12",
-      "text": "渐进式披露",
-      "tech": "Disclosure"
-    },
-    {
-      "fromS": "S13",
-      "toS": "S14",
-      "text": "发现技能",
-      "tech": "Discovery"
-    },
-    {
-      "fromS": "S15",
-      "toS": "S16",
-      "text": "执行脚本",
-      "tech": "Execution"
-    },
-    {
-      "fromS": "S17",
-      "toS": "S18",
-      "text": "上下文预算",
-      "tech": "Context"
-    },
-    {
-      "fromS": "S19",
-      "toS": "S20",
-      "text": "命名与描述",
-      "tech": "Naming"
-    },
-    {
-      "fromS": "S21",
-      "toS": "S22",
-      "text": "触发时机",
-      "tech": "Trigger"
-    },
-    {
-      "fromS": "S23",
-      "toS": "S24",
-      "text": "测试与迭代",
-      "tech": "Iterate"
-    }
+    { "fromS": "S01", "toS": "S01", "text": "为什么需要", "tech": "The Gap" },
+    { "fromS": "S02", "toS": "S02", "text": "一个文件夹", "tech": "A Folder" },
+    { "fromS": "S03", "toS": "S03", "text": "与提示词的区别", "tech": "vs Prompt" },
+    { "fromS": "S04", "toS": "S04", "text": "与常驻的区别", "tech": "vs Always-on" },
+    { "fromS": "S05", "toS": "S05", "text": "与工具的边界", "tech": "vs Tools" },
+    { "fromS": "S06", "toS": "S06", "text": "开放标准", "tech": "Open Standard" },
+    { "fromS": "S07", "toS": "S07", "text": "目录结构", "tech": "Anatomy" },
+    { "fromS": "S08", "toS": "S08", "text": "三个目录", "tech": "Three Dirs" },
+    { "fromS": "S09", "toS": "S09", "text": "SKILL.md", "tech": "Frontmatter" },
+    { "fromS": "S10", "toS": "S10", "text": "入职指南", "tech": "Onboarding" },
+    { "fromS": "S11", "toS": "S11", "text": "渐进式披露", "tech": "Disclosure" },
+    { "fromS": "S12", "toS": "S12", "text": "省上下文", "tech": "Context Budget" },
+    { "fromS": "S13", "toS": "S13", "text": "第一步：发现", "tech": "Discovery" },
+    { "fromS": "S14", "toS": "S14", "text": "相关才访问", "tech": "Relevance" },
+    { "fromS": "S15", "toS": "S15", "text": "最小加载", "tech": "Minimal Load" },
+    { "fromS": "S16", "toS": "S16", "text": "脚本执行", "tech": "Execution" },
+    { "fromS": "S17", "toS": "S17", "text": "上下文预算", "tech": "Budget" },
+    { "fromS": "S18", "toS": "S18", "text": "技能叠加", "tech": "Composition" },
+    { "fromS": "S19", "toS": "S19", "text": "命名与描述", "tech": "Naming" },
+    { "fromS": "S20", "toS": "S20", "text": "触发时机", "tech": "Trigger" },
+    { "fromS": "S21", "toS": "S21", "text": "何时值得建", "tech": "When" },
+    { "fromS": "S22", "toS": "S22", "text": "打包成能力", "tech": "Packaging" },
+    { "fromS": "S23", "toS": "S23", "text": "两种用法", "tech": "Loading" },
+    { "fromS": "S24", "toS": "S24", "text": "所以是什么", "tech": "Recap" }
   ],
   "chapterTech": [
     "What Is a Skill",

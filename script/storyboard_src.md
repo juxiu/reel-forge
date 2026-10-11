@@ -11,7 +11,7 @@
 | SC | 起–止 | 节拍 | 画面 | 动效 |
 | --- | --- | --- | --- | --- |
 | SC01 | {S01.from}–{S01.to} | 通用 Agent 缺方法 | pipeline3 三段工序：通用能力→缺口→容器；阶段徽章 + 格内进度条 | continuous: 格内进度条推进 + 紫度在槽间交接（11f 爬坡）; hold: 36f |
-| SC02 | {S02.from}–{S02.to} | 技能就是一个文件夹 | causechain 纵向因果：容器→SKILL.md→动态加载 | continuous: 纵向轨道光点行进 + 焦点交接; hold: 36f |
+| SC02 | {S02.from}–{S02.to} | 技能就是一个文件夹 | causechain 纵向因果：容器→SKILL.md→动态加载 | continuous: 下游箭头逐段点亮 + 焦点交接; hold: 36f |
 | SC03 | {S03.from}–{S03.to} | 重复粘贴的指令 | comparetable 双列对照：提示词列 vs 技能列 | continuous: 逐行焦点交接 + 整行框换色; hold: 36f |
 | SC04 | {S04.from}–{S04.to} | 正文按需读入 | layerstack 三层层叠：常驻描述 / 命中正文 / 按需资料 | continuous: 层次板错位展开后逐层点亮; hold: 36f |
 | SC05 | {S05.from}–{S05.to} | 工具与技能的边界 | splitrows 左右两列对置：工具与插件 / 技能 | continuous: 中缝竖分隔画入 + 逐行紫高亮交接; hold: 36f |
@@ -33,4 +33,4 @@
 | SC21 | {S21.from}–{S21.to} | 什么时候值得建技能 | ballot 三候选并排，选中项落勾 | continuous: 候选进度条推进 + 焦点交接; hold: 36f |
 | SC22 | {S22.from}–{S22.to} | 把专长打包成能力 | reshape 碎片 Agent 压成一个通用能力形 | continuous: 形变残留聚焦在高亮两形之间交接; hold: 36f |
 | SC23 | {S23.from}–{S23.to} | 自动与点名两种调用 | splitrows 自动加载 vs 点名调用 | continuous: 中缝竖分隔画入 + 逐行紫高亮交接; hold: 36f |
-| SC24 | {S24.from}–{S24.to} | 从一个文件夹开始 | causechain 收束：文件夹→方法论→入职指南 | continuous: 纵向轨道光点行进 + 焦点交接; hold: 36f |
+| SC24 | {S24.from}–{S24.to} | 从一个文件夹开始 | causechain 收束：文件夹→方法论→入职指南 | continuous: 下游箭头逐段点亮 + 焦点交接; hold: 36f |
