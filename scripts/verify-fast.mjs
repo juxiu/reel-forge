@@ -44,7 +44,7 @@ const checks = [
   "verify:semantic-director",
   // Production-linked director preflight: validates IR/script/registry identities and risk flags without rendering.
   "verify:director-contract",
-  "verify:director-preflight",
+  "verify:director-preflight:static",
   "verify:footage",
   // a2e 硬性原则 2「事实有出处」在本仓库**只有这一个执行者**，而它此前只在一键链里跑
   // （skill.mjs:119）—— 本地 fast 与 CI 都不碰它。它的 B 段就是这样在没人跑的地方
