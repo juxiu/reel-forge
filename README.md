@@ -1,7 +1,5 @@
 # reel-forge
 
-
-
 > **当前临时运行模式（2026-10-11）**：GitHub Actions 工作流已停用；生产渲染、QC、Repair 与 Delivery 当前只执行 16:9。9:16 Composition 暂时未注册，不会生成竖屏成片；对应 IR 文件保留为休眠资产，后续可恢复。`npm run verify:fast` 仍可在本地手动运行。
 
 Agent-native 视频生产引擎。
