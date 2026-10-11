@@ -7,6 +7,7 @@ function requireText(condition, message) {
   if (!condition) throw new Error("audit guard missing: " + message);
 }
 const materializer = read("scripts/materialize-shots.mjs");
+const verifyShots = read("scripts/verify-shots.mjs");
 const fingerprint = read("src/release/fingerprint.mjs");
 const skill = read("scripts/skill.mjs");
 const buildGroups = read("scripts/build-groups.mjs");
@@ -15,6 +16,7 @@ const orchestrator = read("src/agents/orchestrator.mjs");
 const manifest = JSON.parse(read("src/shots/AUTHORED_PROJECT.json"));
 
 requireText(/project identity mismatch/.test(materializer), "project and render IR identity mismatch must fail closed");
+requireText(/active shot import missing/.test(verifyShots) && /fallback-SCxx/.test(verifyShots), "shot verification must validate the component selected by the group index");
 requireText(/AUTHORED_PROJECT\.json/.test(materializer), "authored shot pack must declare its topic identity");
 requireText(/authoredPackMatches/.test(materializer) && /source_urls/.test(materializer), "authored pack reuse must be bound to topic and sources");
 requireText(/@reel-forge-project/.test(materializer) && /fallback-/.test(materializer), "unmatched authored shots must route through isolated fallback components");
@@ -27,6 +29,6 @@ requireText(Boolean(manifest.project_id && manifest.request && Array.isArray(man
 
 console.log("audit guards PASS", JSON.stringify({
   authored_pack: manifest.project_id,
-  guards: 10,
+  guards: 11,
   test_scope: "source-level contracts only; not a render or pixel acceptance test",
 }));
