@@ -2,6 +2,8 @@
 
 > 本文只描述**现在真实存在**的模块、调用关系与数据流。每条结论都指向文件；任何「制度上应该有、代码里没有」的东西不写在这里，而写在 [VISUAL_GRAMMAR.md](VISUAL_GRAMMAR.md) 的「⚠ 只有 lint / 无执行者」列与 [knowledge/agent-protocol.md](knowledge/agent-protocol.md) §5。
 >
+> **临时运行模式（2026-10-11）**：GitHub Actions 工作流已移除；Remotion 当前只注册并输出 16:9。`fixtures/render-ir-9x16.json` 保留但不属于活动渲染、QC 或交付链。
+>
 > 一句话定位：**reel-forge = 一个 Agent Skill（判断）+ 一条确定性流水线（执行）**。Agent 负责语义判断（调研取舍、导演意图、QC 语义判定），脚本负责可复现的一切（时间轴、装配、渲染、测量、修复、交付）。二者的边界就是「同一输入是否必须得到同一输出」。
 
 ---
@@ -15,7 +17,7 @@
 | Agent 层 | [src/agents/orchestrator.mjs](../src/agents/orchestrator.mjs)、[src/agents/task-brief.mjs](../src/agents/task-brief.mjs)、[src/providers/agent/](../src/providers/agent/) | 四个角色派单、任务书注入、provider 适配 | 部分 |
 | 内容生产层 | [src/research/](../src/research/)、[src/director/](../src/director/)、[src/captions/](../src/captions/)、[scripts/tts_build.mjs](../scripts/tts_build.mjs)、[scripts/sync-script.mjs](../scripts/sync-script.mjs) | 调研、解说词、配音、时间轴、分镜 | 是 |
 | 装配层 | [src/backends/render-ir.mjs](../src/backends/render-ir.mjs)、[src/shots/plan.mjs](../src/shots/plan.mjs)、[src/shots/stage-kit.jsx](../src/shots/stage-kit.jsx)、[src/shots/registry.jsx](../src/shots/registry.jsx) | RenderIR、镜头计划、舞台拓扑、镜头注册 | 是 |
-| 渲染层 | [src/remotion/](../src/remotion/)、[scripts/render.sh](../scripts/render.sh)、[scripts/render-preview.mjs](../scripts/render-preview.mjs) | Composition、覆盖层、双比例渲染 | 是 |
+| 渲染层 | [src/remotion/](../src/remotion/)、[scripts/render.sh](../scripts/render.sh)、[scripts/render-preview.mjs](../scripts/render-preview.mjs) | Composition、覆盖层、临时单比例（16:9）渲染 | 是 |
 | 质量层 | [scripts/frame_metrics.py](../scripts/frame_metrics.py)、[scripts/motion_check.py](../scripts/motion_check.py)、[scripts/qc.mjs](../scripts/qc.mjs)、[scripts/plan-audit.mjs](../scripts/plan-audit.mjs)、[scripts/verify-*.mjs](../scripts/) | 测量、审计、门禁 | 是 |
 | 修复层 | [src/repair/engine.mjs](../src/repair/engine.mjs)、[src/qc/flags.mjs](../src/qc/flags.mjs)、[scripts/repair.mjs](../scripts/repair.mjs)、[scripts/repair-cycle.mjs](../scripts/repair-cycle.mjs) | 缺陷分级、路由、定向修复 | 是 |
 | 交付层 | [scripts/deliver.mjs](../scripts/deliver.mjs)、[src/delivery/package.mjs](../src/delivery/package.mjs)、[src/release/fingerprint.mjs](../src/release/fingerprint.mjs)、[scripts/verify-production.mjs](../scripts/verify-production.mjs) | checksum manifest、输入指纹、生产门 | 是 |
@@ -61,7 +63,7 @@ fixtures/project.json            ← 作者源（含 hud / credit / chapterTech 
         │              src/shots/registry.jsx ← scene-001…scene-044 → SCxx.jsx
         │                    │
         │                    ▼
-        │              render.sh → artifacts/render/reel-forge-{16x9,9x16}.mp4
+        │              render.sh → artifacts/render/reel-forge-16x9.mp4
         │                    │  frame 导出 → artifacts/frames/<ratio>/f_*.png
         │                    ▼
         │              qc.mjs → frame_metrics / motion_check / visual_regression / text_provenance
@@ -95,7 +97,7 @@ fixtures/project.json            ← 作者源（含 hud / credit / chapterTech 
 | `artifacts/<pid>/qc/{frame_metrics,motion,visual_regression,text_provenance}_*.json` | python 测量层 | `qc.mjs`、`verify-production` |
 | `artifacts/<pid>/qc/report.json`（含 `input_fingerprint`） | `qc.mjs` | `deliver`、`verify-production` |
 | `artifacts/<pid>/repair/{status,repair-plan,source-repair}.json` | `repair.mjs` | `verify-production`、审计 |
-| `artifacts/render/reel-forge-{16x9,9x16}.mp4` | `render.sh` | QC、交付 |
+| `artifacts/render/reel-forge-16x9.mp4`（9:16 暂停） | `render.sh` | QC、交付 |
 | `artifacts/delivery/<pid>/delivery-manifest.json` | `deliver.mjs` | `verify-production`（逐文件 sha256+size） |
 | `artifacts/<pid>/storyboard.md` | `storyboard-gen.mjs` | 人工审阅（导演意图文档） |
 | `artifacts/deliver/sheet-16x9.html` | `sheet-gen.mjs` | QC 通读全片（接在 `render.sh` 尾部） |
@@ -145,7 +147,7 @@ fixtures/project.json            ← 作者源（含 hud / credit / chapterTech 
 ```text
 [人工] length-language ─ narration-signoff ─ voiceover ─ pilot-preview
    │
-   ├─ scaffold ──────────── package.json / Remotion Composition（双比例）
+   ├─ scaffold ──────────── package.json / Remotion Composition（仅 16:9，临时模式）
    ├─ research ──────────── research.json/.md（claims 带 source）
    ├─ narration ─────────── script/narration.txt（4 章 44 段，段落=画面单元）
    ├─ tts/timeline ──────── audio.wav + timeline.json + captions.json（真实 WordBoundary）
@@ -153,7 +155,7 @@ fixtures/project.json            ← 作者源（含 hud / credit / chapterTech 
    ├─ primitives ────────── Primitives / Fx / Icons / style.mjs
    ├─ pilot ─────────────── preview 30s + pilot approval（硬门禁）
    ├─ parallel-build ────── build-groups(8) → materialize-shots → registry.jsx
-   ├─ render ────────────── render.sh → 16:9 + 9:16 mp4 → frames → sheet-gen
+   ├─ render ────────────── render.sh → 16:9 mp4 → frames → sheet-gen（9:16 暂停）
    ├─ qc ────────────────── plan-audit → frame_metrics / motion / visual_regression / text_provenance → report.json
    ├─ repair ────────────── status / repair-plan / source-repair（含 rerender hook + 二轮 QC）
    └─ delivery ──────────── checksum manifest → verify:production
