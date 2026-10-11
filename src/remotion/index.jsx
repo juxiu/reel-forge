@@ -1,7 +1,6 @@
 import React from 'react';
 import {Composition, registerRoot} from 'remotion';
 import fixtureWide from '../../fixtures/render-ir-16x9.json';
-import fixtureTall from '../../fixtures/render-ir-9x16.json';
 import captions from '../../fixtures/captions.json';
 import buildGroups from '../../fixtures/build-groups.json';
 import project from '../../fixtures/project.json';
@@ -49,15 +48,6 @@ export const RemotionRoot = () => (
       width={fixtureWide.width}
       height={fixtureWide.height}
       defaultProps={baseProps(fixtureWide)}
-    />
-    <Composition
-      id="ReelForge9x16"
-      component={ReelForgeComposition}
-      durationInFrames={totalFramesOf(fixtureTall)}
-      fps={Number(fixtureTall.fps) || FPS}
-      width={fixtureTall.width}
-      height={fixtureTall.height}
-      defaultProps={baseProps(fixtureTall)}
     />
     <Composition
       id="Overlay"
