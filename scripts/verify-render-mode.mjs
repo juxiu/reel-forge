@@ -13,6 +13,7 @@ const delivery = read("scripts/deliver.mjs");
 const verifyDelivery = read("scripts/verify-delivery.mjs");
 const verifyProduction = read("scripts/verify-production.mjs");
 const skill = read("scripts/skill.mjs");
+const debugShot = read("scripts/debug-shot.mjs");
 const fingerprint = read("src/release/fingerprint.mjs");
 
 assert.deepEqual(project.target_ratios, ["16:9"], "project target_ratios must contain only 16:9");
@@ -23,6 +24,8 @@ assert.match(render, /ReelForge16x9 artifacts\/render\/reel-forge-16x9\.mp4/);
 assert.doesNotMatch(render, /ReelForge9x16|reel-forge-9x16\.mp4|extract artifacts\/render\/reel-forge-9x16/, "render.sh must not render or extract portrait video");
 assert.match(render, /COUNT_16/);
 assert.doesNotMatch(render, /COUNT_9/, "render.sh must not require portrait frame output");
+assert.match(debugShot, /const RATIOS = \["16x9"\]/, "single-shot renderer must allow only 16:9");
+assert.match(debugShot, /9:16 渲染暂时停用/, "single-shot renderer must explain the disabled ratio");
 
 // Keep the portrait IR file available as a dormant reference, but stop regenerating it in production.
 const activeMaterializeCode = materialize.split("\n").filter((line) => !line.trim().startsWith("//")).join("\n");
