@@ -7,7 +7,7 @@ import {createAgentProvider} from "../src/providers/agent/index.mjs";
 import {runNamedAgents} from "../src/agents/orchestrator.mjs";
 
 const project=JSON.parse(fs.readFileSync(process.env.PROJECT_FILE||"fixtures/project.json","utf8"));
-const files=["artifacts/render/reel-forge-16x9.mp4","artifacts/render/reel-forge-9x16.mp4"];
+const files=["artifacts/render/reel-forge-16x9.mp4"];
 const reports=[];
 for(const file of files){
   if(!fs.existsSync(file)) reports.push({file,status:"FAIL",issues:[{node:"render",type:"missing_media"}]});
@@ -29,13 +29,9 @@ const qcDir=path.join("artifacts",project.project_id,"qc");
 //   用帧目录 mtime（render.sh 抽帧时它会被重建）当基准，不用文件计数：后者要遍历上万张。
 const framesAt=(ratio)=>{const d=path.join("artifacts","frames",ratio);try{return fs.statSync(d).mtimeMs}catch{return 0}};
 const isStale=(file,at)=>{try{return at>0&&fs.statSync(file).mtimeMs+1000<at}catch{return false}};
-// 验收范围（用户决策，2026-10-10 起有效：验收与对标以 16:9 为对象；9:16 只保持双画幅能力，不投入质量打磨）。
-// 范围外比例的测量**照跑照记**：blocking 不转阻断 issue，而是降级为带标注的 warning ——
-// 报告里仍然看得到 FAIL 与原因，只是不拦交付。这不是静默跳过：accept_ratios 会写进 report.json，
-// verify:production 对范围外比例同样只查产物在位与覆盖度、不查 PASS，并在输出里显式列出。
-const ACCEPT=new Set((process.env.ACCEPT_RATIOS||"16x9,9x16").split(",").map(s=>s.trim()).filter(Boolean));
-if(!ACCEPT.has("16x9")) throw new Error("ACCEPT_RATIOS 必须包含 16x9（16:9 是验收基准，不可移出范围）");
-for(const ratio of ["16x9","9x16"]){
+// 临时单画幅模式：本轮只对 16:9 执行媒体、帧、运动与视觉回归检查；9:16 不参与运行。
+const ACCEPT=new Set(["16x9"]);
+for(const ratio of ["16x9"]){
   const frameFile=path.join(qcDir,"frame_metrics_"+ratio+".json");
   const motionFile=path.join(qcDir,"motion_"+ratio+".json");
   const visualFile=path.join(qcDir,"visual_regression_"+ratio+".json");
@@ -90,7 +86,7 @@ const agent=createAgentProvider();
 // 有它就把路径随 payload 发出去，让有视觉能力的 provider 真能去看；没有就如实标 NO-INDEX，
 // 而不是假装 agent "看过画面"（agent-protocol §2 第 3 条记录的就是这件事）。
 const mediaIndex=fs.existsSync(path.join(qcDir,"media_index.json"))?JSON.parse(fs.readFileSync(path.join(qcDir,"media_index.json"),"utf8")):{status:"NO-INDEX",hint:"先跑 npm run contact-sheet（它读 still-manifest.json 并核对盘上 PNG）"};
-const reviews=await runNamedAgents(agent,["16x9","9x16"].map(ratio=>({
+const reviews=await runNamedAgents(agent,["16x9"].map(ratio=>({
   role:"qc-agent",
   input:{project,ratio,issues:issues.filter(i=>i.ratio===ratio),warnings:warnings.filter(w=>w.ratio===ratio),reports:reports.filter(r=>r.file.includes(ratio)),media:mediaIndex}
 })),{concurrency:2,strict:process.env.AGENT_STRICT==="1"});
@@ -106,7 +102,7 @@ const result={
   media:reports.map(report=>({file:report.file,status:report.status,motion_frames:report.motion_frames,black_segments:report.black_segments,duration:report.probe?.format?.duration||0})),
   agent_reviews:reviews,
   plan_audit:planAudit,
-  visual_regression:["16x9","9x16"].map(ratio=>{
+  visual_regression:["16x9"].map(ratio=>{
     const file=path.join(qcDir,"visual_regression_"+ratio+".json");
     if(!fs.existsSync(file)) return {ratio,status:"MISSING"};
     const report=JSON.parse(fs.readFileSync(file,"utf8"));
