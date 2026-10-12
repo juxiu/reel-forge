@@ -1,7 +1,7 @@
 {
-  "project_id": "skill-explainer",
+  "project_id": "skill-agent-c6ecb8f0e11e",
   "concurrency": 4,
-  "agent_mode": "existing-authored-source-reuse",
+  "agent_mode": "external-agent",
   "groups": [
     {
       "id": "G1",
@@ -13,7 +13,7 @@
         "scene-005",
         "scene-006"
       ],
-      "agent_status": "skipped",
+      "agent_status": "completed",
       "source_status": "bound-to-script",
       "status": "reused",
       "changed_shots": 0
@@ -28,7 +28,7 @@
         "scene-011",
         "scene-012"
       ],
-      "agent_status": "skipped",
+      "agent_status": "completed",
       "source_status": "bound-to-script",
       "status": "reused",
       "changed_shots": 0
@@ -43,7 +43,7 @@
         "scene-017",
         "scene-018"
       ],
-      "agent_status": "skipped",
+      "agent_status": "completed",
       "source_status": "bound-to-script",
       "status": "reused",
       "changed_shots": 0
@@ -58,7 +58,7 @@
         "scene-023",
         "scene-024"
       ],
-      "agent_status": "skipped",
+      "agent_status": "completed",
       "source_status": "bound-to-script",
       "status": "reused",
       "changed_shots": 0

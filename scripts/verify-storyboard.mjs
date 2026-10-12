@@ -212,7 +212,7 @@ try {
   expect(
     "没有持续动作要失败",
     {match: "missing continuous action: SC02"},
-    produce({caseName: "no-continuous", srcText: mutate("continuous: 下游箭头逐段点亮 + 焦点交接; ", "")}),
+    produce({caseName: "no-continuous", srcText: mutate("continuous: 自主循环持续旋转 + 工具节点逐个点亮; ", "")}),
   );
   expect(
     "末拍稳定期 <30 帧要失败",
@@ -222,12 +222,12 @@ try {
   expect(
     "白名单外的镜头用 Glitch 要失败",
     {match: "glitch over whitelist: SC01"},
-    produce({caseName: "glitch-offlist", srcText: mutate("阶段徽章 + 格内进度条", "阶段徽章 + 格内进度条 (GlitchIn)")}),
+    produce({caseName: "glitch-offlist", srcText: mutate("三段管线：同一个词→几种定义→先分清", "三段管线：同一个词→几种定义→先分清 (GlitchIn)")}),
   );
   expect(
     "白名单外的镜头用扫光图元要失败",
     {match: "light-sweep over whitelist: SC01"},
-    produce({caseName: "sweep-offlist", srcText: mutate("阶段徽章 + 格内进度条", "阶段徽章 + 格内进度条 + LightSweep")}),
+    produce({caseName: "sweep-offlist", srcText: mutate("三段管线：同一个词→几种定义→先分清", "三段管线：同一个词→几种定义→先分清 + LightSweep")}),
   );
   expect(
     "分镜引用了时间轴没有的句子要出声（不是 KeyError 回溯）",

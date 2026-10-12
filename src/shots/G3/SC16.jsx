@@ -1,10 +1,10 @@
-// reel-forge-source: {"project_id":"skill-explainer","script_id":"seg-016","script_sha256":"7b6fbde19dffa079b0f626822c4d56913800d312ed5c7ae1901690d8dc9efaff"}
+// reel-forge-source: {"project_id":"skill-agent-c6ecb8f0e11e","script_id":"seg-016","script_sha256":"874f89f2f0485f822fd2e070265445d31180e488b6872259feb1564092847469"}
 import React from "react";
 import {ExplainerShot} from "../Shot.jsx";
 import {G3_STAGE} from "./stage.jsx";
 
 /**
- * SC16 · terminal —— 真正干活的是脚本。
+ * SC16 · terminal —— Skills 按需发现并加载。
  *
  * 拓扑骨架在 ../stage-kit.jsx，本镜的摆法（几何 / 文案 / 焦点拍）全在下面这个 stage 里。
  * ⚠ 不声明入场帧：入场帧由 buildPlan 从字幕块推出（-6…+3 窗口），节拍与语义镜头同源。
@@ -17,15 +17,15 @@ export const SHOT_RECIPE = {
   hero_size: 200,
   camera: "pan",
   settle_frames: 30,
-  narrative_job: "真正干活的是脚本",
+  narrative_job: "Skills 按需发现并加载",
   stage: {
     kind: "terminal",
     focus: [0, 38, 76],
-    title: "run.sh",
+    title: "skills/",
     items: [
-      {id: "t1", icon: undefined, text: "$ skill run scripts/collect.py"},
-      {id: "t2", icon: undefined, text: "-> 读取本地文件系统"},
-      {id: "t3", icon: undefined, text: "-> 写回结构化结论"},
+      {id: "t1", icon: undefined, text: "$ agent 需要一项专长"},
+      {id: "t2", icon: undefined, text: "-> 扫描 skills 文件夹"},
+      {id: "t3", icon: undefined, text: "-> 按需加载指令与脚本"},
     ],
   },
 };

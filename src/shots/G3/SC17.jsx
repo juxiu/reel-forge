@@ -1,10 +1,10 @@
-// reel-forge-source: {"project_id":"skill-explainer","script_id":"seg-017","script_sha256":"965a774165263ed7419b74195b6e9ce5066be736aef6b54bfefd1aaf7de779bc"}
+// reel-forge-source: {"project_id":"skill-agent-c6ecb8f0e11e","script_id":"seg-017","script_sha256":"30f5997c91c2cf2aa69129899f495fdd98b6b684271ade55b98ef42c4590b2bf"}
 import React from "react";
 import {ExplainerShot} from "../Shot.jsx";
 import {G3_STAGE} from "./stage.jsx";
 
 /**
- * SC17 · comparetable —— 命中那一刻才付出成本。
+ * SC17 · comparetable —— 专长从散落提示词到资源包。
  *
  * 拓扑骨架在 ../stage-kit.jsx，本镜的摆法（几何 / 文案 / 焦点拍）全在下面这个 stage 里。
  * ⚠ 不声明入场帧：入场帧由 buildPlan 从字幕块推出（-6…+3 窗口），节拍与语义镜头同源。
@@ -17,18 +17,18 @@ export const SHOT_RECIPE = {
   hero_size: 200,
   camera: "parallax",
   settle_frames: 30,
-  narrative_job: "命中那一刻才付出成本",
+  narrative_job: "专长从散落提示词到资源包",
   stage: {
     kind: "comparetable",
     focus: [0, 38, 76],
-    left_label: "常驻",
-    right_label: "命中时",
+    left_label: "散落提示词",
+    right_label: "打包资源",
     winner: 1,
     items: [
-      {id: "l1", icon: "doc", text: "只有名字与描述"},
-      {id: "r1", icon: "db", text: "指令与资料"},
-      {id: "l2", icon: "clock", text: "几乎不占预算"},
-      {id: "r2", icon: "gauge", text: "按次付成本"},
+      {id: "l1", icon: "doc", text: "用完就散"},
+      {id: "r1", icon: "grid", text: "可组合资源"},
+      {id: "l2", icon: "clock", text: "重复粘贴"},
+      {id: "r2", icon: "link", text: "随取随用"},
     ],
   },
 };

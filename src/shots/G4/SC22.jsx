@@ -1,10 +1,10 @@
-// reel-forge-source: {"project_id":"skill-explainer","script_id":"seg-022","script_sha256":"852e3d160b89a41bf06cce44650bc952ad146ffecb257ef55398aadf8f33ffe7"}
+// reel-forge-source: {"project_id":"skill-agent-c6ecb8f0e11e","script_id":"seg-022","script_sha256":"d457549f4c7f2241a8c09b1b7d92b5095c41a79c4d47b20567647e4a9fd54853"}
 import React from "react";
 import {ExplainerShot} from "../Shot.jsx";
 import {G4_STAGE} from "./stage.jsx";
 
 /**
- * SC22 · reshape —— 把专长打包成能力。
+ * SC22 · reshape —— 开放标准跨平台。
  *
  * 拓扑骨架在 ../stage-kit.jsx，本镜的摆法（几何 / 文案 / 焦点拍）全在下面这个 stage 里。
  * ⚠ 不声明入场帧：入场帧由 buildPlan 从字幕块推出（-6…+3 窗口），节拍与语义镜头同源。
@@ -17,19 +17,17 @@ export const SHOT_RECIPE = {
   hero_size: 200,
   camera: "pan",
   settle_frames: 30,
-  narrative_job: "把专长打包成能力",
+  narrative_job: "开放标准跨平台",
   stage: {
     kind: "reshape",
     focus: [0, 38],
-    // to_icon grid→shield：网格线塞进圆形 = 审计问题 3「方格纸被圈住」；shield=能力/专长，
-    // 与「把专长打包成能力」的语义对位，圆形内只留一枚居中图标。
-    from_icon: "person",
-    to_icon: "shield",
-    from_sub: "每个场景各造一个",
-    to_sub: "长出专才分支",
+    from_icon: "lock",
+    to_icon: "link",
+    from_sub: "绑定一家平台",
+    to_sub: "标准跨平台移植",
     items: [
-      {id: "f", icon: "person", text: "碎片技能"},
-      {id: "t", icon: "shield", text: "通用能力"},
+      {id: "f", icon: "lock", text: "私有绑定"},
+      {id: "t", icon: "link", text: "开放标准"},
     ],
   },
 };

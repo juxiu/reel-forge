@@ -1,10 +1,10 @@
-// reel-forge-source: {"project_id":"skill-explainer","script_id":"seg-015","script_sha256":"14b39c8e6174864ced22a766f783fc48568f61f6e0df0abfbdfaf9fb04546160"}
+// reel-forge-source: {"project_id":"skill-agent-c6ecb8f0e11e","script_id":"seg-015","script_sha256":"edd641669f5faca68dbbf811b0aa1751bc569491aad2bbc7e0173607bb5b9a7b"}
 import React from "react";
 import {ExplainerShot} from "../Shot.jsx";
 import {G3_STAGE} from "./stage.jsx";
 
 /**
- * SC15 · reshape —— 只加载最小的那一部分。
+ * SC15 · reshape —— 越强大越需要领域专长。
  *
  * 拓扑骨架在 ../stage-kit.jsx，本镜的摆法（几何 / 文案 / 焦点拍）全在下面这个 stage 里。
  * ⚠ 不声明入场帧：入场帧由 buildPlan 从字幕块推出（-6…+3 窗口），节拍与语义镜头同源。
@@ -17,17 +17,17 @@ export const SHOT_RECIPE = {
   hero_size: 200,
   camera: "push",
   settle_frames: 30,
-  narrative_job: "只加载最小的那一部分",
+  narrative_job: "越强大越需要领域专长",
   stage: {
     kind: "reshape",
     focus: [0, 38],
-    from_icon: "db",
-    to_icon: "chunk",
-    from_sub: "一千行文档",
-    to_sub: "响应还很快",
+    from_icon: "person",
+    to_icon: "shield",
+    from_sub: "越强大的通用能力",
+    to_sub: "越要可组合的专长",
     items: [
-      {id: "f", icon: "db", text: "全部内容"},
-      {id: "t", icon: "chunk", text: "最小片段"},
+      {id: "f", icon: "person", text: "通用能力"},
+      {id: "t", icon: "shield", text: "领域专长"},
     ],
   },
 };

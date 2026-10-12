@@ -1,10 +1,10 @@
-// reel-forge-source: {"project_id":"skill-explainer","script_id":"seg-013","script_sha256":"e5d64301459f03a3dc237525c8bbecc99c801aba4bc5baed3a9c60e198874ebd"}
+// reel-forge-source: {"project_id":"skill-agent-c6ecb8f0e11e","script_id":"seg-013","script_sha256":"107a7a20a1fcdb45d81ccfa7a47711a54c741493c1b01a03b6663a7d98441e93"}
 import React from "react";
 import {ExplainerShot} from "../Shot.jsx";
 import {G3_STAGE} from "./stage.jsx";
 
 /**
- * SC13 · pipeline3 —— 第一步是发现。
+ * SC13 · pipeline3 —— 通用 agent 走进计算环境。
  *
  * 拓扑骨架在 ../stage-kit.jsx，本镜的摆法（几何 / 文案 / 焦点拍）全在下面这个 stage 里。
  * ⚠ 不声明入场帧：入场帧由 buildPlan 从字幕块推出（-6…+3 窗口），节拍与语义镜头同源。
@@ -17,15 +17,15 @@ export const SHOT_RECIPE = {
   hero_size: 190,
   camera: "pan",
   settle_frames: 30,
-  narrative_job: "第一步是发现",
+  narrative_job: "通用 agent 走进计算环境",
   stage: {
     kind: "pipeline3",
     focus: [0, 38, 76],
-    subs: ["扫描手上的技能","找出相关的","变成候选"],
+    subs: ["模型在变强","环境更完整","交互更真实"],
     items: [
-      {id: "s1", icon: "funnel", text: "扫描"},
-      {id: "s2", icon: "link", text: "匹配"},
-      {id: "s3", icon: "grid", text: "候选"},
+      {id: "s1", icon: "gauge", text: "模型变强"},
+      {id: "s2", icon: "db", text: "完整计算环境"},
+      {id: "s3", icon: "branch", text: "直接交互"},
     ],
   },
 };

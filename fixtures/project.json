@@ -1,117 +1,78 @@
 {
-  "project_id": "skill-explainer",
+  "project_id": "skill-agent-c6ecb8f0e11e",
   "rails": [
     {
-      "steps": [
-        "定义",
-        "对比",
-        "边界"
-      ],
-      "switchS": [
-        "S01",
-        "S03",
-        "S05"
-      ],
+      "steps": ["一词多义", "两种定义", "一条分界"],
+      "switchS": ["S01", "S02", "S04"],
       "fromS": "S01",
-      "toS": "S06"
+      "toS": "S05"
     },
     {
-      "steps": [
-        "目录",
-        "前言",
-        "披露"
-      ],
-      "switchS": [
-        "S07",
-        "S09",
-        "S11"
-      ],
-      "fromS": "S07",
-      "toS": "S12"
+      "steps": ["agent 定义", "经验结论", "取舍"],
+      "switchS": ["S06", "S07", "S11"],
+      "fromS": "S06",
+      "toS": "S11"
     },
     {
-      "steps": [
-        "发现",
-        "执行",
-        "预算"
-      ],
-      "switchS": [
-        "S13",
-        "S15",
-        "S17"
-      ],
-      "fromS": "S13",
-      "toS": "S18"
+      "steps": ["通用不够", "走进环境", "装上专长"],
+      "switchS": ["S12", "S13", "S15"],
+      "fromS": "S12",
+      "toS": "S17"
     },
     {
-      "steps": [
-        "命名",
-        "触发",
-        "迭代"
-      ],
-      "switchS": [
-        "S19",
-        "S21",
-        "S23"
-      ],
-      "fromS": "S19",
+      "steps": ["技能形状", "通用变专用", "开放收束"],
+      "switchS": ["S18", "S20", "S22"],
+      "fromS": "S18",
       "toS": "S24"
     }
   ],
   "hud": [
-    { "fromS": "S01", "toS": "S01", "text": "为什么需要", "tech": "The Gap" },
-    { "fromS": "S02", "toS": "S02", "text": "一个文件夹", "tech": "A Folder" },
-    { "fromS": "S03", "toS": "S03", "text": "与提示词的区别", "tech": "vs Prompt" },
-    { "fromS": "S04", "toS": "S04", "text": "与常驻的区别", "tech": "vs Always-on" },
-    { "fromS": "S05", "toS": "S05", "text": "与工具的边界", "tech": "vs Tools" },
-    { "fromS": "S06", "toS": "S06", "text": "开放标准", "tech": "Open Standard" },
-    { "fromS": "S07", "toS": "S07", "text": "目录结构", "tech": "Anatomy" },
-    { "fromS": "S08", "toS": "S08", "text": "三个目录", "tech": "Three Dirs" },
-    { "fromS": "S09", "toS": "S09", "text": "SKILL.md", "tech": "Frontmatter" },
-    { "fromS": "S10", "toS": "S10", "text": "入职指南", "tech": "Onboarding" },
-    { "fromS": "S11", "toS": "S11", "text": "渐进式披露", "tech": "Disclosure" },
-    { "fromS": "S12", "toS": "S12", "text": "省上下文", "tech": "Context Budget" },
-    { "fromS": "S13", "toS": "S13", "text": "第一步：发现", "tech": "Discovery" },
-    { "fromS": "S14", "toS": "S14", "text": "相关才访问", "tech": "Relevance" },
-    { "fromS": "S15", "toS": "S15", "text": "最小加载", "tech": "Minimal Load" },
-    { "fromS": "S16", "toS": "S16", "text": "脚本执行", "tech": "Execution" },
-    { "fromS": "S17", "toS": "S17", "text": "上下文预算", "tech": "Budget" },
-    { "fromS": "S18", "toS": "S18", "text": "技能叠加", "tech": "Composition" },
-    { "fromS": "S19", "toS": "S19", "text": "命名与描述", "tech": "Naming" },
-    { "fromS": "S20", "toS": "S20", "text": "触发时机", "tech": "Trigger" },
-    { "fromS": "S21", "toS": "S21", "text": "何时值得建", "tech": "When" },
-    { "fromS": "S22", "toS": "S22", "text": "打包成能力", "tech": "Packaging" },
-    { "fromS": "S23", "toS": "S23", "text": "两种用法", "tech": "Loading" },
-    { "fromS": "S24", "toS": "S24", "text": "所以是什么", "tech": "Recap" }
+    { "fromS": "S01", "toS": "S01", "text": "一词多义", "tech": "One Word" },
+    { "fromS": "S02", "toS": "S02", "text": "完全自主派", "tech": "Autonomy" },
+    { "fromS": "S03", "toS": "S03", "text": "预定流程派", "tech": "Prescriptive" },
+    { "fromS": "S04", "toS": "S04", "text": "统称与分界", "tech": "Taxonomy" },
+    { "fromS": "S05", "toS": "S05", "text": "workflow 一侧", "tech": "Workflow" },
+    { "fromS": "S06", "toS": "S06", "text": "agent 一侧", "tech": "Agent" },
+    { "fromS": "S07", "toS": "S07", "text": "数十团队一年", "tech": "Field Notes" },
+    { "fromS": "S08", "toS": "S08", "text": "不靠框架", "tech": "No Framework" },
+    { "fromS": "S09", "toS": "S09", "text": "简单可组合", "tech": "Composable" },
+    { "fromS": "S10", "toS": "S10", "text": "可组合专门化", "tech": "Specialize" },
+    { "fromS": "S11", "toS": "S11", "text": "可控与灵活", "tech": "Trade-off" },
+    { "fromS": "S12", "toS": "S12", "text": "通用≠能干活", "tech": "General Gap" },
+    { "fromS": "S13", "toS": "S13", "text": "完整计算环境", "tech": "Environment" },
+    { "fromS": "S14", "toS": "S14", "text": "Claude Code", "tech": "Example" },
+    { "fromS": "S15", "toS": "S15", "text": "越强越要专长", "tech": "Expertise" },
+    { "fromS": "S16", "toS": "S16", "text": "Skills 文件夹", "tech": "Skills" },
+    { "fromS": "S17", "toS": "S17", "text": "打包成资源", "tech": "Package" },
+    { "fromS": "S18", "toS": "S18", "text": "目录+SKILL.md", "tech": "Directory" },
+    { "fromS": "S19", "toS": "S19", "text": "像入职指南", "tech": "Onboarding" },
+    { "fromS": "S20", "toS": "S20", "text": "通用变专用", "tech": "Transform" },
+    { "fromS": "S21", "toS": "S21", "text": "捕获与分享", "tech": "Share" },
+    { "fromS": "S22", "toS": "S22", "text": "开放标准", "tech": "Open Standard" },
+    { "fromS": "S23", "toS": "S23", "text": "谱系收束", "tech": "Spectrum" },
+    { "fromS": "S24", "toS": "S24", "text": "模式长存", "tech": "Patterns Last" }
   ],
-  "chapterTech": [
-    "What Is a Skill",
-    "Anatomy",
-    "Runtime",
-    "Authoring"
-  ],
+  "chapterTech": ["What Is an Agent", "Two Sides", "General to Special", "Shape of a Skill"],
   "title": {
-    "big": "SKILL",
-    "rest": "什么是技能",
-    "en": "Agent Skills",
-    "tagline": "把方法论写成 Agent 能用的说明书"
+    "big": "AGENT",
+    "rest": "agent 是什么",
+    "en": "Agentic Systems",
+    "tagline": "从写死的流程到自主的系统，中间隔一条架构分界线"
   },
   "credit": {
     "kicker": "REEL-FORGE 样片",
-    "title": "什么是技能",
+    "title": "agent 是什么",
     "byline": "脚本 · 画面 · 配音 全部由 reel-forge 生产线生成",
     "note": "all visuals drawn in code"
   },
-  "request": "Explain what an Agent Skill is, how it is structured, how it runs, and how to author a good one.",
+  "request": "agent是什么",
   "language": "zh",
   "target_ratios": [
     "16:9"
   ],
   "source_urls": [
-    "https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills",
-    "https://code.claude.com/docs/en/skills",
-    "https://agentskills.io/",
-    "https://www.anthropic.com/news/skills"
+    "https://www.anthropic.com/engineering/building-effective-agents",
+    "https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills"
   ],
   "duration_target_s": 190
 }

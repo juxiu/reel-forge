@@ -10,15 +10,15 @@
   ],
   "literals": [
     {
-      "literal": "$ skill run scripts/collect.py",
+      "literal": "$ agent 需要一项专长",
       "file": "src/shots/G3/SC16.jsx"
     },
     {
-      "literal": "-> 写回结构化结论",
+      "literal": "-> 扫描 skills 文件夹",
       "file": "src/shots/G3/SC16.jsx"
     },
     {
-      "literal": "-> 读取本地文件系统",
+      "literal": "-> 按需加载指令与脚本",
       "file": "src/shots/G3/SC16.jsx"
     },
     {
@@ -42,20 +42,24 @@
       "file": "src/shots/plan.mjs"
     },
     {
+      "literal": "Claude Code",
+      "file": "src/shots/G3/SC14.jsx"
+    },
+    {
+      "literal": "LLM 与工具",
+      "file": "src/shots/G1/SC05.jsx"
+    },
+    {
       "literal": "SKILL.md",
-      "file": "src/shots/G1/SC02.jsx"
+      "file": "src/shots/G3/SC18.jsx"
     },
     {
-      "literal": "SKILL.md（必需）",
-      "file": "src/shots/G2/SC07.jsx"
+      "literal": "agent",
+      "file": "src/shots/G1/SC06.jsx"
     },
     {
-      "literal": "assets",
-      "file": "src/shots/G2/SC07.jsx"
-    },
-    {
-      "literal": "description",
-      "file": "src/shots/G2/SC09.jsx"
+      "literal": "agent 一端",
+      "file": "src/shots/G4/SC23.jsx"
     },
     {
       "literal": "header",
@@ -66,10 +70,6 @@
       "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "name",
-      "file": "src/shots/G2/SC09.jsx"
-    },
-    {
       "literal": "payload",
       "file": "src/shots/plan.mjs"
     },
@@ -78,20 +78,12 @@
       "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "references",
-      "file": "src/shots/G2/SC07.jsx"
-    },
-    {
       "literal": "request",
       "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "run.sh",
+      "literal": "skills/",
       "file": "src/shots/G3/SC16.jsx"
-    },
-    {
-      "literal": "scripts",
-      "file": "src/shots/G2/SC07.jsx"
     },
     {
       "literal": "transform",
@@ -102,184 +94,144 @@
       "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "一个任务",
-      "file": "src/shots/G3/SC18.jsx"
-    },
-    {
-      "literal": "一个文件夹",
-      "file": "src/shots/G1/SC02.jsx"
-    },
-    {
-      "literal": "一次性接入",
-      "file": "src/shots/G1/SC05.jsx"
-    },
-    {
-      "literal": "不用再踩一遍",
-      "file": "src/shots/G2/SC10.jsx"
-    },
-    {
-      "literal": "两种都靠描述",
+      "literal": "workflow 一端",
       "file": "src/shots/G4/SC23.jsx"
+    },
+    {
+      "literal": "一线经验",
+      "file": "src/shots/G2/SC07.jsx"
+    },
+    {
+      "literal": "不用专用库",
+      "file": "src/shots/G2/SC08.jsx"
+    },
+    {
+      "literal": "不用复杂框架",
+      "file": "src/shots/G2/SC08.jsx"
+    },
+    {
+      "literal": "专用库",
+      "file": "src/shots/G2/SC09.jsx"
+    },
+    {
+      "literal": "专长装入容器",
+      "file": "src/shots/G4/SC24.jsx"
+    },
+    {
+      "literal": "专门化 agent",
+      "file": "src/shots/G4/SC21.jsx"
+    },
+    {
+      "literal": "两种走法",
+      "file": "src/shots/G1/SC04.jsx"
     },
     {
       "literal": "主张",
       "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "九成是描述没写好",
-      "file": "src/shots/G4/SC19.jsx"
-    },
-    {
-      "literal": "也是入职指南",
-      "file": "src/shots/G4/SC24.jsx"
-    },
-    {
-      "literal": "什么时候用它",
-      "file": "src/shots/G2/SC10.jsx"
-    },
-    {
-      "literal": "从一个文件夹开始",
-      "file": "src/shots/G4/SC24.jsx"
+      "literal": "交给模型，灵活",
+      "file": "src/shots/G2/SC11.jsx"
     },
     {
       "literal": "优选",
       "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "候选",
-      "file": "src/shots/G3/SC13.jsx"
+      "literal": "何时用讲明白",
+      "file": "src/shots/G4/SC19.jsx"
     },
     {
-      "literal": "候选技能",
-      "file": "src/shots/G3/SC14.jsx"
+      "literal": "先分清",
+      "file": "src/shots/G1/SC01.jsx"
     },
     {
-      "literal": "免重写",
-      "file": "src/shots/G1/SC06.jsx"
+      "literal": "先想清楚要哪种",
+      "file": "src/shots/G2/SC11.jsx"
     },
     {
-      "literal": "入职指南",
-      "file": "src/shots/G2/SC10.jsx"
+      "literal": "共同点",
+      "file": "src/shots/G2/SC08.jsx"
     },
     {
-      "literal": "全部内容",
-      "file": "src/shots/G3/SC15.jsx"
+      "literal": "写死路径，可控",
+      "file": "src/shots/G2/SC11.jsx"
     },
     {
-      "literal": "全量常驻",
-      "file": "src/shots/G2/SC12.jsx"
-    },
-    {
-      "literal": "几乎不占预算",
-      "file": "src/shots/G3/SC17.jsx"
-    },
-    {
-      "literal": "匹配",
-      "file": "src/shots/G3/SC13.jsx"
+      "literal": "几种定义",
+      "file": "src/shots/G1/SC01.jsx"
     },
     {
       "literal": "原文",
       "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "反复粘贴",
-      "file": "src/shots/G4/SC21.jsx"
+      "literal": "反复验证",
+      "file": "src/shots/G2/SC07.jsx"
     },
     {
-      "literal": "只有名字与描述",
-      "file": "src/shots/G3/SC17.jsx"
-    },
-    {
-      "literal": "可叠加组合",
-      "file": "src/shots/G1/SC05.jsx"
+      "literal": "变成专用 agent",
+      "file": "src/shots/G4/SC20.jsx"
     },
     {
       "literal": "可检验",
       "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "同一格式",
-      "file": "src/shots/G1/SC06.jsx"
+      "literal": "可组合能力",
+      "file": "src/shots/G2/SC10.jsx"
     },
     {
-      "literal": "命中：正文",
-      "file": "src/shots/G1/SC04.jsx"
+      "literal": "可组合资源",
+      "file": "src/shots/G3/SC17.jsx"
     },
     {
-      "literal": "固定下来",
-      "file": "src/shots/G1/SC03.jsx"
+      "literal": "同一个词",
+      "file": "src/shots/G1/SC01.jsx"
+    },
+    {
+      "literal": "坑提前写进去",
+      "file": "src/shots/G4/SC19.jsx"
+    },
+    {
+      "literal": "完全自主",
+      "file": "src/shots/G1/SC02.jsx"
+    },
+    {
+      "literal": "完整计算环境",
+      "file": "src/shots/G3/SC13.jsx"
+    },
+    {
+      "literal": "定制 agent",
+      "file": "src/shots/G2/SC10.jsx"
     },
     {
       "literal": "实测 B",
       "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "小段描述",
-      "file": "src/shots/G2/SC12.jsx"
-    },
-    {
-      "literal": "常驻：名字与描述",
-      "file": "src/shots/G1/SC04.jsx"
-    },
-    {
       "literal": "开放标准",
-      "file": "src/shots/G1/SC06.jsx"
+      "file": "src/shots/G4/SC22.jsx"
     },
     {
-      "literal": "扫描",
-      "file": "src/shots/G3/SC13.jsx"
-    },
-    {
-      "literal": "技能 A",
-      "file": "src/shots/G3/SC18.jsx"
-    },
-    {
-      "literal": "技能 B",
-      "file": "src/shots/G3/SC18.jsx"
-    },
-    {
-      "literal": "技能 C",
-      "file": "src/shots/G3/SC18.jsx"
-    },
-    {
-      "literal": "技能容器",
-      "file": "src/shots/G1/SC01.jsx"
-    },
-    {
-      "literal": "技能目录",
-      "file": "src/shots/G2/SC08.jsx"
-    },
-    {
-      "literal": "把踩过的坑写清",
-      "file": "src/shots/G2/SC10.jsx"
-    },
-    {
-      "literal": "指令与资料",
-      "file": "src/shots/G3/SC17.jsx"
-    },
-    {
-      "literal": "指令正文",
-      "file": "src/shots/G2/SC09.jsx"
-    },
-    {
-      "literal": "按次付成本",
-      "file": "src/shots/G3/SC17.jsx"
-    },
-    {
-      "literal": "按需：附属资料",
-      "file": "src/shots/G1/SC04.jsx"
-    },
-    {
-      "literal": "描述写得含糊",
+      "literal": "怎么干写清楚",
       "file": "src/shots/G4/SC19.jsx"
     },
     {
-      "literal": "描述是唯一的门",
-      "file": "src/shots/G4/SC23.jsx"
+      "literal": "指令",
+      "file": "src/shots/G3/SC18.jsx"
     },
     {
-      "literal": "描述：一直挂着",
-      "file": "src/shots/G2/SC11.jsx"
+      "literal": "按流程走",
+      "file": "src/shots/G1/SC03.jsx"
+    },
+    {
+      "literal": "按需专门化",
+      "file": "src/shots/G2/SC10.jsx"
+    },
+    {
+      "literal": "捕获程序性知识",
+      "file": "src/shots/G4/SC21.jsx"
     },
     {
       "literal": "改造前",
@@ -290,8 +242,20 @@
       "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "文档塞不下",
-      "file": "src/shots/G4/SC21.jsx"
+      "literal": "数十个团队",
+      "file": "src/shots/G2/SC07.jsx"
+    },
+    {
+      "literal": "整套绑定",
+      "file": "src/shots/G2/SC09.jsx"
+    },
+    {
+      "literal": "文件系统",
+      "file": "src/shots/G3/SC14.jsx"
+    },
+    {
+      "literal": "新员工入职指南",
+      "file": "src/shots/G4/SC19.jsx"
     },
     {
       "literal": "方案 A",
@@ -302,12 +266,8 @@
       "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "无关技能",
+      "literal": "本地代码执行",
       "file": "src/shots/G3/SC14.jsx"
-    },
-    {
-      "literal": "最小片段",
-      "file": "src/shots/G3/SC15.jsx"
     },
     {
       "literal": "机制",
@@ -318,36 +278,40 @@
       "file": "src/shots/plan.mjs"
     },
     {
+      "literal": "架构分界线",
+      "file": "src/shots/G1/SC04.jsx"
+    },
+    {
       "literal": "校验",
       "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "模板与素材",
-      "file": "src/shots/G2/SC08.jsx"
+      "literal": "框架会过时",
+      "file": "src/shots/G4/SC24.jsx"
     },
     {
-      "literal": "正文：命中才读",
-      "file": "src/shots/G2/SC11.jsx"
+      "literal": "模型变强",
+      "file": "src/shots/G3/SC13.jsx"
     },
     {
-      "literal": "步骤与边界",
-      "file": "src/shots/G2/SC09.jsx"
+      "literal": "模式不会",
+      "file": "src/shots/G4/SC24.jsx"
     },
     {
-      "literal": "每次重写",
+      "literal": "每个场景造一个",
+      "file": "src/shots/G2/SC10.jsx"
+    },
+    {
+      "literal": "每个用例重造",
+      "file": "src/shots/G4/SC21.jsx"
+    },
+    {
+      "literal": "照规定接龙",
       "file": "src/shots/G1/SC03.jsx"
     },
     {
-      "literal": "沉淀的文档",
-      "file": "src/shots/G2/SC08.jsx"
-    },
-    {
-      "literal": "没有触发时机",
-      "file": "src/shots/G4/SC19.jsx"
-    },
-    {
-      "literal": "清单变长",
-      "file": "src/shots/G4/SC21.jsx"
+      "literal": "照路径执行",
+      "file": "src/shots/G1/SC05.jsx"
     },
     {
       "literal": "现象",
@@ -355,23 +319,31 @@
     },
     {
       "literal": "用完就散",
-      "file": "src/shots/G1/SC03.jsx"
+      "file": "src/shots/G3/SC17.jsx"
     },
     {
-      "literal": "直接点名调用",
-      "file": "src/shots/G4/SC23.jsx"
+      "literal": "用工具完成任务",
+      "file": "src/shots/G1/SC06.jsx"
     },
     {
-      "literal": "相关技能",
-      "file": "src/shots/G3/SC14.jsx"
+      "literal": "用工具完成复杂任务",
+      "file": "src/shots/G1/SC02.jsx"
     },
     {
-      "literal": "相关时自动加载",
-      "file": "src/shots/G4/SC23.jsx"
+      "literal": "用简单模式",
+      "file": "src/shots/G2/SC08.jsx"
     },
     {
-      "literal": "碎片技能",
+      "literal": "直接交互",
+      "file": "src/shots/G3/SC13.jsx"
+    },
+    {
+      "literal": "私有绑定",
       "file": "src/shots/G4/SC22.jsx"
+    },
+    {
+      "literal": "程序性知识",
+      "file": "src/shots/G2/SC12.jsx"
     },
     {
       "literal": "第一步",
@@ -386,8 +358,8 @@
       "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "等于不存在",
-      "file": "src/shots/G4/SC19.jsx"
+      "literal": "简单模式",
+      "file": "src/shots/G2/SC09.jsx"
     },
     {
       "literal": "结构化",
@@ -402,44 +374,52 @@
       "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "给一双手",
-      "file": "src/shots/G1/SC05.jsx"
+      "literal": "统称 agentic systems",
+      "file": "src/shots/G1/SC04.jsx"
     },
     {
-      "literal": "给方法",
-      "file": "src/shots/G1/SC05.jsx"
+      "literal": "脚本",
+      "file": "src/shots/G3/SC18.jsx"
     },
     {
-      "literal": "能力边界",
-      "file": "src/shots/G4/SC20.jsx"
+      "literal": "自主决定步骤",
+      "file": "src/shots/G1/SC06.jsx"
     },
     {
-      "literal": "能跑的代码",
-      "file": "src/shots/G2/SC08.jsx"
+      "literal": "自主决策",
+      "file": "src/shots/G4/SC23.jsx"
+    },
+    {
+      "literal": "自己拿主意",
+      "file": "src/shots/G1/SC03.jsx"
+    },
+    {
+      "literal": "自由组合",
+      "file": "src/shots/G2/SC09.jsx"
     },
     {
       "literal": "落库",
       "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "装的是方法论",
-      "file": "src/shots/G4/SC24.jsx"
+      "literal": "装入专长",
+      "file": "src/shots/G4/SC20.jsx"
     },
     {
       "literal": "观测",
       "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "触发时机",
-      "file": "src/shots/G4/SC20.jsx"
-    },
-    {
       "literal": "诱因",
       "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "跨平台",
-      "file": "src/shots/G1/SC06.jsx"
+      "literal": "资料",
+      "file": "src/shots/G3/SC18.jsx"
+    },
+    {
+      "literal": "路径写死",
+      "file": "src/shots/G4/SC23.jsx"
     },
     {
       "literal": "转发",
@@ -450,32 +430,44 @@
       "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "适用场景",
+      "literal": "过去一年",
+      "file": "src/shots/G2/SC07.jsx"
+    },
+    {
+      "literal": "通用 agent",
       "file": "src/shots/G4/SC20.jsx"
     },
     {
       "literal": "通用能力",
-      "file": "src/shots/G4/SC22.jsx"
+      "file": "src/shots/G3/SC15.jsx"
+    },
+    {
+      "literal": "重复粘贴",
+      "file": "src/shots/G3/SC17.jsx"
     },
     {
       "literal": "重试",
       "file": "src/shots/plan.mjs"
     },
     {
-      "literal": "附属文件：按需再取",
-      "file": "src/shots/G2/SC11.jsx"
+      "literal": "长期独立运行",
+      "file": "src/shots/G1/SC06.jsx"
     },
     {
-      "literal": "随时复用",
-      "file": "src/shots/G1/SC03.jsx"
+      "literal": "随取随用",
+      "file": "src/shots/G3/SC17.jsx"
     },
     {
-      "literal": "需要时自己加载",
-      "file": "src/shots/G1/SC02.jsx"
+      "literal": "顺序先定好",
+      "file": "src/shots/G1/SC05.jsx"
     },
     {
-      "literal": "领域缺口",
-      "file": "src/shots/G1/SC01.jsx"
+      "literal": "预定义路径",
+      "file": "src/shots/G1/SC05.jsx"
+    },
+    {
+      "literal": "领域专长",
+      "file": "src/shots/G3/SC15.jsx"
     }
   ]
 }

@@ -1,10 +1,10 @@
-// reel-forge-source: {"project_id":"skill-explainer","script_id":"seg-014","script_sha256":"7e6dae4dac6211adc5d1e3a62741f6d92240915d4d9bd1c3e19d28fc3033d8e1"}
+// reel-forge-source: {"project_id":"skill-agent-c6ecb8f0e11e","script_id":"seg-014","script_sha256":"44581573eeccf5a7c61371322e5dda2d7ea226e7a34b2a5f590e59b91e35a6b1"}
 import React from "react";
 import {ExplainerShot} from "../Shot.jsx";
 import {G3_STAGE} from "./stage.jsx";
 
 /**
- * SC14 · ballot —— 没有匹配就完全不碰。
+ * SC14 · ballot —— 例证 Claude Code。
  *
  * 拓扑骨架在 ../stage-kit.jsx，本镜的摆法（几何 / 文案 / 焦点拍）全在下面这个 stage 里。
  * ⚠ 不声明入场帧：入场帧由 buildPlan 从字幕块推出（-6…+3 窗口），节拍与语义镜头同源。
@@ -17,15 +17,15 @@ export const SHOT_RECIPE = {
   hero_size: 185,
   camera: "parallax",
   settle_frames: 30,
-  narrative_job: "没有匹配就完全不碰",
+  narrative_job: "例证 Claude Code",
   stage: {
     kind: "ballot",
     focus: [0, 38, 76],
-    pick: 1,
+    pick: 0,
     items: [
-      {id: "b1", icon: "doc", text: "无关技能"},
-      {id: "b2", icon: "chip", text: "相关技能"},
-      {id: "b3", icon: "grid", text: "候选技能"},
+      {id: "b1", icon: "chip", text: "Claude Code"},
+      {id: "b2", icon: "doc", text: "本地代码执行"},
+      {id: "b3", icon: "db", text: "文件系统"},
     ],
   },
 };

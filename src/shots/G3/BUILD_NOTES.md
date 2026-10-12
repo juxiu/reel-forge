@@ -10,3 +10,4 @@
 - G3 由 scripts/materialize-shots.mjs 登记 6 镜：SC13(scene-013) SC14(scene-014) SC15(scene-015) SC16(scene-016) SC17(scene-017) SC18(scene-018)
 - G3 由 scripts/materialize-shots.mjs 登记 6 镜：SC13(scene-013) SC14(scene-014) SC15(scene-015) SC16(scene-016) SC17(scene-017) SC18(scene-018)
 - G3 由 scripts/materialize-shots.mjs 登记 6 镜：SC13(scene-013) SC14(scene-014) SC15(scene-015) SC16(scene-016) SC17(scene-017) SC18(scene-018)
+- G3 由 scripts/materialize-shots.mjs 登记 6 镜：SC13(scene-013) SC14(scene-014) SC15(scene-015) SC16(scene-016) SC17(scene-017) SC18(scene-018)

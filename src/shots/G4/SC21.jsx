@@ -1,10 +1,10 @@
-// reel-forge-source: {"project_id":"skill-explainer","script_id":"seg-021","script_sha256":"6c597a83b912fb91811b25ce4b6665dd603fe884dd1d3f3f1badd6add43a5b39"}
+// reel-forge-source: {"project_id":"skill-agent-c6ecb8f0e11e","script_id":"seg-021","script_sha256":"e3092898f55177ed4f4cb59752b4a0aa57017acc779523e38ddec08889f2a394"}
 import React from "react";
 import {ExplainerShot} from "../Shot.jsx";
 import {G4_STAGE} from "./stage.jsx";
 
 /**
- * SC21 · ballot —— 什么时候值得建一个技能。
+ * SC21 · ballot —— 捕获知识而非重造。
  *
  * 拓扑骨架在 ../stage-kit.jsx，本镜的摆法（几何 / 文案 / 焦点拍）全在下面这个 stage 里。
  * ⚠ 不声明入场帧：入场帧由 buildPlan 从字幕块推出（-6…+3 窗口），节拍与语义镜头同源。
@@ -17,15 +17,15 @@ export const SHOT_RECIPE = {
   hero_size: 185,
   camera: "push",
   settle_frames: 30,
-  narrative_job: "什么时候值得建一个技能",
+  narrative_job: "捕获知识而非重造",
   stage: {
     kind: "ballot",
     focus: [0, 38, 76],
-    pick: 2,
+    pick: 1,
     items: [
-      {id: "b1", icon: "doc", text: "反复粘贴"},
-      {id: "b2", icon: "chunk", text: "清单变长"},
-      {id: "b3", icon: "db", text: "文档塞不下"},
+      {id: "b1", icon: "grid", text: "每个用例重造"},
+      {id: "b2", icon: "db", text: "捕获程序性知识"},
+      {id: "b3", icon: "person", text: "专门化 agent"},
     ],
   },
 };

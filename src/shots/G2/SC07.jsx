@@ -1,10 +1,10 @@
-// reel-forge-source: {"project_id":"skill-explainer","script_id":"seg-007","script_sha256":"7f73fec33e6cd25182555a46d4f6eb3195e6106d671559d0ace9e121587fbce2"}
+// reel-forge-source: {"project_id":"skill-agent-c6ecb8f0e11e","script_id":"seg-007","script_sha256":"3bb3ecdba72526c002e459211d43594b80b5b40d6e097e545a594e89c5288e18"}
 import React from "react";
 import {ExplainerShot} from "../Shot.jsx";
 import {G2_STAGE} from "./stage.jsx";
 
 /**
- * SC07 · layerstack —— 一个技能目录长这样。
+ * SC07 · layerstack —— 一年、数十个团队的现场经验。
  *
  * 拓扑骨架在 ../stage-kit.jsx，本镜的摆法（几何 / 文案 / 焦点拍）全在下面这个 stage 里。
  * ⚠ 不声明入场帧：入场帧由 buildPlan 从字幕块推出（-6…+3 窗口），节拍与语义镜头同源。
@@ -17,15 +17,15 @@ export const SHOT_RECIPE = {
   hero_size: 200,
   camera: "push",
   settle_frames: 30,
-  narrative_job: "一个技能目录长这样",
+  narrative_job: "一年、数十个团队的现场经验",
   stage: {
     kind: "layerstack",
     focus: [0, 38, 76],
     items: [
-      {id: "a1", icon: "doc", text: "SKILL.md（必需）"},
-      {id: "a2", icon: "chip", text: "scripts"},
-      {id: "a3", icon: "db", text: "references"},
-      {id: "a4", icon: "rack", text: "assets"},
+      {id: "a1", icon: "clock", text: "过去一年"},
+      {id: "a2", icon: "gauge", text: "数十个团队"},
+      {id: "a3", icon: "doc", text: "一线经验"},
+      {id: "a4", icon: "grid", text: "反复验证"},
     ],
   },
 };

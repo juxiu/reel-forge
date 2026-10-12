@@ -1,10 +1,10 @@
-// reel-forge-source: {"project_id":"skill-explainer","script_id":"seg-011","script_sha256":"972d3d6910399f4c10e31439daa4ac9de0220c879461aae42b879b2b36803c8a"}
+// reel-forge-source: {"project_id":"skill-agent-c6ecb8f0e11e","script_id":"seg-011","script_sha256":"0714f147a1eef9d6ba5fe9bea2a184f5eb4bb132c1ea728b042caa10dbc9e163"}
 import React from "react";
 import {ExplainerShot} from "../Shot.jsx";
 import {G2_STAGE} from "./stage.jsx";
 
 /**
- * SC11 · ladder —— 关键在于渐进式披露。
+ * SC11 · ladder —— 可控与灵活，按任务选。
  *
  * 拓扑骨架在 ../stage-kit.jsx，本镜的摆法（几何 / 文案 / 焦点拍）全在下面这个 stage 里。
  * ⚠ 不声明入场帧：入场帧由 buildPlan 从字幕块推出（-6…+3 窗口），节拍与语义镜头同源。
@@ -17,14 +17,14 @@ export const SHOT_RECIPE = {
   hero_size: 190,
   camera: "parallax",
   settle_frames: 30,
-  narrative_job: "关键在于渐进式披露",
+  narrative_job: "可控与灵活，按任务选",
   stage: {
     kind: "ladder",
     focus: [0, 38, 76],
     items: [
-      {id: "l1", icon: "doc", text: "描述：一直挂着"},
-      {id: "l2", icon: "chunk", text: "正文：命中才读"},
-      {id: "l3", icon: "db", text: "附属文件：按需再取"},
+      {id: "l1", icon: "link", text: "写死路径，可控"},
+      {id: "l2", icon: "chip", text: "交给模型，灵活"},
+      {id: "l3", icon: "key", text: "先想清楚要哪种"},
     ],
   },
 };

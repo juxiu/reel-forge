@@ -1,10 +1,10 @@
-// reel-forge-source: {"project_id":"skill-explainer","script_id":"seg-005","script_sha256":"7764d6b48abaedc4dac8cc8797efae20d6eb8fdb761a409c6b837ae478db4e1d"}
+// reel-forge-source: {"project_id":"skill-agent-c6ecb8f0e11e","script_id":"seg-005","script_sha256":"767c8833052c6383eafb7520409689320078735c017baac538d665b3b8c5de74"}
 import React from "react";
 import {ExplainerShot} from "../Shot.jsx";
 import {G1_STAGE} from "./stage.jsx";
 
 /**
- * SC05 · splitrows —— 工具给手，技能给方法。
+ * SC05 · splitrows —— workflow 由代码路径编排。
  *
  * 拓扑骨架在 ../stage-kit.jsx，本镜的摆法（几何 / 文案 / 焦点拍）全在下面这个 stage 里。
  * ⚠ 不声明入场帧：入场帧由 buildPlan 从字幕块推出（-6…+3 窗口），节拍与语义镜头同源。
@@ -17,18 +17,18 @@ export const SHOT_RECIPE = {
   hero_size: 190,
   camera: "parallax",
   settle_frames: 30,
-  narrative_job: "工具给手，技能给方法",
+  narrative_job: "workflow 由代码路径编排",
   stage: {
     kind: "splitrows",
     focus: [0, 38, 76],
-    left_label: "工具与插件",
-    right_label: "技能",
-    winner: 1,
+    left_label: "代码路径",
+    right_label: "LLM 与工具",
+    winner: 0,
     items: [
-      {id: "l1", icon: "chip", text: "给一双手"},
-      {id: "r1", icon: "branch", text: "给方法"},
-      {id: "l2", icon: "lock", text: "一次性接入"},
-      {id: "r2", icon: "grid", text: "可叠加组合"},
+      {id: "l1", icon: "link", text: "预定义路径"},
+      {id: "r1", icon: "chip", text: "LLM 与工具"},
+      {id: "l2", icon: "doc", text: "顺序先定好"},
+      {id: "r2", icon: "grid", text: "照路径执行"},
     ],
   },
 };

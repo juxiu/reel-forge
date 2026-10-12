@@ -1,34 +1,190 @@
 {
-  "project_id": "skill-explainer",
+  "project_id": "skill-agent-c6ecb8f0e11e",
   "sources": [
+    {
+      "id": "src-7d24e5faa2",
+      "url": "https://www.anthropic.com/engineering/building-effective-agents",
+      "title": "Building Effective AI Agents \\ Anthropic",
+      "content_hash": "5e6870383ba8331d5794a71d73ce5b20105d5d021ea515ee478eb518e2b8534a"
+    },
     {
       "id": "src-77ae700ce1",
       "url": "https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills",
       "title": "Equipping agents for the real world with Agent Skills \\ Anthropic",
       "content_hash": "0318f00d80a63ec7f4ca49fdcf88c039a3715d76be1a699fa07029966e0c1e05"
-    },
-    {
-      "id": "src-bbd9e46f13",
-      "url": "https://code.claude.com/docs/en/skills",
-      "title": "Extend Claude with skills - Claude Code Docs",
-      "content_hash": "4abb3cb99438a18717e381d7555c3dc32ffa57afc2e9f5c8743dc4a1ffc7445b"
-    },
-    {
-      "id": "src-47e636d803",
-      "url": "https://agentskills.io/",
-      "title": "Agent Skills Overview - Agent Skills",
-      "content_hash": "26c3ff8e984fe2c8f2c4b19f6d5a76a677fc4c0f3b8e67dd12078aa8c45f10ab"
-    },
-    {
-      "id": "src-bfa87fb31b",
-      "url": "https://www.anthropic.com/news/skills",
-      "title": "Introducing Agent Skills | Claude by Anthropic",
-      "content_hash": "cb0ed9a6f568972bb14198d88ed0d3d0a6a2f53bfd2824444689acd14b1a88b2"
     }
   ],
   "claims": [
     {
       "id": "claim-001",
+      "statement": "Building Effective AI Agents \\ Anthropic Skip to main content Skip to footer Research Policy Commitments Learn News Try Claude Engineering at Anthropic Building effective agents Published Dec 19, 2024 We&#x27;ve worked with dozens of teams building LLM agents across industries.",
+      "source_ids": [
+        "src-7d24e5faa2"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-7d24e5faa2",
+          "url": "https://www.anthropic.com/engineering/building-effective-agents",
+          "excerpt": "Building Effective AI Agents \\ Anthropic Skip to main content Skip to footer Research Policy Commitments Learn News Try Claude Engineering at Anthropic Building effective agents Published Dec 19, 2024 We&#x27;ve worked with dozens of teams building LLM agents across industries."
+        }
+      ]
+    },
+    {
+      "id": "claim-002",
+      "statement": "Consistently, the most successful implementations use simple, composable patterns rather than complex frameworks.",
+      "source_ids": [
+        "src-7d24e5faa2"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-7d24e5faa2",
+          "url": "https://www.anthropic.com/engineering/building-effective-agents",
+          "excerpt": "Consistently, the most successful implementations use simple, composable patterns rather than complex frameworks."
+        }
+      ]
+    },
+    {
+      "id": "claim-003",
+      "statement": "Note: Much of the tooling landscape described in this post has changed since December 2024.",
+      "source_ids": [
+        "src-7d24e5faa2"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-7d24e5faa2",
+          "url": "https://www.anthropic.com/engineering/building-effective-agents",
+          "excerpt": "Note: Much of the tooling landscape described in this post has changed since December 2024."
+        }
+      ]
+    },
+    {
+      "id": "claim-004",
+      "statement": "For our current approach, see how we built Claude Managed Agents and the Managed Agents documentation .",
+      "source_ids": [
+        "src-7d24e5faa2"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-7d24e5faa2",
+          "url": "https://www.anthropic.com/engineering/building-effective-agents",
+          "excerpt": "For our current approach, see how we built Claude Managed Agents and the Managed Agents documentation ."
+        }
+      ]
+    },
+    {
+      "id": "claim-005",
+      "statement": "Over the past year, we&#x27;ve worked with dozens of teams building large language model (LLM) agents across industries.",
+      "source_ids": [
+        "src-7d24e5faa2"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-7d24e5faa2",
+          "url": "https://www.anthropic.com/engineering/building-effective-agents",
+          "excerpt": "Over the past year, we&#x27;ve worked with dozens of teams building large language model (LLM) agents across industries."
+        }
+      ]
+    },
+    {
+      "id": "claim-006",
+      "statement": "Consistently, the most successful implementations weren&#x27;t using complex frameworks or specialized libraries.",
+      "source_ids": [
+        "src-7d24e5faa2"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-7d24e5faa2",
+          "url": "https://www.anthropic.com/engineering/building-effective-agents",
+          "excerpt": "Consistently, the most successful implementations weren&#x27;t using complex frameworks or specialized libraries."
+        }
+      ]
+    },
+    {
+      "id": "claim-007",
+      "statement": "Instead, they were building with simple, composable patterns.",
+      "source_ids": [
+        "src-7d24e5faa2"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-7d24e5faa2",
+          "url": "https://www.anthropic.com/engineering/building-effective-agents",
+          "excerpt": "Instead, they were building with simple, composable patterns."
+        }
+      ]
+    },
+    {
+      "id": "claim-008",
+      "statement": "In this post, we share what we’ve learned from working with our customers and building agents ourselves, and give practical advice for developers on building effective agents.",
+      "source_ids": [
+        "src-7d24e5faa2"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-7d24e5faa2",
+          "url": "https://www.anthropic.com/engineering/building-effective-agents",
+          "excerpt": "In this post, we share what we’ve learned from working with our customers and building agents ourselves, and give practical advice for developers on building effective agents."
+        }
+      ]
+    },
+    {
+      "id": "claim-009",
+      "statement": "&quot;Agent&quot; can be defined in several ways.",
+      "source_ids": [
+        "src-7d24e5faa2"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-7d24e5faa2",
+          "url": "https://www.anthropic.com/engineering/building-effective-agents",
+          "excerpt": "&quot;Agent&quot; can be defined in several ways."
+        }
+      ]
+    },
+    {
+      "id": "claim-010",
+      "statement": "Some customers define agents as fully autonomous systems that operate independently over extended periods, using various tools to accomplish complex tasks.",
+      "source_ids": [
+        "src-7d24e5faa2"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-7d24e5faa2",
+          "url": "https://www.anthropic.com/engineering/building-effective-agents",
+          "excerpt": "Some customers define agents as fully autonomous systems that operate independently over extended periods, using various tools to accomplish complex tasks."
+        }
+      ]
+    },
+    {
+      "id": "claim-011",
+      "statement": "Others use the term to describe more prescriptive implementations that follow predefined workflows.",
+      "source_ids": [
+        "src-7d24e5faa2"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-7d24e5faa2",
+          "url": "https://www.anthropic.com/engineering/building-effective-agents",
+          "excerpt": "Others use the term to describe more prescriptive implementations that follow predefined workflows."
+        }
+      ]
+    },
+    {
+      "id": "claim-012",
+      "statement": "At Anthropic, we categorize all these variations as agentic systems , but draw an important architectural distinction between workflows and agents : Workflows are systems where LLMs and tools are orchestrated through predefined code paths.",
+      "source_ids": [
+        "src-7d24e5faa2"
+      ],
+      "evidence": [
+        {
+          "source_id": "src-7d24e5faa2",
+          "url": "https://www.anthropic.com/engineering/building-effective-agents",
+          "excerpt": "At Anthropic, we categorize all these variations as agentic systems , but draw an important architectural distinction between workflows and agents : Workflows are systems where LLMs and tools are orchestrated through predefined code paths."
+        }
+      ]
+    },
+    {
+      "id": "claim-013",
       "statement": "Equipping agents for the real world with Agent Skills \\ Anthropic Skip to main content Skip to footer Research Policy Commitments Learn News Try Claude Engineering at Anthropic Equipping agents for the real world with Agent Skills Published Oct 16, 2025 Claude is powerful, but real work requires procedural knowledge and organizational context.",
       "source_ids": [
         "src-77ae700ce1"
@@ -42,7 +198,7 @@
       ]
     },
     {
-      "id": "claim-002",
+      "id": "claim-014",
       "statement": "Introducing Agent Skills, a new way to build specialized agents using files and folders.",
       "source_ids": [
         "src-77ae700ce1"
@@ -56,7 +212,7 @@
       ]
     },
     {
-      "id": "claim-003",
+      "id": "claim-015",
       "statement": "Update: We&#x27;ve published Agent Skills as an open standard for cross-platform portability.",
       "source_ids": [
         "src-77ae700ce1"
@@ -70,7 +226,7 @@
       ]
     },
     {
-      "id": "claim-004",
+      "id": "claim-016",
       "statement": "(December 18, 2025) As model capabilities improve, we can now build general-purpose agents that interact with full-fledged computing environments.",
       "source_ids": [
         "src-77ae700ce1"
@@ -84,7 +240,7 @@
       ]
     },
     {
-      "id": "claim-005",
+      "id": "claim-017",
       "statement": "Claude Code , for example, can accomplish complex tasks across domains using local code execution and filesystems.",
       "source_ids": [
         "src-77ae700ce1"
@@ -98,7 +254,7 @@
       ]
     },
     {
-      "id": "claim-006",
+      "id": "claim-018",
       "statement": "But as these agents become more powerful, we need more composable, scalable, and portable ways to equip them with domain-specific expertise.",
       "source_ids": [
         "src-77ae700ce1"
@@ -112,7 +268,7 @@
       ]
     },
     {
-      "id": "claim-007",
+      "id": "claim-019",
       "statement": "This led us to create Agent Skills : organized folders of instructions, scripts, and resources that agents can discover and load dynamically to perform better at specific tasks.",
       "source_ids": [
         "src-77ae700ce1"
@@ -126,7 +282,7 @@
       ]
     },
     {
-      "id": "claim-008",
+      "id": "claim-020",
       "statement": "Skills extend Claude’s capabilities by packaging your expertise into composable resources for Claude, transforming general-purpose agents into specialized agents that fit your needs.",
       "source_ids": [
         "src-77ae700ce1"
@@ -140,7 +296,7 @@
       ]
     },
     {
-      "id": "claim-009",
+      "id": "claim-021",
       "statement": "Building a skill for an agent is like putting together an onboarding guide for a new hire.",
       "source_ids": [
         "src-77ae700ce1"
@@ -154,7 +310,7 @@
       ]
     },
     {
-      "id": "claim-010",
+      "id": "claim-022",
       "statement": "Instead of building fragmented, custom-designed agents for each use case, anyone can now specialize their agents with composable capabilities by capturing and sharing their procedural knowledge.",
       "source_ids": [
         "src-77ae700ce1"
@@ -168,7 +324,7 @@
       ]
     },
     {
-      "id": "claim-011",
+      "id": "claim-023",
       "statement": "In this article, we explain what Skills are, show how they work, and share best practices for building your own.",
       "source_ids": [
         "src-77ae700ce1"
@@ -182,7 +338,7 @@
       ]
     },
     {
-      "id": "claim-012",
+      "id": "claim-024",
       "statement": "A skill is a directory containing a SKILL.md file that contains organized folders of instructions, scripts, and resources that give agents additional capabilities.",
       "source_ids": [
         "src-77ae700ce1"
@@ -194,514 +350,10 @@
           "excerpt": "A skill is a directory containing a SKILL.md file that contains organized folders of instructions, scripts, and resources that give agents additional capabilities."
         }
       ]
-    },
-    {
-      "id": "claim-013",
-      "statement": "Extend Claude with skills - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further.",
-      "source_ids": [
-        "src-bbd9e46f13"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bbd9e46f13",
-          "url": "https://code.claude.com/docs/en/skills",
-          "excerpt": "Extend Claude with skills - Claude Code Docs Documentation Index Fetch the complete documentation index at: /docs/llms.txt Use this file to discover all available pages before exploring further."
-        }
-      ]
-    },
-    {
-      "id": "claim-014",
-      "statement": "Skip to main content Claude Code Docs home page English Search...",
-      "source_ids": [
-        "src-bbd9e46f13"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bbd9e46f13",
-          "url": "https://code.claude.com/docs/en/skills",
-          "excerpt": "Skip to main content Claude Code Docs home page English Search..."
-        }
-      ]
-    },
-    {
-      "id": "claim-015",
-      "statement": "⌘ K Ask Assistant ⌘ I Claude Developer Platform Open Claude Code Open Claude Code Search...",
-      "source_ids": [
-        "src-bbd9e46f13"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bbd9e46f13",
-          "url": "https://code.claude.com/docs/en/skills",
-          "excerpt": "⌘ K Ask Assistant ⌘ I Claude Developer Platform Open Claude Code Open Claude Code Search..."
-        }
-      ]
-    },
-    {
-      "id": "claim-016",
-      "statement": "Navigation Skills Extend Claude with skills Getting started Build with Claude Code Plugins Administration Configuration Reference Agent SDK What&#x27;s New Resources Agents and parallel work Overview Create custom subagents Agent view Run agent teams Cross-session messaging Dynamic workflows Isolate sessions with worktrees MCP Quickstart Reference Skills Extend Claude with skills Artifacts Share session output as artifacts Automation Automate with hooks Push external events to Claude Run prompts on a schedule Goals Programmatic usage Launch sessions from links Guides Monorepos and large repos Troubleshooting Troubleshoot installation and login Troubleshoot performance and stability Debug configuration Error reference On this page Bundled skills Check your setup with /doctor Run and verify your app Run your checks before each commit Work on Claude API projects Getting started Create your first skill Choose where skills load Load skills in monorepos and subdirectories Load skills from a directory outside the project Resolve skills that share a name Use skills in Cowork and cloud sessions Skills synced from claude.ai Where synced skills load When a synced skill name matches another command Names reserved for synced skills How Claude Code handles the frontmatter of a synced skill How Claude Code handles the body of a synced skill Edit a skill during a session Remove a skill Configure skills Types of skill content Frontmatter reference Using skill frontmatter outside Claude Code How a skill gets its command name Available string substitutions Add supporting files Control who invokes a skill Where you write the skill’s name Skill content lifecycle Pre-approve tools for a skill When only managed permission rules apply Pass arguments to skills Advanced patterns Inject dynamic context How injected commands run When an injected command fails Permission checks on injected commands Run skills in a subagent Example: Research skill using Explore agent Restrict Claude’s skill access Override skill visibility from settings Find unused skills Evaluate and iterate on a skill Run evals with skill-creator Share skills Generate visual output Troubleshooting Skill not triggering Skill triggers too often Claude stops following a skill Skill descriptions are cut short Personal skills disappeared Related resources Skills Extend Claude with skills Copy page Copy page Create, manage, and share skills to extend Claude’s capabilities in Claude Code.",
-      "source_ids": [
-        "src-bbd9e46f13"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bbd9e46f13",
-          "url": "https://code.claude.com/docs/en/skills",
-          "excerpt": "Navigation Skills Extend Claude with skills Getting started Build with Claude Code Plugins Administration Configuration Reference Agent SDK What&#x27;s New Resources Agents and parallel work Overview Create custom subagents Agent view Run agent teams Cross-session messaging Dynamic workflows Isolate sessions with worktrees MCP Quickstart Reference Skills Extend Claude with skills Artifacts Share session output as artifacts Automation Automate with hooks Push external events to Claude Run prompts on a schedule Goals Programmatic usage Launch sessions from links Guides Monorepos and large repos Troubleshooting Troubleshoot installation and login Troubleshoot performance and stability Debug configuration Error reference On this page Bundled skills Check your setup with /doctor Run and verify your app Run your checks before each commit Work on Claude API projects Getting started Create your first skill Choose where skills load Load skills in monorepos and subdirectories Load skills from a directory outside the project Resolve skills that share a name Use skills in Cowork and cloud sessions Skills synced from claude.ai Where synced skills load When a synced skill name matches another command Names reserved for synced skills How Claude Code handles the frontmatter of a synced skill How Claude Code handles the body of a synced skill Edit a skill during a session Remove a skill Configure skills Types of skill content Frontmatter reference Using skill frontmatter outside Claude Code How a skill gets its command name Available string substitutions Add supporting files Control who invokes a skill Where you write the skill’s name Skill content lifecycle Pre-approve tools for a skill When only managed permission rules apply Pass arguments to skills Advanced patterns Inject dynamic context How injected commands run When an injected command fails Permission checks on injected commands Run skills in a subagent Example: Research skill using Explore agent Restrict Claude’s skill access Override skill visibility from settings Find unused skills Evaluate and iterate on a skill Run evals with skill-creator Share skills Generate visual output Troubleshooting Skill not triggering Skill triggers too often Claude stops following a skill Skill descriptions are cut short Personal skills disappeared Related resources Skills Extend Claude with skills Copy page Copy page Create, manage, and share skills to extend Claude’s capabilities in Claude Code."
-        }
-      ]
-    },
-    {
-      "id": "claim-017",
-      "statement": "Includes custom commands and bundled skills.",
-      "source_ids": [
-        "src-bbd9e46f13"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bbd9e46f13",
-          "url": "https://code.claude.com/docs/en/skills",
-          "excerpt": "Includes custom commands and bundled skills."
-        }
-      ]
-    },
-    {
-      "id": "claim-018",
-      "statement": "Copy page Copy page Skills extend what Claude can do.",
-      "source_ids": [
-        "src-bbd9e46f13"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bbd9e46f13",
-          "url": "https://code.claude.com/docs/en/skills",
-          "excerpt": "Copy page Copy page Skills extend what Claude can do."
-        }
-      ]
-    },
-    {
-      "id": "claim-019",
-      "statement": "Create a SKILL.md file with instructions, and Claude adds it to its toolkit.",
-      "source_ids": [
-        "src-bbd9e46f13"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bbd9e46f13",
-          "url": "https://code.claude.com/docs/en/skills",
-          "excerpt": "Create a SKILL.md file with instructions, and Claude adds it to its toolkit."
-        }
-      ]
-    },
-    {
-      "id": "claim-020",
-      "statement": "Claude uses skills when relevant, or you can invoke one directly with /skill-name .",
-      "source_ids": [
-        "src-bbd9e46f13"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bbd9e46f13",
-          "url": "https://code.claude.com/docs/en/skills",
-          "excerpt": "Claude uses skills when relevant, or you can invoke one directly with /skill-name ."
-        }
-      ]
-    },
-    {
-      "id": "claim-021",
-      "statement": "Create a skill when you keep pasting the same instructions, checklist, or multi-step procedure into chat, or when a section of CLAUDE.md has grown into a procedure rather than a fact.",
-      "source_ids": [
-        "src-bbd9e46f13"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bbd9e46f13",
-          "url": "https://code.claude.com/docs/en/skills",
-          "excerpt": "Create a skill when you keep pasting the same instructions, checklist, or multi-step procedure into chat, or when a section of CLAUDE.md has grown into a procedure rather than a fact."
-        }
-      ]
-    },
-    {
-      "id": "claim-022",
-      "statement": "Unlike CLAUDE.md content, a skill’s body loads only when it’s used, so long reference material costs almost nothing until you need it.",
-      "source_ids": [
-        "src-bbd9e46f13"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bbd9e46f13",
-          "url": "https://code.claude.com/docs/en/skills",
-          "excerpt": "Unlike CLAUDE.md content, a skill’s body loads only when it’s used, so long reference material costs almost nothing until you need it."
-        }
-      ]
-    },
-    {
-      "id": "claim-023",
-      "statement": "For built-in commands like /help and /compact , and bundled skills like /debug and /code-review , see the commands reference .",
-      "source_ids": [
-        "src-bbd9e46f13"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bbd9e46f13",
-          "url": "https://code.claude.com/docs/en/skills",
-          "excerpt": "For built-in commands like /help and /compact , and bundled skills like /debug and /code-review , see the commands reference ."
-        }
-      ]
-    },
-    {
-      "id": "claim-024",
-      "statement": "Custom commands have been merged into skills.",
-      "source_ids": [
-        "src-bbd9e46f13"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bbd9e46f13",
-          "url": "https://code.claude.com/docs/en/skills",
-          "excerpt": "Custom commands have been merged into skills."
-        }
-      ]
-    },
-    {
-      "id": "claim-025",
-      "statement": "Agent Skills Overview - Agent Skills Documentation Index Fetch the complete documentation index at: /llms.txt Use this file to discover all available pages before exploring further.",
-      "source_ids": [
-        "src-47e636d803"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-47e636d803",
-          "url": "https://agentskills.io/",
-          "excerpt": "Agent Skills Overview - Agent Skills Documentation Index Fetch the complete documentation index at: /llms.txt Use this file to discover all available pages before exploring further."
-        }
-      ]
-    },
-    {
-      "id": "claim-026",
-      "statement": "Skip to main content Agent Skills now has an official Discord server .",
-      "source_ids": [
-        "src-47e636d803"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-47e636d803",
-          "url": "https://agentskills.io/",
-          "excerpt": "Skip to main content Agent Skills now has an official Discord server ."
-        }
-      ]
-    },
-    {
-      "id": "claim-027",
-      "statement": "Agent Skills home page Agent Skills Search...",
-      "source_ids": [
-        "src-47e636d803"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-47e636d803",
-          "url": "https://agentskills.io/",
-          "excerpt": "Agent Skills home page Agent Skills Search..."
-        }
-      ]
-    },
-    {
-      "id": "claim-028",
-      "statement": "⌘ K Ask Assistant ⌘ I agentskills/agentskills agentskills/agentskills Search...",
-      "source_ids": [
-        "src-47e636d803"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-47e636d803",
-          "url": "https://agentskills.io/",
-          "excerpt": "⌘ K Ask Assistant ⌘ I agentskills/agentskills agentskills/agentskills Search..."
-        }
-      ]
-    },
-    {
-      "id": "claim-029",
-      "statement": "Navigation Agent Skills Overview Overview Specification Client Showcase For skill creators Quickstart Best practices Optimizing descriptions Evaluating skills Using scripts For client implementors Adding skills support On this page What are Agent Skills?",
-      "source_ids": [
-        "src-47e636d803"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-47e636d803",
-          "url": "https://agentskills.io/",
-          "excerpt": "Navigation Agent Skills Overview Overview Specification Client Showcase For skill creators Quickstart Best practices Optimizing descriptions Evaluating skills Using scripts For client implementors Adding skills support On this page What are Agent Skills?"
-        }
-      ]
-    },
-    {
-      "id": "claim-030",
-      "statement": "Open development Get started with Agent Skills Agent Skills Overview Copy page Copy page A standardized way to give AI agents new capabilities and expertise.",
-      "source_ids": [
-        "src-47e636d803"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-47e636d803",
-          "url": "https://agentskills.io/",
-          "excerpt": "Open development Get started with Agent Skills Agent Skills Overview Copy page Copy page A standardized way to give AI agents new capabilities and expertise."
-        }
-      ]
-    },
-    {
-      "id": "claim-031",
-      "statement": "Copy page Copy page ​ What are Agent Skills?",
-      "source_ids": [
-        "src-47e636d803"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-47e636d803",
-          "url": "https://agentskills.io/",
-          "excerpt": "Copy page Copy page ​ What are Agent Skills?"
-        }
-      ]
-    },
-    {
-      "id": "claim-032",
-      "statement": "Agent Skills are a lightweight, open format for extending AI agent capabilities with specialized knowledge and workflows.",
-      "source_ids": [
-        "src-47e636d803"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-47e636d803",
-          "url": "https://agentskills.io/",
-          "excerpt": "Agent Skills are a lightweight, open format for extending AI agent capabilities with specialized knowledge and workflows."
-        }
-      ]
-    },
-    {
-      "id": "claim-033",
-      "statement": "At its core, a skill is a folder containing a SKILL.md file.",
-      "source_ids": [
-        "src-47e636d803"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-47e636d803",
-          "url": "https://agentskills.io/",
-          "excerpt": "At its core, a skill is a folder containing a SKILL.md file."
-        }
-      ]
-    },
-    {
-      "id": "claim-034",
-      "statement": "This file includes metadata ( name and description , at minimum) and instructions that tell an agent how to perform a specific task.",
-      "source_ids": [
-        "src-47e636d803"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-47e636d803",
-          "url": "https://agentskills.io/",
-          "excerpt": "This file includes metadata ( name and description , at minimum) and instructions that tell an agent how to perform a specific task."
-        }
-      ]
-    },
-    {
-      "id": "claim-035",
-      "statement": "Skills can also bundle scripts, reference materials, templates, and other resources.",
-      "source_ids": [
-        "src-47e636d803"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-47e636d803",
-          "url": "https://agentskills.io/",
-          "excerpt": "Skills can also bundle scripts, reference materials, templates, and other resources."
-        }
-      ]
-    },
-    {
-      "id": "claim-036",
-      "statement": "my-skill/ ├── SKILL.md # Required: metadata + instructions ├── scripts/ # Optional: executable code ├── references/ # Optional: documentation ├── assets/ # Optional: templates, resources └── ...",
-      "source_ids": [
-        "src-47e636d803"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-47e636d803",
-          "url": "https://agentskills.io/",
-          "excerpt": "my-skill/ ├── SKILL.md # Required: metadata + instructions ├── scripts/ # Optional: executable code ├── references/ # Optional: documentation ├── assets/ # Optional: templates, resources └── ..."
-        }
-      ]
-    },
-    {
-      "id": "claim-037",
-      "statement": "Introducing Agent Skills | Claude by Anthropic Skip to main content Product Products Claude Claude Code @Claude Specialized Claude Security Claude Science Capabilities Artifacts Design Connectors Plugins Skills Extensions Claude for Chrome Claude for Microsoft 365 Models Mythos Fable Opus Sonnet Haiku Import to Claude Download apps Login (opens in new tab) Developers Build with Claude Code Claude Platform For developers Claude Academy Community Developer blog Developer docs Console Enterprise Enterprise Overview Claude Code for Enterprise Claude Platform Use Cases AI Agents Coding Commerce Departments Customer support Cybersecurity Legal Sales Industries Financial advisors Financial services Government Healthcare Higher education K-12 teachers Life sciences Nonprofits Browse marketplace Customers Contact sales Resources Insights Resources Articles Webinars Customer stories Marketplace Anthropic news Learn Claude Academy Courses Tutorials Use cases Connect Events Community Pricing Overview API Login Contact sales Try Claude Claude Resources Home Articles Guides Webinars Videos Home Articles Guides Webinars Videos Search Introducing Agent Skills Category Announcements Product Claude Platform Date October 16, 2025 Reading time 4 min Share Copy link Update: We&#x27;ve added organization-wide management for skills , a directory featuring partner-built skills, and published Agent Skills as an open standard for cross-platform portability.",
-      "source_ids": [
-        "src-bfa87fb31b"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bfa87fb31b",
-          "url": "https://www.anthropic.com/news/skills",
-          "excerpt": "Introducing Agent Skills | Claude by Anthropic Skip to main content Product Products Claude Claude Code @Claude Specialized Claude Security Claude Science Capabilities Artifacts Design Connectors Plugins Skills Extensions Claude for Chrome Claude for Microsoft 365 Models Mythos Fable Opus Sonnet Haiku Import to Claude Download apps Login (opens in new tab) Developers Build with Claude Code Claude Platform For developers Claude Academy Community Developer blog Developer docs Console Enterprise Enterprise Overview Claude Code for Enterprise Claude Platform Use Cases AI Agents Coding Commerce Departments Customer support Cybersecurity Legal Sales Industries Financial advisors Financial services Government Healthcare Higher education K-12 teachers Life sciences Nonprofits Browse marketplace Customers Contact sales Resources Insights Resources Articles Webinars Customer stories Marketplace Anthropic news Learn Claude Academy Courses Tutorials Use cases Connect Events Community Pricing Overview API Login Contact sales Try Claude Claude Resources Home Articles Guides Webinars Videos Home Articles Guides Webinars Videos Search Introducing Agent Skills Category Announcements Product Claude Platform Date October 16, 2025 Reading time 4 min Share Copy link Update: We&#x27;ve added organization-wide management for skills , a directory featuring partner-built skills, and published Agent Skills as an open standard for cross-platform portability."
-        }
-      ]
-    },
-    {
-      "id": "claim-038",
-      "statement": "(December 18, 2025) Claude can now use Skills to improve how it performs specific tasks.",
-      "source_ids": [
-        "src-bfa87fb31b"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bfa87fb31b",
-          "url": "https://www.anthropic.com/news/skills",
-          "excerpt": "(December 18, 2025) Claude can now use Skills to improve how it performs specific tasks."
-        }
-      ]
-    },
-    {
-      "id": "claim-039",
-      "statement": "Skills are folders that include instructions, scripts, and resources that Claude can load when needed.",
-      "source_ids": [
-        "src-bfa87fb31b"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bfa87fb31b",
-          "url": "https://www.anthropic.com/news/skills",
-          "excerpt": "Skills are folders that include instructions, scripts, and resources that Claude can load when needed."
-        }
-      ]
-    },
-    {
-      "id": "claim-040",
-      "statement": "Claude will only access a skill when it&#x27;s relevant to the task at hand.",
-      "source_ids": [
-        "src-bfa87fb31b"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bfa87fb31b",
-          "url": "https://www.anthropic.com/news/skills",
-          "excerpt": "Claude will only access a skill when it&#x27;s relevant to the task at hand."
-        }
-      ]
-    },
-    {
-      "id": "claim-041",
-      "statement": "When used, skills make Claude better at specialized tasks like working with Excel or following your organization&#x27;s brand guidelines.",
-      "source_ids": [
-        "src-bfa87fb31b"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bfa87fb31b",
-          "url": "https://www.anthropic.com/news/skills",
-          "excerpt": "When used, skills make Claude better at specialized tasks like working with Excel or following your organization&#x27;s brand guidelines."
-        }
-      ]
-    },
-    {
-      "id": "claim-042",
-      "statement": "You&#x27;ve already seen Skills at work in Claude apps, where Claude uses them to create files like spreadsheets and presentations.",
-      "source_ids": [
-        "src-bfa87fb31b"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bfa87fb31b",
-          "url": "https://www.anthropic.com/news/skills",
-          "excerpt": "You&#x27;ve already seen Skills at work in Claude apps, where Claude uses them to create files like spreadsheets and presentations."
-        }
-      ]
-    },
-    {
-      "id": "claim-043",
-      "statement": "Now, you can build your own skills and use them across Claude apps, Claude Code, and our API.",
-      "source_ids": [
-        "src-bfa87fb31b"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bfa87fb31b",
-          "url": "https://www.anthropic.com/news/skills",
-          "excerpt": "Now, you can build your own skills and use them across Claude apps, Claude Code, and our API."
-        }
-      ]
-    },
-    {
-      "id": "claim-044",
-      "statement": "How Skills work While working on tasks, Claude scans available skills to find relevant matches.",
-      "source_ids": [
-        "src-bfa87fb31b"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bfa87fb31b",
-          "url": "https://www.anthropic.com/news/skills",
-          "excerpt": "How Skills work While working on tasks, Claude scans available skills to find relevant matches."
-        }
-      ]
-    },
-    {
-      "id": "claim-045",
-      "statement": "When one matches, it loads only the minimal information and files needed—keeping Claude fast while accessing specialized expertise.",
-      "source_ids": [
-        "src-bfa87fb31b"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bfa87fb31b",
-          "url": "https://www.anthropic.com/news/skills",
-          "excerpt": "When one matches, it loads only the minimal information and files needed—keeping Claude fast while accessing specialized expertise."
-        }
-      ]
-    },
-    {
-      "id": "claim-046",
-      "statement": "Skills are: Composable : Skills stack together.",
-      "source_ids": [
-        "src-bfa87fb31b"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bfa87fb31b",
-          "url": "https://www.anthropic.com/news/skills",
-          "excerpt": "Skills are: Composable : Skills stack together."
-        }
-      ]
-    },
-    {
-      "id": "claim-047",
-      "statement": "Claude automatically identifies which skills are needed and coordinates their use.",
-      "source_ids": [
-        "src-bfa87fb31b"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bfa87fb31b",
-          "url": "https://www.anthropic.com/news/skills",
-          "excerpt": "Claude automatically identifies which skills are needed and coordinates their use."
-        }
-      ]
-    },
-    {
-      "id": "claim-048",
-      "statement": "Portable : Skills use the same format everywhere.",
-      "source_ids": [
-        "src-bfa87fb31b"
-      ],
-      "evidence": [
-        {
-          "source_id": "src-bfa87fb31b",
-          "url": "https://www.anthropic.com/news/skills",
-          "excerpt": "Portable : Skills use the same format everywhere."
-        }
-      ]
     }
   ],
   "instruction_filter": {
-    "judged": 48,
+    "judged": 24,
     "dropped": 0,
     "rules": [],
     "dropped_claims": []

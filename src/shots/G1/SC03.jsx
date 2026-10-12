@@ -1,10 +1,10 @@
-// reel-forge-source: {"project_id":"skill-explainer","script_id":"seg-003","script_sha256":"66c97bb73d607899796b115085182a6d6ada1ea9dc2bfc06fc528ecd2079a701"}
+// reel-forge-source: {"project_id":"skill-agent-c6ecb8f0e11e","script_id":"seg-003","script_sha256":"3a482e33253ebde161f8bb2f31a1964a17852ef46eb0deb18e5e611946eec747"}
 import React from "react";
 import {ExplainerShot} from "../Shot.jsx";
 import {G1_STAGE} from "./stage.jsx";
 
 /**
- * SC03 · comparetable —— 提示词用完就散，技能把它固定下来。
+ * SC03 · comparetable —— 定义二，按预定流程走。
  *
  * 拓扑骨架在 ../stage-kit.jsx，本镜的摆法（几何 / 文案 / 焦点拍）全在下面这个 stage 里。
  * ⚠ 不声明入场帧：入场帧由 buildPlan 从字幕块推出（-6…+3 窗口），节拍与语义镜头同源。
@@ -17,18 +17,18 @@ export const SHOT_RECIPE = {
   hero_size: 200,
   camera: "push",
   settle_frames: 30,
-  narrative_job: "提示词用完就散，技能把它固定下来",
+  narrative_job: "定义二，按预定流程走",
   stage: {
     kind: "comparetable",
     focus: [0, 38, 76],
-    left_label: "提示词",
-    right_label: "技能",
-    winner: 1,
+    left_label: "自主系统",
+    right_label: "预定流程",
+    winner: 0,
     items: [
-      {id: "l1", icon: "doc", text: "用完就散"},
-      {id: "r1", icon: "grid", text: "固定下来"},
-      {id: "l2", icon: "clock", text: "每次重写"},
-      {id: "r2", icon: "link", text: "随时复用"},
+      {id: "l1", icon: "clock", text: "长期独立运行"},
+      {id: "r1", icon: "doc", text: "按流程走"},
+      {id: "l2", icon: "chip", text: "自己拿主意"},
+      {id: "r2", icon: "link", text: "照规定接龙"},
     ],
   },
 };

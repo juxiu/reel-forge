@@ -13,3 +13,4 @@
 - G1 由 scripts/materialize-shots.mjs 登记 6 镜：SC01(scene-001) SC02(scene-002) SC03(scene-003) SC04(scene-004) SC05(scene-005) SC06(scene-006)
 - G1 由 scripts/materialize-shots.mjs 登记 6 镜：SC01(scene-001) SC02(scene-002) SC03(scene-003) SC04(scene-004) SC05(scene-005) SC06(scene-006)
 - G1 由 scripts/materialize-shots.mjs 登记 6 镜：SC01(scene-001) SC02(scene-002) SC03(scene-003) SC04(scene-004) SC05(scene-005) SC06(scene-006)
+- G1 由 scripts/materialize-shots.mjs 登记 6 镜：SC01(scene-001) SC02(scene-002) SC03(scene-003) SC04(scene-004) SC05(scene-005) SC06(scene-006)

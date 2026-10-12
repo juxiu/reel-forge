@@ -1,10 +1,10 @@
-// reel-forge-source: {"project_id":"skill-explainer","script_id":"seg-006","script_sha256":"9f6981d5bfdffb0afa21242444039827a4314693bab4d25f999f1fd6e8a9ec81"}
+// reel-forge-source: {"project_id":"skill-agent-c6ecb8f0e11e","script_id":"seg-006","script_sha256":"c2a5d0289ff7d0ab3b525fe900bc26364c61fbfdfa9c280e60edda82215784a9"}
 import React from "react";
 import {ExplainerShot} from "../Shot.jsx";
 import {G1_STAGE} from "./stage.jsx";
 
 /**
- * SC06 · orbit —— 开放标准，换个平台不用重写。
+ * SC06 · orbit —— agent 自主决定过程。
  *
  * 拓扑骨架在 ../stage-kit.jsx，本镜的摆法（几何 / 文案 / 焦点拍）全在下面这个 stage 里。
  * ⚠ 不声明入场帧：入场帧由 buildPlan 从字幕块推出（-6…+3 窗口），节拍与语义镜头同源。
@@ -17,20 +17,20 @@ export const SHOT_RECIPE = {
   hero_size: 210,
   camera: "push",
   settle_frames: 30,
-  narrative_job: "开放标准，换个平台不用重写",
+  narrative_job: "agent 自主决定过程",
   stage: {
     kind: "orbit",
     focus: [0, 38, 76],
-    icon: "wave",
-    label: "开放标准",
+    icon: "person",
+    label: "agent",
     cx: 640,
     cy: 350,
     rx: 400,
     ry: 150,
     items: [
-      {id: "o1", icon: "rack", text: "跨平台"},
-      {id: "o2", icon: "link", text: "同一格式"},
-      {id: "o3", icon: "grid", text: "免重写"},
+      {id: "o1", icon: "branch", text: "自主决定步骤"},
+      {id: "o2", icon: "clock", text: "长期独立运行"},
+      {id: "o3", icon: "chip", text: "用工具完成任务"},
     ],
   },
 };

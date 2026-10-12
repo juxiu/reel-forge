@@ -2,7 +2,7 @@ import React from "react";
 import {Ballot, CompareTable, Orbit, Pipeline3, Reshape, Terminal} from "../stage-kit.jsx";
 
 /**
- * G3 组舞台（第 3 章 · 运行）。
+ * G3 组舞台（第 3 章 · 从通用到专业）。
  *
  * 本组只声明**镜头 → 拓扑**的映射与用了哪几种拓扑；拓扑骨架实现在 src/shots/stage-kit.jsx，
  * 几何与文案在各自镜头的 recipe.stage 里。组内拓扑互不重复（verify:authored-shots 按 kind 去重）。
@@ -10,7 +10,7 @@ import {Ballot, CompareTable, Orbit, Pipeline3, Reshape, Terminal} from "../stag
  */
 export const G3_STAGE = {
   group: "G3",
-  chapter: "第 3 章 · 运行",
+  chapter: "第 3 章 · 从通用到专业",
   topologies: ["pipeline3","ballot","reshape","terminal","comparetable","orbit"],
   components: {
     SC13: Pipeline3,

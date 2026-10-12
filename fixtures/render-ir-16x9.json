@@ -1,29 +1,23 @@
 {
   "version": "0.3",
-  "project_id": "skill-explainer",
+  "project_id": "skill-agent-c6ecb8f0e11e",
   "width": 1280,
   "height": 720,
   "fps": 30,
-  "duration": 212.66666666666666,
+  "duration": 166.4,
   "scenes": [
     {
       "id": "scene-001",
       "start": 2.8333333333333335,
-      "duration": 10.2,
+      "duration": 6.6,
       "source_ref": {
         "segment_index": 0,
         "script_id": "seg-001"
       },
-      "variant": "preference",
+      "variant": "generic",
       "narrative_job": "hook",
-      "semantic_confidence": 0.45,
-      "matched_rules": [
-        "want-content-digest",
-        "want-repr-digest",
-        "\\bpreference\\b",
-        "\\bwanted\\b",
-        "偏好|选择|想要|需要|目标"
-      ],
+      "semantic_confidence": 0,
+      "matched_rules": [],
       "composition": {
         "focus": "hero-plus-flow",
         "hero_weight": 0.68,
@@ -38,7 +32,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "通用 Agent 已经能干活了,但一到你的领域就不够用,缺的不是算力，是方法,所以我们需要一种,能把专长装进去的容器"
+          "text": "「Agent」这个词,在不同人嘴里指的东西并不一样,同一个词有几种定义,先分清它"
         },
         {
           "id": "flow",
@@ -66,22 +60,16 @@
     },
     {
       "id": "scene-002",
-      "start": 13.033333333333333,
-      "duration": 10.4,
+      "start": 9.433333333333334,
+      "duration": 7.566666666666666,
       "source_ref": {
         "segment_index": 1,
         "script_id": "seg-002"
       },
-      "variant": "preference",
-      "narrative_job": "hook",
-      "semantic_confidence": 0.45,
-      "matched_rules": [
-        "want-content-digest",
-        "want-repr-digest",
-        "\\bpreference\\b",
-        "\\bwanted\\b",
-        "偏好|选择|想要|需要|目标"
-      ],
+      "variant": "generic",
+      "narrative_job": "explain",
+      "semantic_confidence": 0,
+      "matched_rules": [],
       "composition": {
         "focus": "hero-plus-flow",
         "hero_weight": 0.68,
@@ -96,7 +84,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "先给结论,一个技能就是一个文件夹,里面放着一份 SKILL.md,再加可选的脚本和资料,Agent 会在需要时自己找到它并加载"
+          "text": "有人说的 agent,是完全自主的系统,长期独立运行,用各种工具完成复杂任务"
         },
         {
           "id": "flow",
@@ -124,8 +112,8 @@
     },
     {
       "id": "scene-003",
-      "start": 23.433333333333334,
-      "duration": 9.833333333333334,
+      "start": 17,
+      "duration": 5.266666666666667,
       "source_ref": {
         "segment_index": 2,
         "script_id": "seg-003"
@@ -154,7 +142,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "你可能一直在重复粘贴同一段指令,那是一张清单，或者一套多步流程,提示词用完就散了,技能是把它固定下来的地方"
+          "text": "也有人用同一个词,指按预定流程走的,更程式化的实现"
         },
         {
           "id": "flow",
@@ -182,22 +170,16 @@
     },
     {
       "id": "scene-004",
-      "start": 33.266666666666666,
-      "duration": 9.333333333333334,
+      "start": 22.266666666666666,
+      "duration": 6.733333333333333,
       "source_ref": {
         "segment_index": 3,
         "script_id": "seg-004"
       },
-      "variant": "preference",
-      "narrative_job": "hook",
-      "semantic_confidence": 0.45,
-      "matched_rules": [
-        "want-content-digest",
-        "want-repr-digest",
-        "\\bpreference\\b",
-        "\\bwanted\\b",
-        "偏好|选择|想要|需要|目标"
-      ],
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
+      "matched_rules": [],
       "composition": {
         "focus": "hero-plus-flow",
         "hero_weight": 0.68,
@@ -212,7 +194,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "技能和常驻配置不一样,正文只在使用时才被读进来,所以再长的参考资料,在真正需要之前几乎不占预算"
+          "text": "Anthropic 把这些变体,统一叫 agentic systems,但划了一条,重要的架构分界线"
         },
         {
           "id": "flow",
@@ -240,16 +222,21 @@
     },
     {
       "id": "scene-005",
-      "start": 42.6,
-      "duration": 8.2,
+      "start": 29,
+      "duration": 5.266666666666667,
       "source_ref": {
         "segment_index": 4,
         "script_id": "seg-005"
       },
-      "variant": "generic",
-      "narrative_job": "transition",
-      "semantic_confidence": 0,
-      "matched_rules": [],
+      "variant": "code",
+      "narrative_job": "mechanism",
+      "semantic_confidence": 0.5,
+      "matched_rules": [
+        "\\bcode\\b",
+        "\\bapi\\b",
+        "\\bfunction\\b",
+        "代码|接口|函数|调用|协议"
+      ],
       "composition": {
         "focus": "hero-plus-flow",
         "hero_weight": 0.68,
@@ -264,7 +251,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "技能不是工具，也不是插件,工具给它一双手，技能给的是方法,技能之间还能像积木一样叠加"
+          "text": "分界线的一侧是 workflow,LLM 和工具,由预定义代码路径编排"
         },
         {
           "id": "flow",
@@ -292,18 +279,21 @@
     },
     {
       "id": "scene-006",
-      "start": 50.8,
-      "duration": 5.566666666666666,
+      "start": 35.86666666666667,
+      "duration": 7.433333333333334,
       "source_ref": {
         "segment_index": 5,
         "script_id": "seg-006"
       },
-      "variant": "structured",
-      "narrative_job": "explain",
-      "semantic_confidence": 0.45,
+      "variant": "sequence",
+      "narrative_job": "sequence",
+      "semantic_confidence": 0.5,
       "matched_rules": [
-        "structured",
-        "结构化|字段|层级|组织|格式"
+        "\\bfirst\\b",
+        "\\bthen\\b",
+        "\\bnext\\b",
+        "\\bstep\\b",
+        "首先|然后|接着|下一步|步骤|流程"
       ],
       "composition": {
         "focus": "hero-plus-flow",
@@ -319,7 +309,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "现在技能已经是一个开放标准,同一份格式到处都能用,换个平台不用重写"
+          "text": "另一侧才是严格的 agent,系统自主决定步骤,长时间独立运行,用工具完成任务"
         },
         {
           "id": "flow",
@@ -347,8 +337,8 @@
     },
     {
       "id": "scene-007",
-      "start": 57.93333333333333,
-      "duration": 10.533333333333333,
+      "start": 43.3,
+      "duration": 5.766666666666667,
       "source_ref": {
         "segment_index": 6,
         "script_id": "seg-007"
@@ -371,7 +361,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "拆开看，一个技能长这样,根目录下一份 SKILL.md,旁边可以有 scripts、references、assets,只有 SKILL.md 是必需的"
+          "text": "过去一年,Anthropic 与数十个团队,一起构建 LLM agent"
         },
         {
           "id": "flow",
@@ -399,21 +389,16 @@
     },
     {
       "id": "scene-008",
-      "start": 68.46666666666667,
-      "duration": 8.6,
+      "start": 49.06666666666667,
+      "duration": 6.266666666666667,
       "source_ref": {
         "segment_index": 7,
         "script_id": "seg-008"
       },
-      "variant": "code",
-      "narrative_job": "mechanism",
-      "semantic_confidence": 0.5,
-      "matched_rules": [
-        "\\bcode\\b",
-        "\\bapi\\b",
-        "\\bfunction\\b",
-        "代码|接口|函数|调用|协议"
-      ],
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
+      "matched_rules": [],
       "composition": {
         "focus": "hero-plus-flow",
         "hero_weight": 0.68,
@@ -428,7 +413,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "三个目录各管一件事,scripts 放能直接跑的代码,references 放沉淀下来的文档,assets 放模板和素材"
+          "text": "结论反复出现,最成功的实现,既不用复杂框架,也不用专用库"
         },
         {
           "id": "flow",
@@ -456,8 +441,8 @@
     },
     {
       "id": "scene-009",
-      "start": 77.06666666666666,
-      "duration": 8.3,
+      "start": 55.333333333333336,
+      "duration": 6.966666666666667,
       "source_ref": {
         "segment_index": 8,
         "script_id": "seg-009"
@@ -485,7 +470,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "SKILL.md 分成两段,开头是元数据，至少两项,名字和描述,下面才是写给 Agent 看的指令"
+          "text": "他们用的是,简单、可组合的模式,事实证明，简单模式反而更好用"
         },
         {
           "id": "flow",
@@ -513,8 +498,8 @@
     },
     {
       "id": "scene-010",
-      "start": 85.36666666666666,
-      "duration": 8.4,
+      "start": 62.3,
+      "duration": 6.433333333333334,
       "source_ref": {
         "segment_index": 9,
         "script_id": "seg-010"
@@ -537,7 +522,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "写技能最好的心智模型,是给新同事写一份入职指南,你把踩过的坑写清楚,它就不用再踩一遍"
+          "text": "与其为每个场景,各造一个定制 agent,不如用可组合的能力,去完成专门化"
         },
         {
           "id": "flow",
@@ -565,8 +550,8 @@
     },
     {
       "id": "scene-011",
-      "start": 93.76666666666667,
-      "duration": 7.8,
+      "start": 68.73333333333333,
+      "duration": 6.066666666666666,
       "source_ref": {
         "segment_index": 10,
         "script_id": "seg-011"
@@ -589,7 +574,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "关键在于渐进式披露,描述一直挂着，但很短,正文命中才读,附属文件按需再取"
+          "text": "写死的路径负责可控,交给模型的负责灵活,先想清楚,你的任务要哪一种"
         },
         {
           "id": "flow",
@@ -617,16 +602,22 @@
     },
     {
       "id": "scene-012",
-      "start": 101.56666666666666,
-      "duration": 8.033333333333333,
+      "start": 76.4,
+      "duration": 6.833333333333333,
       "source_ref": {
         "segment_index": 11,
         "script_id": "seg-012"
       },
-      "variant": "generic",
-      "narrative_job": "transition",
-      "semantic_confidence": 0,
-      "matched_rules": [],
+      "variant": "preference",
+      "narrative_job": "hook",
+      "semantic_confidence": 0.45,
+      "matched_rules": [
+        "want-content-digest",
+        "want-repr-digest",
+        "\\bpreference\\b",
+        "\\bwanted\\b",
+        "偏好|选择|想要|需要|目标"
+      ],
       "composition": {
         "focus": "hero-plus-flow",
         "hero_weight": 0.68,
@@ -641,7 +632,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "这样设计是为了省上下文,常驻的只有一小段描述,所以你能同时装很多技能,而不会把窗口塞满"
+          "text": "但通用能力不等于能干活,真实工作需要,程序性知识和组织上下文"
         },
         {
           "id": "flow",
@@ -669,8 +660,8 @@
     },
     {
       "id": "scene-013",
-      "start": 111.16666666666667,
-      "duration": 7.966666666666667,
+      "start": 83.23333333333333,
+      "duration": 5.666666666666667,
       "source_ref": {
         "segment_index": 12,
         "script_id": "seg-013"
@@ -693,7 +684,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "那它到底怎么被用起来,第一步是发现,Agent 会扫描手上所有技能,找出和当前任务相关的那些"
+          "text": "模型能力在提升,通用 agent 已经能,和完整的计算环境交互"
         },
         {
           "id": "flow",
@@ -721,16 +712,21 @@
     },
     {
       "id": "scene-014",
-      "start": 119.13333333333334,
-      "duration": 7.466666666666667,
+      "start": 88.9,
+      "duration": 6.7,
       "source_ref": {
         "segment_index": 13,
         "script_id": "seg-014"
       },
-      "variant": "generic",
-      "narrative_job": "transition",
-      "semantic_confidence": 0,
-      "matched_rules": [],
+      "variant": "code",
+      "narrative_job": "mechanism",
+      "semantic_confidence": 1,
+      "matched_rules": [
+        "\\bcode\\b",
+        "\\bapi\\b",
+        "\\bfunction\\b",
+        "代码|接口|函数|调用|协议"
+      ],
       "composition": {
         "focus": "hero-plus-flow",
         "hero_weight": 0.68,
@@ -745,7 +741,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "没有匹配就完全不碰,只有相关时才会访问某个技能,所以技能多，不等于负担重"
+          "text": "比如 Claude Code,靠本地代码执行和文件系统,跨领域完成复杂任务"
         },
         {
           "id": "flow",
@@ -773,16 +769,22 @@
     },
     {
       "id": "scene-015",
-      "start": 126.6,
-      "duration": 7.266666666666667,
+      "start": 95.6,
+      "duration": 7.033333333333333,
       "source_ref": {
         "segment_index": 14,
         "script_id": "seg-015"
       },
-      "variant": "generic",
-      "narrative_job": "transition",
-      "semantic_confidence": 0,
-      "matched_rules": [],
+      "variant": "preference",
+      "narrative_job": "hook",
+      "semantic_confidence": 0.45,
+      "matched_rules": [
+        "want-content-digest",
+        "want-repr-digest",
+        "\\bpreference\\b",
+        "\\bwanted\\b",
+        "偏好|选择|想要|需要|目标"
+      ],
       "composition": {
         "focus": "hero-plus-flow",
         "hero_weight": 0.68,
@@ -797,7 +799,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "命中之后,它只加载最小的那一部分,必要的说明和文件就够了,这样还能保持响应速度"
+          "text": "agent 越强大,就越需要可组合、可扩展,可移植的方式,来装上领域专长"
         },
         {
           "id": "flow",
@@ -825,20 +827,18 @@
     },
     {
       "id": "scene-016",
-      "start": 133.86666666666667,
-      "duration": 7.7,
+      "start": 102.63333333333334,
+      "duration": 8.2,
       "source_ref": {
         "segment_index": 15,
         "script_id": "seg-016"
       },
-      "variant": "code",
-      "narrative_job": "mechanism",
-      "semantic_confidence": 0.5,
+      "variant": "structured",
+      "narrative_job": "explain",
+      "semantic_confidence": 0.45,
       "matched_rules": [
-        "\\bcode\\b",
-        "\\bapi\\b",
-        "\\bfunction\\b",
-        "代码|接口|函数|调用|协议"
+        "structured",
+        "结构化|字段|层级|组织|格式"
       ],
       "composition": {
         "focus": "hero-plus-flow",
@@ -854,7 +854,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "技能里真正干活的是脚本,Agent 用本地代码执行,配合文件系统完成任务,再把结论写回来"
+          "text": "答案是 Agent Skills,指令、脚本和资料,组织成文件夹,agent 按需发现并动态加载"
         },
         {
           "id": "flow",
@@ -882,22 +882,16 @@
     },
     {
       "id": "scene-017",
-      "start": 141.56666666666666,
-      "duration": 9.4,
+      "start": 110.83333333333333,
+      "duration": 4.766666666666667,
       "source_ref": {
         "segment_index": 16,
         "script_id": "seg-017"
       },
-      "variant": "comparison",
-      "narrative_job": "compare",
-      "semantic_confidence": 0.5,
-      "matched_rules": [
-        "\\bversus\\b",
-        "\\bvs\\.?\\b",
-        "\\bcompare\\b",
-        "\\bcomparison\\b",
-        "相比|对比|区别|差异|优于|劣于"
-      ],
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
+      "matched_rules": [],
       "composition": {
         "focus": "hero-plus-flow",
         "hero_weight": 0.68,
@@ -912,7 +906,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "再回到上下文预算这条线,指令和资料都不常驻,只有命中那一刻才付出成本,这是它和常驻提示词最大的区别"
+          "text": "专长不再散落在提示词里,而是被打包成,可组合的资源"
         },
         {
           "id": "flow",
@@ -940,22 +934,16 @@
     },
     {
       "id": "scene-018",
-      "start": 150.96666666666667,
-      "duration": 7.2,
+      "start": 117.2,
+      "duration": 5.966666666666667,
       "source_ref": {
         "segment_index": 17,
         "script_id": "seg-018"
       },
-      "variant": "preference",
-      "narrative_job": "hook",
-      "semantic_confidence": 0.45,
-      "matched_rules": [
-        "want-content-digest",
-        "want-repr-digest",
-        "\\bpreference\\b",
-        "\\bwanted\\b",
-        "偏好|选择|想要|需要|目标"
-      ],
+      "variant": "generic",
+      "narrative_job": "transition",
+      "semantic_confidence": 0,
+      "matched_rules": [],
       "composition": {
         "focus": "hero-plus-flow",
         "hero_weight": 0.68,
@@ -970,7 +958,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "一个任务往往要用好几个技能,它们能叠在一起,Agent 自己判断需要哪些,再协调它们一起用"
+          "text": "一个技能就是一个目录,一份 SKILL.md,加上指令、脚本和资源"
         },
         {
           "id": "flow",
@@ -998,8 +986,8 @@
     },
     {
       "id": "scene-019",
-      "start": 159.76666666666668,
-      "duration": 9.3,
+      "start": 123.16666666666667,
+      "duration": 6.233333333333333,
       "source_ref": {
         "segment_index": 18,
         "script_id": "seg-019"
@@ -1022,7 +1010,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "如果你的技能一直没被触发,九成是描述没写好,名字和描述是唯一的常驻信息,写得含糊，就等于不存在"
+          "text": "给 agent 写技能,就像给新员工,准备一份入职指南,照着做就能上手"
         },
         {
           "id": "flow",
@@ -1050,16 +1038,20 @@
     },
     {
       "id": "scene-020",
-      "start": 169.06666666666666,
-      "duration": 8.966666666666667,
+      "start": 129.4,
+      "duration": 6.266666666666667,
       "source_ref": {
         "segment_index": 19,
         "script_id": "seg-020"
       },
-      "variant": "generic",
-      "narrative_job": "transition",
-      "semantic_confidence": 0,
-      "matched_rules": [],
+      "variant": "transformation",
+      "narrative_job": "transform",
+      "semantic_confidence": 0.5,
+      "matched_rules": [
+        "\\bbefore\\b",
+        "\\bafter\\b",
+        "变成|转化|转换|演变|改成|从.*到"
+      ],
       "composition": {
         "focus": "hero-plus-flow",
         "hero_weight": 0.68,
@@ -1074,7 +1066,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "描述里要写清楚什么时候用它,触发时机、适用场景、还有边界,Agent 就是靠这几句判断该不该开"
+          "text": "把你的专长打包进去,通用 agent,就变成贴合需求的,专用 agent"
         },
         {
           "id": "flow",
@@ -1102,8 +1094,8 @@
     },
     {
       "id": "scene-021",
-      "start": 178.03333333333333,
-      "duration": 8.233333333333333,
+      "start": 135.66666666666666,
+      "duration": 7.833333333333333,
       "source_ref": {
         "segment_index": 20,
         "script_id": "seg-021"
@@ -1126,7 +1118,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "什么时候值得建一个技能,当你反复粘贴同一段指令,当一个清单越来越长,或者某个文档已经塞不下的时候"
+          "text": "任何人都能,捕获并分享程序性知识,来专门化自己的 agent,而不是每个用例重造一个"
         },
         {
           "id": "flow",
@@ -1154,8 +1146,8 @@
     },
     {
       "id": "scene-022",
-      "start": 186.26666666666668,
-      "duration": 7.966666666666667,
+      "start": 143.5,
+      "duration": 6.466666666666667,
       "source_ref": {
         "segment_index": 21,
         "script_id": "seg-022"
@@ -1178,7 +1170,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "与其为每个场景单独造一个 Agent,不如把专长打包成能力,让同一个通用 Agent 长出专才的分支"
+          "text": "这套东西已发布为,开放标准,能力可以跨平台移植,不被私有绑定锁死"
         },
         {
           "id": "flow",
@@ -1206,20 +1198,21 @@
     },
     {
       "id": "scene-023",
-      "start": 194.23333333333332,
-      "duration": 8.1,
+      "start": 149.96666666666667,
+      "duration": 6.966666666666667,
       "source_ref": {
         "segment_index": 22,
         "script_id": "seg-023"
       },
-      "variant": "code",
-      "narrative_job": "mechanism",
+      "variant": "sequence",
+      "narrative_job": "sequence",
       "semantic_confidence": 0.5,
       "matched_rules": [
-        "\\bcode\\b",
-        "\\bapi\\b",
-        "\\bfunction\\b",
-        "代码|接口|函数|调用|协议"
+        "\\bfirst\\b",
+        "\\bthen\\b",
+        "\\bnext\\b",
+        "\\bstep\\b",
+        "首先|然后|接着|下一步|步骤|流程"
       ],
       "composition": {
         "focus": "hero-plus-flow",
@@ -1235,7 +1228,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "技能有两种被用起来的方式,相关时自动加载,也可以直接点名调用,两种都靠那份描述兜底"
+          "text": "回到开头的问题,agent 是什么,它是一条谱系,从写死的流程,到自主的系统"
         },
         {
           "id": "flow",
@@ -1263,8 +1256,8 @@
     },
     {
       "id": "scene-024",
-      "start": 202.33333333333334,
-      "duration": 7.4,
+      "start": 156.93333333333334,
+      "duration": 6.5,
       "source_ref": {
         "segment_index": 23,
         "script_id": "seg-024"
@@ -1287,7 +1280,7 @@
         {
           "id": "hero",
           "type": "narration",
-          "text": "所以技能到底是什么,是一份能被执行的方法论,也是给 Agent 的一份入职指南,从一个文件夹开始"
+          "text": "框架会过时，模式不会,把专长装进,可组合的容器,agent 才能真正干活"
         },
         {
           "id": "flow",

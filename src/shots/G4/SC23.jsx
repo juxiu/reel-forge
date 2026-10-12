@@ -1,10 +1,10 @@
-// reel-forge-source: {"project_id":"skill-explainer","script_id":"seg-023","script_sha256":"18364260cad11a8aa01493b1c09436a8fff6e975bc85dec2a93544caf5f589df"}
+// reel-forge-source: {"project_id":"skill-agent-c6ecb8f0e11e","script_id":"seg-023","script_sha256":"31868c310a33e9339742077c9ce4bb27d3cd0d2decae07aeb0fb11570acae8be"}
 import React from "react";
 import {ExplainerShot} from "../Shot.jsx";
 import {G4_STAGE} from "./stage.jsx";
 
 /**
- * SC23 · splitrows —— 自动与点名两种调用方式。
+ * SC23 · splitrows —— 从流程到自主的谱系。
  *
  * 拓扑骨架在 ../stage-kit.jsx，本镜的摆法（几何 / 文案 / 焦点拍）全在下面这个 stage 里。
  * ⚠ 不声明入场帧：入场帧由 buildPlan 从字幕块推出（-6…+3 窗口），节拍与语义镜头同源。
@@ -17,18 +17,18 @@ export const SHOT_RECIPE = {
   hero_size: 190,
   camera: "parallax",
   settle_frames: 30,
-  narrative_job: "自动与点名两种调用方式",
+  narrative_job: "从流程到自主的谱系",
   stage: {
     kind: "splitrows",
     focus: [0, 38, 76],
-    left_label: "自动加载",
-    right_label: "点名调用",
-    winner: 0,
+    left_label: "写死的流程",
+    right_label: "自主的系统",
+    winner: 1,
     items: [
-      {id: "l1", icon: "link", text: "相关时自动加载"},
-      {id: "r1", icon: "person", text: "直接点名调用"},
-      {id: "l2", icon: "shield", text: "两种都靠描述"},
-      {id: "r2", icon: "doc", text: "描述是唯一的门"},
+      {id: "l1", icon: "link", text: "路径写死"},
+      {id: "r1", icon: "branch", text: "自主决策"},
+      {id: "l2", icon: "doc", text: "workflow 一端"},
+      {id: "r2", icon: "person", text: "agent 一端"},
     ],
   },
 };
