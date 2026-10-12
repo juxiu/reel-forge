@@ -9,6 +9,7 @@
     "verify:runtime": "node scripts/verify-runtime.mjs",
     "verify:approval": "node scripts/verify-approval.mjs",
     "verify:build": "node scripts/verify-build.mjs",
+    "verify:audit-guards": "node scripts/verify-audit-guards.mjs",
     "verify:research": "node scripts/verify-research.mjs",
     "verify:instruction-filter": "node scripts/verify-instruction-filter.mjs",
     "verify:visual": "node scripts/verify-visual.mjs",
